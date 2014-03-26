@@ -1,0 +1,81 @@
+<head><title>app</title>
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+</head>
+<body>
+  {{> navbar}}
+  <div class="container-fluid" id="main-body">
+    <div class="row">
+      <div class="col-sm-6">{{> menu}}</div>
+      <div class="col-sm-6">{{> hello}}{{> content}}</div>
+    </div>
+  </div>
+</body>
+
+<template name="menu">
+  <ul>
+    <li>Home</li>
+    <li>Next</li>
+  </ul>
+</template>
+
+<template name="content">{{> color_list}}</template>
+
+<template name="navbar">
+  <div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand">Home</a>
+      </div>
+      <div class="navbar-right">
+        <button class="navbar-toggle" id="btn-toggle-collapsed" type="button" data-toggle="collapse" data-target="#navbar-main">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+      <div class="navbar-collapse collapse" id="navbar-main">
+        {{> navbar-main}}
+      </div>
+      <div class="navbar-right">{{loginButtons align="right"}}</div>
+    </div>
+  </div>
+</template>
+
+
+<template name="navbar-main">
+  <ul class="nav navbar-nav">
+    <li><a>Help</a></li>
+    <li><a>Blog</a></li>
+    <li class="dropdown">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="download">Download <i class="fa fa-chevron-down"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="download">
+        <li><a href="./bootstrap.min.css">Sumin Han</a></li>
+        <li><a href="./bootstrap.css">Jason Han</a></li>
+        <li class="divider"></li>
+        <li><a href="./variables.less">Chris Jin</a></li>
+      </ul>
+    </li>
+  </ul>
+</template>
+
+<template name="hello">
+  {{greeting}}
+  <input type="button" class="btn-default" value="Click" />
+</template>
+
+<template name="about">
+  {{greeting}}
+</template>
+
+<template name="color_list">
+  <ul>
+  {{#each colors}}
+    {{> color_info}}
+  {{else}}
+    No colors yet.
+  {{/each}}
+  </ul>
+  <div><button class="btn-primary">like</button></div>
+</template>
+
+<template name="color_info"><li class={{maybe_selected}}>{{name}} {{likes}}</li></template>
+
+

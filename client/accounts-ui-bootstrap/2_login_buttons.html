@@ -1,0 +1,251 @@
+<template name="_loginButtons">
+  <div id="login-buttons" class="login-buttons-dropdown-align-{{align}}"></div>
+  {{#if currentUser}}
+    {{#if loggingIn}}
+      {{! We aren't actually logged in yet;}}
+      {{#if dropdown}}
+        {{> _loginButtonsLoggingIn }}
+      {{else}}
+        <div class="login-buttons-with-only-one-button">
+          {{> _loginButtonsLoggingInSingleLoginButton }}
+        </div>
+      {{/if}}
+    {{else}}
+      {{> _loginButtonsLoggedIn}}
+    {{/if}}
+  {{else}}
+    {{> _loginButtonsLoggedOut}}
+  {{/if}}
+</template>
+
+<template name="_loginButtonsLoggedIn">
+  {{#if dropdown}}
+    {{> _loginButtonsLoggedInDropdown}}
+  {{else}}
+    <div class="login-buttons-with-only-one-button">
+      {{> _loginButtonsLoggedInSingleLogoutButton}}
+    </div>
+  {{/if}}
+</template>
+
+<template name="_loginButtonsLoggedOut">
+  {{#if services}} {{! if at least one service is configured }}
+    {{#if configurationLoaded}}
+      {{#if dropdown}} {{! if more than one service configured, or password is configured}}
+        {{> _loginButtonsLoggedOutDropdown}}
+      {{else}}
+        {{#with singleService}} {{! at this point there must be only one configured services }}
+          <div class="login-buttons-with-only-one-button">
+            {{#if loggingIn}}
+              {{> _loginButtonsLoggingInSingleLoginButton}}
+            {{else}}
+              {{> _loginButtonsLoggedOutSingleLoginButton}}
+            {{/if}}
+          </div>
+        {{/with}}
+      {{/if}}
+    {{/if}}
+  {{else}}
+    <div class="no-services">No login services configured</div>
+  {{/if}}
+</template>
+
+<!-- used in various places to display messages to user -->
+<template name="_loginButtonsMessages">
+  <br class="half-line">
+  {{#if errorMessage}}
+    <div class="alert alert-danger">{{errorMessage}}</div>
+  {{/if}}
+  {{#if infoMessage}}
+    <div class="alert alert-success no-margin">{{infoMessage}}</div>
+  {{/if}}
+</template>
+
+<template name="_loginButtonsLoggingIn">
+  {{> _loginButtonsLoggingInPadding}}
+  <div class="loading">&nbsp;</div>
+  {{> _loginButtonsLoggingInPadding}}
+</template>
+
+<template name="_loginButtonsLoggingInPadding">
+  {{#unless dropdown}}
+    {{! invisible div used for correct height of surrounding div. this ensures
+        that the _loginButtons template is always the same height
+        and the rest of the page doesn't move up and down }}
+    <div class="login-buttons-padding">
+      <div class="login-button single-login-button" style="visibility: hidden;" id="login-buttons-logout">&nbsp;</div>
+    </div>
+  {{else}}
+    {{! just add some padding }}
+    <div class="login-buttons-padding"></div>
+  {{/unless}}
+</template>
+
+<template name="_loginButtonsLoggedOutSingleLoginButton">
+  <div class="login-text-and-button">
+    <div class="login-button single-login-button col-sm-12 {{#if configured}}btn btn-info {{else}}configure-button btn btn-danger{{/if}}" id="login-buttons-{{name}}">
+      <div class="login-image" id="login-buttons-image-{{name}}"></div>
+      {{#if configured}}
+        <span class="text-besides-image sign-in-text-{{name}}">Sign in with {{capitalizedName}}</span>
+      {{else}}
+        <span class="text-besides-image configure-text-{{name}}">Configure {{capitalizedName}} Login</span>
+      {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="_loginButtonsLoggingInSingleLoginButton">
+  <div class="login-text-and-button">
+    {{> _loginButtonsLoggingIn}}
+  </div>
+</template>
+
+<template name="_loginButtonsLoggedInSingleLogoutButton">
+  <div class="login-text-and-button">
+    <div class="login-display-name">
+      {{displayName}}
+    </div>
+    <div class="login-button single-login-button" id="login-buttons-logout">Sign Out</div>
+  </div>
+</template>
+
+<!--           -->
+<!-- LOGGED IN -->
+<!--           -->
+<template name="_loginButtonsLoggedInDropdown">
+  <li id="login-dropdown-list" class="dropdown">
+    <a class="dropdown-toggle"  data-toggle="dropdown" id="login-id">
+      {{displayName}} <i class="fa fa-chevron-down"></i>
+    </a>
+      {{#if inMessageOnlyFlow}}
+        <div class="dropdown-menu">
+        {{> _loginButtonsMessages}}
+        </div>
+      {{else}}
+        {{#if inChangePasswordFlow}}
+          <div class="dropdown-menu">
+          {{> _loginButtonsChangePassword}}
+          </div>
+        {{else}}
+          <div class="dropdown-menu" id="logged-in-dropdown">
+          {{> _loginButtonsLoggedInDropdownActions}}
+          </div>
+        {{/if}}
+      {{/if}}
+  </li>
+</template>
+
+<template name="_loginButtonsLoggedInDropdownActions">
+<!--  {{#if additionalLoggedInDropdownActions}}
+    {{> _loginButtonsAdditionalLoggedInDropdownActions}}
+  {{/if}} -->
+  <li><a id="login-buttons-open-change-password"><i class="fa fa-key menu-icon"></i> Change Password </a></li>
+  <li class="divider"></li>
+  <li><a id="login-buttons-logout"><i class="fa fa-sign-out menu-icon"></i> Sign Out </a></li>
+
+<!--  
+  {{#if allowChangingPassword}}
+  <button class="btn btn-default btn-block" id="login-buttons-open-change-password">Change password</button>
+  {{/if}}
+  <button class="btn btn-block btn-primary" id="login-buttons-logout">Sign out</button>
+-->
+</template>
+
+<!-- Logged out -->
+<template name="_loginButtonsLoggedOutDropdown">
+  <li id="login-dropdown-list" class="dropdown">
+    <a class="dropdown-toggle"  data-toggle="dropdown">
+      Sign In <i class="fa fa-chevron-down"></i><!--{{#unless forbidClientAccountCreation}} / Up{{/unless}}-->
+    </a>
+    <div class="dropdown-menu">
+      {{> _loginButtonsLoggedOutAllServices}}
+    </div>
+  </li>
+</template>
+
+<template name="_loginButtonsLoggedOutAllServices">
+  {{#each services}}
+  {{#unless hasPasswordService}}
+    {{> _loginButtonsMessages}}
+  {{/unless}}
+    {{#if isPasswordService}}
+      {{#if hasOtherServices}} {{! the password service will always come last }}
+        {{> _loginButtonsLoggedOutPasswordServiceSeparator}}
+      {{/if}}
+      {{> _loginButtonsLoggedOutPasswordService}}
+    {{else}}
+      {{> _loginButtonsLoggedOutSingleLoginButton}}
+    {{/if}}
+  {{/each}}
+</template>
+
+<template name="_loginButtonsLoggedOutPasswordServiceSeparator">
+  <div class="or">
+    <span class="hline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+    <span class="or-text">or</span>
+    <span class="hline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  </div>
+</template>
+
+<template name="_loginButtonsLoggedOutPasswordService">
+  {{#if inForgotPasswordFlow}}
+    {{> _forgotPasswordForm}}
+  {{else}}
+    {{#each fields}}
+      {{> _loginButtonsFormField}}
+    {{/each}}
+    {{> _loginButtonsMessages}}
+    <button class="btn btn-primary col-sm-12" id="login-buttons-password" type="button">
+      {{#if inSignupFlow}}Create{{else}}Sign in{{/if}}
+    </button>
+    {{#if inLoginFlow}}
+      <div id="login-other-options">
+      {{#if showForgotPasswordLink}}
+        <a id="forgot-password-link" class="pull-left">Forgot password?</a><br>
+      {{/if}}
+      {{#if showCreateAccountLink}}
+        <a id="signup-link" class="pull-left" >Create account</a>
+      {{/if}}
+      </div>
+    {{/if}}
+    {{#if inSignupFlow}}
+      {{> _loginButtonsBackToLoginLink}}
+    {{/if}}
+  {{/if}}
+</template>
+
+<template name="_forgotPasswordForm">
+  <div class="login-form">
+    <div id="forgot-password-email-label-and-input"> {{! XXX we should probably use loginButtonsFormField }}
+    <div class="input-group margin-bottom-sm">
+      <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
+      <input id="forgot-password-email" type="email" placeholder="E-mail" class="form-control" />
+    </div>
+    </div>
+    {{> _loginButtonsMessages}}
+    <button class="btn btn-primary login-button-form-submit col-sm-12" id="login-buttons-forgot-password">Reset password</button>
+    {{> _loginButtonsBackToLoginLink}}
+  </div>
+</template>
+
+<template name="_loginButtonsBackToLoginLink">
+    <button id="back-to-login-link" class="btn btn-default col-sm-12">Back to Sign In</button>
+</template>
+
+<template name="_loginButtonsFormField">
+  {{#if visible}}
+  <div class="input-group margin-bottom-sm">
+    <span class="input-group-addon"><i class="fa fa-{{fieldIcon}} fa-fw"></i></span>
+    <input id="login-{{fieldName}}" type="{{inputType}}" placeholder="{{fieldLabel}}" class="form-control" />
+  </div>
+    {{/if}}
+</template>
+
+<template name="_loginButtonsChangePassword">
+  {{#each fields}}
+    {{> _loginButtonsFormField}}
+  {{/each}}
+  {{> _loginButtonsMessages}}
+  <button class="btn btn-primary" id="login-buttons-do-change-password">Change Password</button>
+  <button class="btn btn-default login-close">Close</button>
+</template>
