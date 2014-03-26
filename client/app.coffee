@@ -1,5 +1,12 @@
 Colors = new Meteor.Collection 'colors'
 Meteor.subscribe('colors')
+Router.configure layoutTemplate: 'layout'
+Router.map -> 
+  this.route 'home',
+    path: '/'
+    template: 'home'
+  this.route 'about' 
+  this.route 'help'
 
 Accounts.ui.config passwordSignupFields: 'USERNAME_AND_EMAIL'
 Template.hello.events 'click input': -> console.log 'You pressed the button!'
