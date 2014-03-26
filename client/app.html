@@ -1,19 +1,29 @@
-<head><title>app</title>
-<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<head>
+  <title>app</title>
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 </head>
-<body>
+
+<template name="layout">
   {{> navbar}}
   <div class="container-fluid" id="main-body">
     <div class="row">
-      <div class="col-sm-6">{{> menu}}</div>
-      <div class="col-sm-6">{{> hello}}{{> content}}</div>
+    {{yield}}
     </div>
   </div>
-</body>
+</template>
 
-<template name="menu">
+<template name="home">
+  <div class="col-sm-6">{{> hello}}</div>
+  <div class="col-sm-6">{{> content}}</div>
+</template>
+
+<template name="help">
+  <div class="col-sm-2">Help!</p>
+</template>
+
+<template name="about">
   <ul>
-    <li>Home</li>
+    <li>About</li>
     <li>Next</li>
   </ul>
 </template>
@@ -24,7 +34,7 @@
   <div class="navbar navbar-default navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
-        <a class="navbar-brand">Home</a>
+        <a class="navbar-brand" href="{{pathFor 'home'}}">Home</a>
       </div>
       <div class="navbar-right">
         <button class="navbar-toggle" id="btn-toggle-collapsed" type="button" data-toggle="collapse" data-target="#navbar-main">
@@ -39,11 +49,10 @@
   </div>
 </template>
 
-
 <template name="navbar-main">
   <ul class="nav navbar-nav">
-    <li><a>Help</a></li>
-    <li><a>Blog</a></li>
+    <li><a href="{{pathFor 'help'}}">Help</a></li>
+    <li><a href="{{pathFor 'about'}}">About</a></li>
     <li class="dropdown">
       <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="download">Download <i class="fa fa-chevron-down"></i></a>
       <ul class="dropdown-menu" aria-labelledby="download">
@@ -59,10 +68,6 @@
 <template name="hello">
   {{greeting}}
   <input type="button" class="btn-default" value="Click" />
-</template>
-
-<template name="about">
-  {{greeting}}
 </template>
 
 <template name="color_list">
