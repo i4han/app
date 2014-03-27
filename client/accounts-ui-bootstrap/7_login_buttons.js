@@ -25,6 +25,14 @@
                 loginButtonsSession.closeDropdown();
                 Accounts.ui.navigate("/");
             });
+        },
+        'click #login-buttons-profile': function() {
+            $('#login-dropdown-list').removeClass('open');
+            Router.go('profile');
+        }
+        'click #login-buttons-settings': function() {
+            $('#login-dropdown-list').removeClass('open');
+            Router.go('settings');
         }
     });
 

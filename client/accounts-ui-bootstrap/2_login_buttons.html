@@ -139,9 +139,11 @@
 <!--  {{#if additionalLoggedInDropdownActions}}
     {{> _loginButtonsAdditionalLoggedInDropdownActions}}
   {{/if}} -->
-  <li><a id="login-buttons-open-change-password"><i class="fa fa-key menu-icon"></i> Change Password </a></li>
+  <li><a id="login-buttons-profile"><i class="fa fa-list-alt dropdown-menu-icon"></i>Profile</a></li>
+  <li><a id="login-buttons-settings"><i class="fa fa-cog dropdown-menu-icon"></i>Settings</a></li>
+  <li><a id="login-buttons-change-password"><i class="fa fa-key dropdown-menu-icon"></i>Change Password</a></li>
   <li class="divider"></li>
-  <li><a id="login-buttons-logout"><i class="fa fa-sign-out menu-icon"></i> Sign Out </a></li>
+  <li><a id="login-buttons-logout"><i class="fa fa-sign-out dropdown-menu-icon"></i>Sign Out</a></li>
 
 <!--  
   {{#if allowChangingPassword}}
@@ -199,12 +201,12 @@
       {{#if inSignupFlow}}Create{{else}}Sign in{{/if}}
     </button>
     {{#if inLoginFlow}}
-      <div id="login-other-options">
+  <div id="login-other-options"><br></br>
       {{#if showForgotPasswordLink}}
-        <a id="forgot-password-link" class="pull-left">Forgot password?</a><br>
+        <a id="forgot-password-link" class="dropdown-menu-link">Forgot password?</a><br>
       {{/if}}
       {{#if showCreateAccountLink}}
-        <a id="signup-link" class="pull-left" >Create account</a>
+        <a id="signup-link" class="dropdown-menu-link" >Create account</a>
       {{/if}}
       </div>
     {{/if}}
@@ -223,7 +225,7 @@
     </div>
     </div>
     {{> _loginButtonsMessages}}
-    <button class="btn btn-primary login-button-form-submit col-sm-12" id="login-buttons-forgot-password">Reset password</button>
+    <button class="btn btn-primary login-button-form-submit col-sm-12" id="login-buttons-forgot-password">Reset Password</button>
     {{> _loginButtonsBackToLoginLink}}
   </div>
 </template>
