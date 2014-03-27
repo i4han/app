@@ -4,9 +4,11 @@ Router.configure layoutTemplate: 'layout'
 Router.map -> 
   this.route 'home',
     path: '/'
-    template: 'home'
+#    template: 'home'
   this.route 'about' 
   this.route 'help'
+  this.route 'profile'
+  this.route 'settings'
 
 Accounts.ui.config passwordSignupFields: 'USERNAME_AND_EMAIL'
 Template.hello.events 'click input': -> console.log 'You pressed the button!'

@@ -5,9 +5,9 @@
 
 standard-app-packages
 insecure
-preserve-inputs
 less
 coffeescript
 stylus
 accounts-password
 iron-router
+jquery
