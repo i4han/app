@@ -7,7 +7,7 @@
   {{> navbar}}
   <div class="container-fluid" id="main-body">
     <div class="row">
-    {{yield}}
+    {{> yield}}
     </div>
   {{> footer}}
   </div></template>
@@ -59,7 +59,7 @@
       <div class="navbar-collapse collapse" id="navbar-main">
         {{> navbar_main}}
       </div>
-      <div class="navbar-right">{{loginButtons align="right"}}</div>
+      <div class="navbar-right">{{> loginButtons}}</div>
     </div>
   </div>
 </template>

@@ -2,9 +2,7 @@ Colors = new Meteor.Collection 'colors'
 Meteor.subscribe('colors')
 Router.configure layoutTemplate: 'layout'
 Router.map -> 
-  this.route 'home',
-    path: '/'
-#    template: 'home'
+  this.route 'home', path: '/'
   this.route 'about' 
   this.route 'help'
   this.route 'profile'

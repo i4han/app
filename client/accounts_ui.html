@@ -1,5 +1,5 @@
-<template name="_loginButtons">
-  <div id="login-buttons" class="login-buttons-dropdown-align-{{align}}"></div>
+<template name="loginButtons">
+  <div id="login-buttons" class="login-buttons-dropdown-align-right"></div>
   {{#if currentUser}}
     {{#if loggingIn}}
       {{! We aren't actually logged in yet;}}
@@ -249,7 +249,7 @@
   {{/each}}
   {{> _loginButtonsMessages}}
   <button class="btn btn-primary" id="login-buttons-do-change-password">Change Password</button>
-  <button class="btn btn-default login-close">Close</button>
+  <button class="btn btn-default login-close" id="login-button-back-to-menu">Close</button>
 </template>
 
 <body>
