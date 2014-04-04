@@ -1,13 +1,12 @@
 head
     title App
-    link(rel="stylesheet", href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css")
 
 template(name="layout")
     +navbar
     .container-fluid#main-body
         .row
             +yield
-            +footer
+        +footer
 
 template(name="home")
     .col-sm-6 
@@ -17,7 +16,7 @@ template(name="home")
     .col-sm-6
         +color_list
 
-template(name="help")
+template(name="help2")
     .col-sm-4 Help
     .col-sm-8 No way.
 
@@ -27,8 +26,11 @@ template(name="about")
         li Next
 
 template(name="profile")
-    ul: li Profile
-
+    .col-sm-4
+    .col-sm-4
+        each fields
+            +formField
+            br.half-line
 
 template(name="settings")
     ul: h2 Settings
@@ -43,7 +45,7 @@ template(name="color_list")
             +color_info
         else
             | No colors yet.
-    .tile#button: button.btn-primary like
+    button.btn-primary like
 
 template(name="color_info")
     li(class="{{maybe_selected}}") {{name}} {{likes}}
@@ -112,7 +114,7 @@ template(name="_loginButtonsLoggedInDropdown")
 
 template(name="_loginButtonsChangePassword")
     each fields
-        +_loginButtonsFormField
+        +formField
     +_loginButtonsMessages
     button.btn#login-buttons-do-change-password(class="btn-primary") Change password
     button.btn#login-button-back-to-menu(class="btn-default login-close") Close
@@ -153,25 +155,32 @@ template(name="_loginButtonsLoggedOutAllServices")
 
 template(name="_forgotPasswordForm")
     .login-form
-        .forgot-password-email-label-and-input: .input-group(class="margin-bottom-sm")
-            span.input-group-addon: i.fa(class="fa-envelope-o fa-fw")
-            input.form-control#forgot-password-email(type="email" placeholder="E-mail")
+        .forgot-password-email-label-and-input 
+            .input-group(class="margin-bottom-sm")
+                span.input-group-addon: i.fa(class="fa-envelope-o fa-fw")
+                input.form-control#forgot-password-email(type="email" placeholder="E-mail")
         +_loginButtonsMessages
         button.btn#login-buttons-forgot-password(class="btn-primary login-button-form-submit col-sm-12") Reset Password
         +_loginButtonsBackToLoginLink
 
-template(name="_loginButtonsFormField")
+template(name="formField")
     if visible
         .input-group(class="margin-bottom-sm")
-            span.input-group-addon: i.fa(class="fa-{{fieldIcon}} fa-fw")
-            input.form-control(id="login-{{fieldName}}" type="{{inputType}}" placeholder="{{fieldLabel}}")
+            span.input-group-addon: i.fa(class="fa-{{icon}} fa-fw")
+            input.form-control(id="{{name}}" type="{{type}}" data-toggle="tooltip" data-placement="right" data-html="true" placeholder="{{label}}")
 
+template(name="tooltip_name")
+    h4 User's name
+    ul
+        li Write your name.
+        li No longer then 12 letters.
+    
 template(name="_loginButtonsLoggedOutPasswordService")
     if inForgotPasswordFlow
         +_forgotPasswordForm
     else
         each fields
-            +_loginButtonsFormField
+            +formField
         +_loginButtonsMessages
         button.btn#login-buttons-password(class="btn-primary col-sm-12", type="button")
             if inSignupFlow
@@ -186,7 +195,7 @@ template(name="_loginButtonsLoggedOutPasswordService")
                     br.half-line
                 if showCreateAccountLink
                     a.dropdown-menu-link#signup-link Create account
-        else  //*if inSignupFlow */
+        else
             +_loginButtonsBackToLoginLink
 
 template(name="_loginButtonsMessagesDialog")
