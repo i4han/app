@@ -1,43 +1,94 @@
 head
     title App
+    link(href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet" type="text/css")
 
 template(name="layout")
     +navbar
-    .container-fluid#main-body
-        .row
-            +yield
+    .content
+        br.triple-line
+        +yield
+    .footer
         +footer
+    if 0
+        .container-fluid#main-body: .row
+
+template(name="navbar") 
+    .navbar.navbar-default.navbar-fixed-top: .container
+        .navbar-header
+            a.navbar-brand(href="{{pathFor 'home'}}") Home
+        .navbar-right
+            button.navbar-toggle#btn-toggle-collapsed(type="button" data-toggle="collapse" data-target="#navbar-menu")
+                i.fa.fa-bars
+        .navbar-collapse.collapse#navbar-menu
+            +navbar_main
+        .navbar-right
+            +loginButtons
+
+template(name="navbar_main")
+    ul.nav.navbar-nav
+        li: a(href="{{pathFor 'about'}}") About
+        li: a(href="{{pathFor 'profile'}}") Profile
+        li: a(href="{{pathFor 'settings'}}") Settings
+        li: a(href="{{pathFor 'help'}}") Help
+        li.dropdown
+            a.dropdown-toggle#download(data-toggle="dropdown") Download 
+                i.fa.fa-chevron-down
+            ul.dropdown-menu(aria-labelledby="download")
+                li: a(href="#") Sumin Han
+                li: a(href="#") Jason Han
+                li.divider
+                li: a(href="#") Chris Jin
+
+template(name="page_nav")
+    ul#page-nav
+        li: a Hello
+        li: a World
+        li: a This
+        li: a Wesite
+        li: a Menu
 
 template(name="home")
-    .col-sm-6 
+    .primary-content
+        h1 Title
+        +page_nav
+    .primary-content
         +hello
+        br.double-line
         +dialog
-        #tile-box
-    .col-sm-6
+    .primary-content
         +color_list
+    .primary-content#blue-box
+        section.container#blue
 
 template(name="help2")
     .col-sm-4 Help
     .col-sm-8 No way.
 
 template(name="about")
-    ul
-        li About
-        li Next
+    .primary-content
+        ul
+            li About
+            li Next
 
 template(name="profile")
-    .col-sm-4
-    .col-sm-4
-        each fields
-            +formField
-            br.half-line
+    .primary-content    
+        .col-sm-4
+        .col-sm-6
+            br.double-line
+            each fields
+                +formField
+                br.half-line
+        .col-sm-2
+            br
 
 template(name="settings")
-    ul: h2 Settings
+    .primary-content    
+        ul: h2 Settings
 
 template(name="hello")
     | Hello
-    input.btn-default(type="button", value="Click")
+    br.single-line
+    input.btn.btn-default(type="button" value="Click")
 
 template(name="color_list")
     ul
@@ -45,41 +96,15 @@ template(name="color_list")
             +color_info
         else
             | No colors yet.
-    button.btn-primary like
+    button.btn.btn-primary Like
 
 template(name="color_info")
     li(class="{{maybe_selected}}") {{name}} {{likes}}
 
 template(name="footer")
-    br.big-line
-    center About Help Blog Terms info Businesses © 2014 Hello
-
-template(name="navbar")
-    .navbar(class="navbar-default navbar-fixed-top"): .container
-        .navbar-header
-            a.navbar-brand(href="{{pathFor 'home'}}") Home
-        .navbar-right
-            button.navbar-toggle#btn-toggle-collapsed(type="button", data-toggle="collapse", data-target="#navbar-menu")
-                i.fa(class="fa-bars")
-        .navbar-collapse(id="navbar-menu", class="collapse")
-            +navbar_main
-        .navbar-right
-            +loginButtons
-
-template(name="navbar_main")
-    ul.nav(class="navbar-nav")
-        li: a(href="{{pathFor 'about'}}") About
-        li: a(href="{{pathFor 'profile'}}") Profile
-        li: a(href="{{pathFor 'settings'}}") Settings
-        li: a(href="{{pathFor 'help'}}") Help
-        li.dropdown
-            a.dropdown-toggle(id="download", data-toggle="dropdown") Download 
-                i.fa(class="fa-chevron-down")
-            ul.dropdown-menu(aria-labelledby="download")
-                li: a(href="#") Sumin Han
-                li: a(href="#") Jason Han
-                li.divider
-                li: a(href="#") Chris Jin
+    .primary-content    
+        br.triple-line
+        center About Help Blog Terms info Businesses © 2014 Hello
       
 template(name="loginButtons")
     .login-buttons-dropdown-align-right#login-buttons
@@ -96,7 +121,7 @@ template(name="loginButtons")
         +_loginButtonsLoggedOut
 
 template(name="_loginButtonsBackToLoginLink")
-    button.btn#back-to-login-link(class="btn-default col-sm-12") Back to sign in
+    button.btn.btn-default#back-to-login-link Back to sign in
 
 template(name="_loginButtonsLoggedInDropdown")
     li.dropdown#login-dropdown-list
@@ -116,29 +141,29 @@ template(name="_loginButtonsChangePassword")
     each fields
         +formField
     +_loginButtonsMessages
-    button.btn#login-buttons-do-change-password(class="btn-primary") Change password
-    button.btn#login-button-back-to-menu(class="btn-default login-close") Close
+    button.btn.btn-primary#login-buttons-do-change-password Change password
+    button.btn.btn-default.login-close#login-button-back-to-menu Close
 
 template(name="_loginButtonsLoggedInDropdownActions")
     li: a#login-buttons-profile
-        i.fa(class="fa-list-alt dropdown-menu-icon") 
+        i.fa.dropdown-menu-icon.fa-list-alt 
         | Profile
     li: a#login-buttons-settings
-        i.fa(class="fa-cog dropdown-menu-icon")
+        i.fa.dropdown-menu-icon.fa-cog
         | Settings
     li: a#login-buttons-change-password
-        i.fa(class="fa-key dropdown-menu-icon")
+        i.fa.dropdown-menu-icon.fa-key
         | Change Password
     li.divider
     li: a#login-buttons-logout
-        i.fa(class="fa-sign-out dropdown-menu-icon")
+        i.fa.dropdown-menu-icon.fa-sign-out
         | Sign Out
 
 template(name="_loginButtonsLoggedOutDropdown")
     li.dropdown#login-dropdown-list
         a.dropdown-toggle(data-toggle="dropdown")
             | Sign In
-            i.fa(class="fa-chevron-down")
+            i.fa.fa-chevron-down
         .dropdown-menu
             +_loginButtonsLoggedOutAllServices
 
@@ -156,21 +181,20 @@ template(name="_loginButtonsLoggedOutAllServices")
 template(name="_forgotPasswordForm")
     .login-form
         .forgot-password-email-label-and-input 
-            .input-group(class="margin-bottom-sm")
-                span.input-group-addon: i.fa(class="fa-envelope-o fa-fw")
+            .input-group.margin-bottom-sm
+                span.input-group-addon: i.fa.fa-envelope-o.fa-fw
                 input.form-control#forgot-password-email(type="email" placeholder="E-mail")
         +_loginButtonsMessages
-        button.btn#login-buttons-forgot-password(class="btn-primary login-button-form-submit col-sm-12") Reset Password
+        button.btn.btn-primary.login-button-form-submit#login-buttons-forgot-password Reset Password
         +_loginButtonsBackToLoginLink
 
 template(name="formField")
     if visible
-        .input-group(class="margin-bottom-sm")
-            span.input-group-addon: i.fa(class="fa-{{icon}} fa-fw")
-            input.form-control(id="{{name}}" type="{{type}}" data-toggle="tooltip" data-placement="right" data-html="true" placeholder="{{label}}")
+        .input-group.margin-bottom-sm
+            span.input-group-addon: i.fa.fa-fw(class="fa-{{icon}}")
+            input.form-control(id="{{name}}" type="{{type}}" placeholder="{{label}}" title="{{title}}" data-toggle="popover" data-trigger="hover" data-placement="right" data-html="true")
 
-template(name="tooltip_name")
-    h4 User's name
+template(name="popover_name")
     ul
         li Write your name.
         li No longer then 12 letters.
@@ -182,7 +206,7 @@ template(name="_loginButtonsLoggedOutPasswordService")
         each fields
             +formField
         +_loginButtonsMessages
-        button.btn#login-buttons-password(class="btn-primary col-sm-12", type="button")
+        button.btn.btn-primary#login-buttons-password(type="button")
             if inSignupFlow
                 | Create
             else
@@ -200,13 +224,13 @@ template(name="_loginButtonsLoggedOutPasswordService")
 
 template(name="_loginButtonsMessagesDialog")
     if visible
-        .accounts-dialog#login-buttons-message-dialog(class="accounts-centered-dialog")
+        .accounts-dialog.accounts-centered-dialog#login-buttons-message-dialog
             +_loginButtonsMessages
             .login-button#messages-dialog-dismiss-button Dismiss
 
 template(name="_justVerifiedEmailDialog")
     if visible
-        .accounts-dialog(class="accounts-centered-dialog")
+        .accounts-dialog.accounts-centered-dialog
             | Email verified
             .login-button#just-verified-dismiss-button Dismiss
 
@@ -219,7 +243,7 @@ template(name="_loginButtonsLoggedIn")
 
 template(name="_loginButtonsLoggedInSingleLogoutButton")
     .login-text-and-button: .login-display-name {{displayName}}
-    .login-button#login-buttons-logout(class="single-login-button") Sign Out
+    .login-button.single-login-button#login-buttons-logout Sign Out
 
 template(name="_loginButtonsLoggedOut")
     if services
@@ -239,9 +263,9 @@ template(name="_loginButtonsLoggedOut")
 template(name="_loginButtonsMessages")
     br.half-line
     if errorMessage
-        .alert(class="alert-danger") {{errorMessage}}
+        .alert.alert-danger {{errorMessage}}
     if infoMessage
-        .alert(class="alert-success no-margin") {{infoMessage}}
+        .alert.alert-success.no-margin {{infoMessage}}
 
 template(name="_loginButtonsLoggingIn")
     +_loginButtonsLoggingInPadding
@@ -251,13 +275,13 @@ template(name="_loginButtonsLoggingIn")
 template(name="_loginButtonsLoggingInPadding")
     unless dropdown
         .login-buttons-padding
-            .login-button#login-buttons-logout(class="single-login-button", style="visibility: hidden;") &nbsp;
+            .login-button.single-login-button#login-buttons-logout(style="visibility: hidden;") &nbsp;
     else
         .login-buttons-padding
 
 template(name="_loginButtonsLoggedOutSingleLoginButton")
     .login-text-and-button
-        .login-button(class="single-login-button col-sm-12 {{#if configured}}btn btn-info {{else}}configure-button btn btn-danger{{/if}}", id="login-buttons-{{name}}")
+        .login-button.single-login-button(class="{{#if configured}}btn btn-info {{else}}configure-button btn btn-danger{{/if}}", id="login-buttons-{{name}}")
             .login-image(id="login-buttons-image-{{name}}")
                 if configured
                     span.text-besides-image(class="sign-in-text-{{name}}") Sign in with {{capitalizedName}}
@@ -278,34 +302,21 @@ template(name="_resetPasswordDialog")
     if inResetPasswordFlow
         .modal#login-buttons-reset-password-modal: .modal-dialog: .modal-content
             .modal-header
-                button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+                button.close(type="button" data-dismiss="modal" aria-hidden="true") &times;
                 h4.modal-title Reset your password
             .modal-body
-                input.form-control#reset-password-new-password(type="password", placeholder="New Password")
+                input.form-control#reset-password-new-password(type="password" placeholder="New Password")
                 +_loginButtonsMessages
             .modal-footer
-                a.btn#login-buttons-cancel-reset-password(class="btn-default") Close
-                button.btn#login-buttons-reset-password-button(class="btn-primary") Set password
-
-template(name="_enrollAccountDialog")
-    if inEnrollAccountFlow
-        .modal#login-buttons-enroll-account-modal: .modal-dialog: .modal-content
-            .modal-header
-                button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
-                h4.modal-title Choose a password
-            .modal-body
-                input.form-control#enroll-account-password(type="password", placeholder="New Password")
-                +_loginButtonsMessages
-            .modal-footer
-                a.btn#login-buttons-cancel-enroll-account-button(class="btn-default") Close
-                button.btn#login-buttons-enroll-account-button(class="btn-primary") Set Password
+                a.btn.btn-default#login-buttons-cancel-reset-password Close
+                button.btn.btn-primary#login-buttons-reset-password-button Set password
 
 template(name="_configureLoginServiceDialog")
     if visible
         .modal-dialog#configure-login-service-dialog-modal: .modal-content
             .modal-header
                 h4.modal-title Configure Service
-            .modal-body: .accounts-dialog#configure-login-service-dialog(class="accounts-centered-dialog")
+            .modal-body: .accounts-dialog.accounts-centered-dialog#configure-login-service-dialog
                 +configurationSteps
                 p Now, copy over some details.
                 p: table
@@ -315,23 +326,36 @@ template(name="_configureLoginServiceDialog")
                     each configurationFields
                         tr
                             td: label(for="configure-login-service-dialog-{{property}}") {{label}}
-                            td: input(id="configure-login-service-dialog-{{property}}", type="text")
+                            td: input(id="configure-login-service-dialog-{{property}}" type="text")
             .modal-footer(class="new-section")
-                .login-button(class="btn btn-danger configure-login-service-dismiss-button")
+                .login-button.btn.btn-danger.configure-login-service-dismiss-button
                     | I'll do this later
-                .login-button#configure-login-service-dialog-save-configuration(class="login-button-configure btn btn-success {{#if saveDisabled}}login-button-disabled{{/if}}")
+                .login-button.btn.btn-success.login-button-configure#configure-login-service-dialog-save-configuration(class="{{#if saveDisabled}}login-button-disabled{{/if}}")
                     | Save configuration
-        .modal-backdrop(class="in")
+        .modal-backdrop.in
+
+template(name="_enrollAccountDialog")
+    if inEnrollAccountFlow
+        .modal#login-buttons-enroll-account-modal: .modal-dialog: .modal-content
+            .modal-header
+                button.close(type="button" data-dismiss="modal" aria-hidden="true") &times;
+                h4.modal-title Choose a password
+            .modal-body
+                input.form-control#enroll-account-password(type="password" placeholder="New Password")
+                +_loginButtonsMessages
+            .modal-footer
+                a.btn.btn-default#login-buttons-cancel-enroll-account-button Close
+                button.btn.btn-primary#login-buttons-enroll-account-button Set Password
 
 template(name="dialog")
-    button.btn(href="#myModal", role="button", data-toggle="modal") Modal
-    .modal(class="fade", id="myModal", tabindex="-1", role="dialog", aria-labelledby="myModalLabel", aria-hidden="true")
+    button.btn(href="#myModal" role="button" data-toggle="modal") Modal
+    .modal.fade#myModal(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true")
         .modal-dialog: .modal-content
             .modal-header
-                button.close(type="button", data-dismiss="modal", aria-hidden="true") ×
+                button.close(type="button" data-dismiss="modal" aria-hidden="true") ×
                 h3#myModalLabel Modal header
             .modal-body
                 p One fine body
             .modal-footer
-                button.btn(data-dismiss="modal", aria-hidden="true") Close
-                button.btn(class="btn-primary") Save changes
+                button.btn(data-dismiss="modal" aria-hidden="true") Close
+                button.btn.btn-primary Save changes

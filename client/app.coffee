@@ -84,14 +84,19 @@ T.hello.events 'click input': -> console.log Router.current().route.name
 T.home.rendered = ->
     console.log _s.dasherize "Hello World".toLowerCase()
     if Router.current().route.name == 'home' # useless
-        _.each [1..12], (i) -> $('#tile-box').append( $("<div id=\"tile-#{i}\" class=\"tile\"><h2>Tile #{i}</h2></div>") ) 
+        container = $('#blue')
+        _.each [1..20], (i) -> container.append( $("<div id=\"tile-#{i}\" class=\"tile box\"><h2>Tile #{i}</h2></div>") ) 
         $('.tile').on 'scrollSpy:enter', -> console.log 'enter:', $(this).attr 'id' 
         $('.tile').on 'scrollSpy:exit', -> console.log 'exit:', $(this).attr 'id' 
         $('.tile').scrollSpy()
-window.onscroll = ( e ) -> console.log window.scrollY
+        container.packery itemSelector: '.box', gutter: 1
+        items = $( container.packery('getItemElements') )
+        items.draggable()
+        container.packery( 'bindUIDraggableEvents', items )
+        
+#window.onscroll = ( e ) -> scroll = window.scrollY * 3; console.log scroll; $('.box').attr('style', "-webkit-transform: rotateY(#{scroll}deg );") 
 window.onresize = -> console.log window.innerWidth
-T.__define__ 'help', ->
-    HTML.Raw('<div class="col-sm-4">Help with define.</div><div class="col-sm-8">Yes way.</div>');
+T.__define__ 'help', -> HTML.Raw('<div class="col-sm-4">Help with define.</div><div class="col-sm-8">Yes way.</div>');
 T.color_list.colors = -> Colors.find {}, sort: likes: -1, name: 1
 T.color_list.events 'click button': -> Colors.update Session.get( 'session_color' ), $inc: likes: 1 
 T.color_info.events 'click': -> Session.set 'session_color', this._id
@@ -160,7 +165,6 @@ Accounts.loginButtons.validateEmail = ( email ) ->
 Accounts.loginButtons.validatePassword = ( password ) ->
     if password.length >= 6 then true else __.errorMessage "Password must be at least 6 characters long" &&  false
 Accounts.loginButtons.rendered = -> debugger
-
 T.loginButtons.events
     'click #login-buttons-logout': -> Meteor.logout -> __.closeDropdown() ; Router.go 'home'
     'click #login-buttons-profile': -> closeMenu() ; Router.go 'profile'
@@ -172,7 +176,6 @@ T.loginButtons.events
         __.set 'dropdownVisible', true
         Meteor.flush()
 T.loginButtons.toggleDropdown = -> toggleDropdown()
-
 T._loginButtonsLoggedOut.helpers
     dropdown: -> Accounts.loginButtons.dropdown()        
     services: -> Accounts.loginButtons.getLoginServices()
@@ -289,15 +292,16 @@ T._loginButtonsLoggedOutAllServices.helpers
     hasOtherServices: -> Accounts.loginButtons.getLoginServices().length > 1
     hasPasswordService: -> Accounts.loginButtons.hasPasswordService()
 T.profile.fields = -> [
+    title: 'Your name'
     label: 'Name',   icon: 'user'
 ,
+    title: 'Mobile Phone Number'
     label: 'Mobile', icon: 'mobile'
 ,
+    title: 'Your home Zip code' 
     label: 'Zip',    icon: 'envelope' ]
 T.profile.events
-    'focus input#name': -> 
-        tooltip = T.tooltip_name.render().value
-        $('input#name').attr('data-original-title', tooltip).tooltip('fixTitle').tooltip('show')
+    'focus input#name': -> $('input#name').attr('data-content',  T['popover_name'].render().value).popover('show')
 T._loginButtonsLoggedOutPasswordService.helpers
     inLoginFlow: -> !__.get('inSignupFlow')  and !__.get 'inForgotPasswordFlow'
     inSignupFlow: -> __.get 'inSignupFlow'
@@ -338,10 +342,11 @@ T.formField.helpers
     type: -> this.type or "text"
     visible: -> if this.visible == undefined then true else if typeof this.visible == 'function' then this.visible() else this.visible
     name: -> this.name or _s.dasherize _s.trim this.label.toLowerCase()
+    title: -> this.title
 T._loginButtonsChangePassword.events
     'keypress #old-password, keypress #password, keypress #password-again': ( event ) -> changePassword() if event.keyCode == 13
-    'click #login-buttons-do-change-password': ( event ) -> event.stopPropagation() ; changePassword() ; console.log "change-password"
-    'click #login-buttons-back-to-menu': ( event ) -> event.stopPropagation() ; closeMenu() ; console.log "back-to-menu"
+    'click #login-buttons-do-change-password': ( event ) -> event.stopPropagation(); changePassword(); console.log "change-password"
+    'click #login-buttons-back-to-menu': ( event ) -> event.stopPropagation(); closeMenu(); console.log "back-to-menu"
 T._loginButtonsChangePassword.fields = -> [
     name: 'old-password'
     label: 'Current Password', icon: 'key',           type: 'password'
