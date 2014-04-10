@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export APP="$HOME/workspace/app"
+cd $APP
+"$APP/private/watch.js" &
+"$APP/private/callback.py" &
+exec "/home/action/.parts/packages/meteor/0.7.1.2/meteor" "$@"

@@ -1,5 +1,12 @@
 Colors = new Meteor.Collection 'colors'
-Meteor.subscribe('colors')
+Meteor.subscribe 'colors'
+F = {}
+T = Template
+T.color_list.colors = -> Colors.find {}, sort: likes: -1, name: 1
+
+_.Colors = Colors
+_s = _.str
+home_url = 'www.hi16.ca'
 Router.configure layoutTemplate: 'layout'
 Router.map -> 
     this.route 'home', path: '/'
@@ -7,7 +14,21 @@ Router.map ->
     this.route 'help'
     this.route 'profile'
     this.route 'settings'
-T = Template; _s = _.str
+#window.onscroll = ( e ) -> scroll = window.scrollY * 3; console.log scroll; $('.box').attr('style', "-webkit-transform: rotateY(#{scroll}deg );") 
+window.onresize = -> console.log window.innerWidth
+T.__define__ 'help', -> HTML.Raw '''
+    <div class="col-sm-4">Help with define.</div>
+    <div class="col-sm-8">Yes way.</div>
+'''
+T.color_list.events 'click button': -> Colors.update Session.get( 'session_color' ), $inc: likes: 1 
+T.color_info.events 'click': -> Session.set 'session_color', this._id
+T.color_info.maybe_selected = -> if Session.equals 'session_color', this._id then 'selected' else 'not_selected'
+T.navbar.helpers
+    instagram_connect: -> 'https://api.instagram.com/oauth/authorize/?' + _.queryString
+        client_id: 'af97412ac5b94e18af85ced8d55785bd'
+        redirect_uri: 'http://www.hi16.ca:3003/callback/instagram/'
+        response_type: 'code'
+
 toggleDropdown = -> $('#login-dropdown-list .dropdown-menu').dropdown('toggle')
 signup = -> 
     __.resetMessages()
@@ -82,26 +103,13 @@ loginOrSignup = -> if __.get 'inSignupFlow' then signup() else login()
 Accounts.ui.config passwordSignupFields: 'USERNAME_AND_EMAIL'
 T.hello.events 'click input': -> console.log Router.current().route.name
 T.home.rendered = ->
-    console.log _s.dasherize "Hello World".toLowerCase()
-    if Router.current().route.name == 'home' # useless
-        container = $('#blue')
-        _.each [1..20], (i) -> container.append( $("<div id=\"tile-#{i}\" class=\"tile box\"><h2>Tile #{i}</h2></div>") ) 
-        $('.tile').on 'scrollSpy:enter', -> console.log 'enter:', $(this).attr 'id' 
-        $('.tile').on 'scrollSpy:exit', -> console.log 'exit:', $(this).attr 'id' 
-        $('.tile').scrollSpy()
-        container.packery itemSelector: '.box', gutter: 1
-        items = $( container.packery('getItemElements') )
-        items.draggable()
-        container.packery( 'bindUIDraggableEvents', items )
+    container = $('#blue')
+    _.each [1..20], (i) -> container.append( $("""<div id="tile-#{i}" class="tile box"><h2>Tile #{i}</h2></div>""") ) 
+    $('.tile').on 'scrollSpy:enter', -> console.log 'enter:', $(this).attr 'id' 
+    $('.tile').on 'scrollSpy:exit', -> console.log 'exit:', $(this).attr 'id' 
+    $('.tile').scrollSpy()
+    container.packery itemSelector: '.box', gutter: 1
         
-#window.onscroll = ( e ) -> scroll = window.scrollY * 3; console.log scroll; $('.box').attr('style', "-webkit-transform: rotateY(#{scroll}deg );") 
-window.onresize = -> console.log window.innerWidth
-T.__define__ 'help', -> HTML.Raw('<div class="col-sm-4">Help with define.</div><div class="col-sm-8">Yes way.</div>');
-T.color_list.colors = -> Colors.find {}, sort: likes: -1, name: 1
-T.color_list.events 'click button': -> Colors.update Session.get( 'session_color' ), $inc: likes: 1 
-T.color_info.events 'click': -> Session.set 'session_color', this._id
-T.color_info.maybe_selected = -> if Session.equals 'session_color', this._id then 'selected' else 'not_selected'
-
 vaild_keys = [
     'dropdownVisible', 'inSignupFlow', 'inForgotPasswordFlow', 'inChangePasswordFlow', 'inMessageOnlyFlow',
     'errorMessage', 'infoMessage', 'resetPasswordToken', 'enrollAccountToken', 'justVerifiedEmail',
@@ -291,6 +299,18 @@ T._loginButtonsLoggedOutAllServices.helpers
     isPasswordService: -> this.name == 'password'
     hasOtherServices: -> Accounts.loginButtons.getLoginServices().length > 1
     hasPasswordService: -> Accounts.loginButtons.hasPasswordService()
+
+F.profile = """
+    .primary-content    
+        .col-sm-4
+        .col-sm-6
+            br.double-line
+            each fields
+                +formField
+                br.half-line
+        .col-sm-2
+            br    
+"""
 T.profile.fields = -> [
     title: 'Your name'
     label: 'Name',   icon: 'user'
@@ -302,6 +322,7 @@ T.profile.fields = -> [
     label: 'Zip',    icon: 'envelope' ]
 T.profile.events
     'focus input#name': -> $('input#name').attr('data-content',  T['popover_name'].render().value).popover('show')
+
 T._loginButtonsLoggedOutPasswordService.helpers
     inLoginFlow: -> !__.get('inSignupFlow')  and !__.get 'inForgotPasswordFlow'
     inSignupFlow: -> __.get 'inSignupFlow'

@@ -20,24 +20,24 @@ template(name="navbar")
             button.navbar-toggle#btn-toggle-collapsed(type="button" data-toggle="collapse" data-target="#navbar-menu")
                 i.fa.fa-bars
         .navbar-collapse.collapse#navbar-menu
-            +navbar_main
+                ul.nav.navbar-nav
+                    li: a(href="{{pathFor 'about'}}") About
+                    li: a(href="{{pathFor 'profile'}}") Profile
+                    li: a(href="{{pathFor 'settings'}}") Settings
+                    li: a(href="{{pathFor 'help'}}") Help
+                    li.dropdown
+                        a.dropdown-toggle#download(data-toggle="dropdown") 
+                            | Connect 
+                            i.fa.fa-chevron-down
+                        ul.dropdown-menu(aria-labelledby="download")
+                            li: a(href="{{instagram_connect}}") 
+                                | Connect with Instagram
+                            li: a(href="#")
+                                | Connect with Facebook
+                            li: a(href="#") 
+                                | Connect with Google+
         .navbar-right
             +loginButtons
-
-template(name="navbar_main")
-    ul.nav.navbar-nav
-        li: a(href="{{pathFor 'about'}}") About
-        li: a(href="{{pathFor 'profile'}}") Profile
-        li: a(href="{{pathFor 'settings'}}") Settings
-        li: a(href="{{pathFor 'help'}}") Help
-        li.dropdown
-            a.dropdown-toggle#download(data-toggle="dropdown") Download 
-                i.fa.fa-chevron-down
-            ul.dropdown-menu(aria-labelledby="download")
-                li: a(href="#") Sumin Han
-                li: a(href="#") Jason Han
-                li.divider
-                li: a(href="#") Chris Jin
 
 template(name="page_nav")
     ul#page-nav

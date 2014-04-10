@@ -343,14 +343,6 @@ ul, ol
   text-align: center
   font-size: 12px
 
-@media screen and ( min-width: $desktop_width )
-  #footer
-    height: 50px
-  .footer-content
-    width: 200px
-    position: absolute
-    left: 0
-    bottom: 1.0em
   
 #hero
   background: #C09
@@ -394,52 +386,6 @@ ul, ol
 
 
 /* ---- desktop ---- */
-@media screen and ( min-width: 960px )
-  #hero .packery
-    padding-left: 200px
-  #hero h1 
-    font-size: 140px
-    padding-top: 20px
-    margin-bottom: 30px
-  #hero .tagline 
-    font-size: 32px
-  #hero .stamp
-    position: absolute
-    z-index: 2
-  #hero .stamp-ackery
-    width: 476px
-    height: 90px
-    left: 294px
-    top: 92px
-  #hero .stamp-p-top
-    width: 95px
-    height: 82px
-    left: 200px
-    top: 70px
-
-  #hero .stamp-p-bottom
-    width: 40px
-    height: 90px
-    left: 200px
-    top: 92px
-
-  #hero .stamp-k
-    width: 34px
-    height: 90px
-    left: 459px
-    top: 65px
-
-  #hero .stamp-y
-    width: 70px
-    height: 88px
-    left: 675px
-    top: 120px
-
-  #hero .stamp-tagline
-    width: 494px
-    height: 40px
-    left: 200px
-    top: 239px
 
 [data-icon]:before
 	font-family: 'icomoon'
@@ -565,98 +511,10 @@ ul, ol
 }
 
 /* tablet-ish */
-@media screen and ( min-width: 800px ) {
-
-  #content .primary-content {
-    padding-top: 20px;
-    padding-bottom: 20px;
-  }
-
-  #content .primary-content > * {
-    max-width: 700px;
-  }
-
-  /* stuff that can go extra wide */
-  #content .primary-content .row,
-  #content #notification,
-  #content #hero-demos {
-    max-width: 1200px;
-  }
-
-  .row {
-    margin-bottom: 0.8em;
-  }
-
-  /* two column by default*/
-  .row .cell {
-    float: left;
-    width: 48.75%;
-    margin-right: 2.5%;
-    margin-bottom: 0;
-  }
-  /* IE8 doesn't support :last-child */
-  .lt-ie9 .row .cell { margin-right: 1.5%; }
-
-  /* no margin */
-/*  .example.row .cell {
-    width: 50%;
-    margin-right: 0;
-  }*/
-
-  /* three column */
-  .row3 .cell {
-    width: 31.6%;
-  }
-
-  /* four column */
-  .row4 .cell {
-    width: 23.1%;
-  }
-
-  .row .cell:last-child {
-    margin-right: 0;
-  }
-
-}
 
 
 
 /* desktop ***************** 960px didn't complie */
-@media screen and ( min-width: 960px ) {
-
-  .primary-content {
-    padding-left: 200px;
-    padding-right: 0px;
-  }
-
-  #page-nav {
-    position: absolute;
-    left: 0;
-    top: 60px;
-    list-style: none;
-    padding: 0;
-    width: 200px;
-    padding: 20px;
-  }
-
-  #page-nav li {
-    display: block;
-    margin-bottom: 4px;
-    margin-left: 0;
-  }
-
-  #page-nav li:after {
-    content: none;
-  }
-
-}
-
-/* fix #page-nav only if we have enough height */
-@media screen and ( min-width: 960px ) and ( min-height: 540px ) {
-  #page-nav {
-    position: fixed;
-  }
-}
 
 .tagline {
   font-size: 1.5em;
