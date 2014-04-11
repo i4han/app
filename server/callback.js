@@ -1,4 +1,4 @@
-var Fiber = Npm.require('fibers')
+var Fiber = Npm.require('fibers');
 var express = Npm.require( 'express' );
 var request = Npm.require( 'request' );
 
@@ -6,7 +6,9 @@ var Colors = new Meteor.Collection( 'colors' );
 // Meteor.publish( 'colors', function() { Colors.find({}); });
 var Profile = new Meteor.Collection( 'profile' );
 // Meteor.publish( 'profile', function() { Profile.find(); });
+
 var app = express();
+
 
 app.get('/callback/instagram/', function( req, res ) {
     var code = req.query.code
@@ -28,4 +30,6 @@ app.get('/callback/instagram/', function( req, res ) {
     });
     res.redirect('http://www.hi16.ca/');
 });
+
+
 app.listen(3003);

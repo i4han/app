@@ -16,7 +16,7 @@ Router.map ->
     this.route 'settings'
 #window.onscroll = ( e ) -> scroll = window.scrollY * 3; console.log scroll; $('.box').attr('style', "-webkit-transform: rotateY(#{scroll}deg );") 
 window.onresize = -> console.log window.innerWidth
-T.__define__ 'help', -> HTML.Raw '''
+T.__define__ 'help2', -> HTML.Raw '''
     <div class="col-sm-4">Help with define.</div>
     <div class="col-sm-8">Yes way.</div>
 '''
@@ -30,6 +30,7 @@ T.navbar.helpers
         response_type: 'code'
 
 toggleDropdown = -> $('#login-dropdown-list .dropdown-menu').dropdown('toggle')
+
 signup = -> 
     __.resetMessages()
     options = {}
@@ -87,7 +88,7 @@ changePassword = ->
             Meteor.setTimeout( -> 
                 __.resetMessages() 
                 __.closeDropdown()
-                closeMenu()
+                $('#login-dropdown-list').removeClass 'open'
             , 3000 )
 matchPasswordAgainIfPresent = ->
     passwordAgain = elementValueById 'password-again'
@@ -115,7 +116,7 @@ vaild_keys = [
     'errorMessage', 'infoMessage', 'resetPasswordToken', 'enrollAccountToken', 'justVerifiedEmail',
     'configureLoginServiceDialogVisible', 'configureLoginServiceDialogServiceName', 'configureLoginServiceDialogSaveDisabled' ]
 validateKey = ( key ) ->  throw new Error "Invalid key in loginButtonsSession: " + key if !_.contains vaild_keys, key
-__ = Accounts.loginButtonsSession =
+__ = Accounts.loginSession = Accounts.loginButtonsSession =
     set: ( key, value ) ->
         validateKey key
         if _.contains ['errorMessage', 'infoMessage'], key
@@ -147,7 +148,6 @@ __ = Accounts.loginButtonsSession =
         this.set 'configureLoginServiceDialogVisible', true
         this.set 'configureLoginServiceDialogServiceName', name
         this.set 'configureLoginServiceDialogSaveDisabled', true
-closeMenu = -> $('#login-dropdown-list').removeClass 'open' ; console.log "close Menu"
 
 Accounts.loginButtons = {} if !Accounts.loginButtons
 Accounts.loginButtons.displayName = ->
@@ -173,28 +173,18 @@ Accounts.loginButtons.validateEmail = ( email ) ->
 Accounts.loginButtons.validatePassword = ( password ) ->
     if password.length >= 6 then true else __.errorMessage "Password must be at least 6 characters long" &&  false
 Accounts.loginButtons.rendered = -> debugger
-T.loginButtons.events
-    'click #login-buttons-logout': -> Meteor.logout -> __.closeDropdown() ; Router.go 'home'
-    'click #login-buttons-profile': -> closeMenu() ; Router.go 'profile'
-    'click #login-buttons-settings': -> closeMenu() ; Router.go 'settings'
-    'click input, click label, click button, click .dropdown-menu, click .alert': ( event ) -> event.stopPropagation()
-    'click .login-close': -> __.closeDropdown() ; closeMenu() ; console.log "login-close"
-    'click #login-name-link, click #login-sign-in-link': ( event ) -> 
-        event.stopPropagation()
-        __.set 'dropdownVisible', true
-        Meteor.flush()
+
+_.each _.keys( _.define ), ( name ) ->
+    _.each _.keys( _.define[ name ] ), ( key ) ->
+        if ( key == 'helpers' )
+            T[ name ].helpers( _.define[ name ].helpers )
+        else if ( key == 'events' )
+            T[ name ].events( _.define[ name ].events )
+        else
+            T[ name ][ key ] = _.define[ name ][ key ]
+
+
 T.loginButtons.toggleDropdown = -> toggleDropdown()
-T._loginButtonsLoggedOut.helpers
-    dropdown: -> Accounts.loginButtons.dropdown()        
-    services: -> Accounts.loginButtons.getLoginServices()
-    singleService: -> 
-        services = Accounts.loginButtons.getLoginServices()
-        throw new Error "Shouldn't be rendering this template with more than one configured service" if services.length != 1
-        services[0]
-    configurationLoaded: -> Accounts.loginServicesConfigured()
-T._loginButtonsLoggedIn.helpers 
-    dropdown: -> Accounts.loginButtons.dropdown()      # of cause
-    displayName: -> Accounts.loginButtons.displayName()
 T._loginButtonsMessages.helpers
     errorMessage: -> __.get 'errorMessage'
     infoMessage: -> __.get 'infoMessage'
@@ -223,18 +213,6 @@ T._loginButtonsLoggedOutSingleLoginButton.configured = -> !!Accounts.loginServic
 T._loginButtonsLoggedOutSingleLoginButton.capitalizedName = -> if this.name == 'github' then 'GitHub' else _s.capitalize this.name
 ###########################################################################
 
-T._loginButtonsLoggedInDropdown.events
-    'click #login-buttons-change-password': ( event ) ->
-        event.stopPropagation()
-        __.resetMessages()
-        __.set 'inChangePasswordFlow', true
-        Meteor.flush()
-#       toggleDropdown()
-T._loginButtonsLoggedInDropdown.helpers
-    displayName: -> Accounts.loginButtons.displayName()
-    inChangePasswordFlow: -> __.get('inChangePasswordFlow')
-    inMessageOnlyFlow: -> __.get('inMessageOnlyFlow')
-    dropdownVisible: -> __.get('dropdownVisible')
 T._loginButtonsLoggedInDropdownActions.helpers
     allowChangingPassword: -> user = Meteor.user() ; user.username || ( user.emails && user.emails[0] && user.emails[0].address )
     additionalLoggedInDropdownActions: -> T._loginButtonsAdditionalLoggedInDropdownActions != undefined
@@ -300,65 +278,6 @@ T._loginButtonsLoggedOutAllServices.helpers
     hasOtherServices: -> Accounts.loginButtons.getLoginServices().length > 1
     hasPasswordService: -> Accounts.loginButtons.hasPasswordService()
 
-F.profile = """
-    .primary-content    
-        .col-sm-4
-        .col-sm-6
-            br.double-line
-            each fields
-                +formField
-                br.half-line
-        .col-sm-2
-            br    
-"""
-T.profile.fields = -> [
-    title: 'Your name'
-    label: 'Name',   icon: 'user'
-,
-    title: 'Mobile Phone Number'
-    label: 'Mobile', icon: 'mobile'
-,
-    title: 'Your home Zip code' 
-    label: 'Zip',    icon: 'envelope' ]
-T.profile.events
-    'focus input#name': -> $('input#name').attr('data-content',  T['popover_name'].render().value).popover('show')
-
-T._loginButtonsLoggedOutPasswordService.helpers
-    inLoginFlow: -> !__.get('inSignupFlow')  and !__.get 'inForgotPasswordFlow'
-    inSignupFlow: -> __.get 'inSignupFlow'
-    inForgotPasswordFlow: -> __.get 'inForgotPasswordFlow'
-    showCreateAccountLink: -> !Accounts._options.forbidClientAccountCreation
-    showForgotPasswordLink: -> 
-        _.contains ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL", "EMAIL_ONLY"], Accounts.ui._passwordSignupFields()
-    fields: ->
-        loginFields = [
-            label: 'Username or email', icon: 'user',                                    visible: -> _.contains( 
-                ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL"], Accounts.ui._passwordSignupFields() )
-        ,
-            label: 'Username',          icon: 'user'
-            visible: -> Accounts.ui._passwordSignupFields() == "USERNAME_ONLY"
-        ,
-            label: 'Email',             icon: 'envelope-o',       type: 'email'
-            visible: -> Accounts.ui._passwordSignupFields() == "EMAIL_ONLY"
-        , 
-            label: 'Password',          icon: 'key',              type: 'password' ] 
-        signupFields = [
-            label: 'Username',          icon: 'user',                                    visible: -> _.contains(
-                ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Accounts.ui._passwordSignupFields() )
-        ,
-            label: 'Email',             icon: 'envelope-o',       type: 'email',         visible: -> _.contains(
-                ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "EMAIL_ONLY"], Accounts.ui._passwordSignupFields() )
-        ,
-            name: 'email'
-            label: 'Email (optional)',  icon: 'envelope-o',       type: 'email',         visible: -> 
-                Accounts.ui._passwordSignupFields() == "USERNAME_AND_OPTIONAL_EMAIL"
-        ,
-            label: 'Password',          icon: 'key',              type: 'password'
-        ,
-            label: 'Password again',    icon: 'key',              type: 'password',      visible: -> _.contains(
-                ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Accounts.ui._passwordSignupFields() ) ]
-        signupFields = Accounts.ui._options.extraSignupFields.concat signupFields
-        if __.get('inSignupFlow') then signupFields else loginFields
 T.formField.helpers
     type: -> this.type or "text"
     visible: -> if this.visible == undefined then true else if typeof this.visible == 'function' then this.visible() else this.visible
@@ -366,8 +285,8 @@ T.formField.helpers
     title: -> this.title
 T._loginButtonsChangePassword.events
     'keypress #old-password, keypress #password, keypress #password-again': ( event ) -> changePassword() if event.keyCode == 13
-    'click #login-buttons-do-change-password': ( event ) -> event.stopPropagation(); changePassword(); console.log "change-password"
-    'click #login-buttons-back-to-menu': ( event ) -> event.stopPropagation(); closeMenu(); console.log "back-to-menu"
+    'click #login-buttons-do-change-password': ( event ) -> event.stopPropagation(); changePassword()
+    'click #login-buttons-back-to-menu': ( event ) -> event.stopPropagation(); $('#login-dropdown-list').removeClass 'open'
 T._loginButtonsChangePassword.fields = -> [
     name: 'old-password'
     label: 'Current Password', icon: 'key',           type: 'password'
