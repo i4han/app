@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+var _ = require( 'underscore' );
+var su = require( './node_utils' );
+require( 'coffee-script/register' );
+var Config = require('../lib/config').__config__;
+
+var pages = {}
+_.each( Config.sets, function (set) {
+    pages[set] = require( '../lib/' + Config.set_prefix + set )[set];
+});
+
+su.collectPages( pages );    

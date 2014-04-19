@@ -13,3 +13,6 @@ iron-router
 jquery
 jade
 autopublish
+x3dom
+underscore
+sat
