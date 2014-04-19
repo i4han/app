@@ -18,6 +18,7 @@ module.exports.__config__ = {
     storables:         main.home_dir + 'private/storables'
     set_prefix:        'set_'
     sets:              'content dialog form layout login style' .split ' '
+    indent_string:     '    '
     init: ->
         # if !Meteor? sets = ls of set_* in home/lib (*) part.
         this.templates  = Object.keys this.pages

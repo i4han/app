@@ -42,7 +42,7 @@ lib = {
     indentBlock: function (block, indent) {
         if ( indent ) {
             block = new String( block );
-            block = block.replace( /^/gm, __.repeat( '    ', indent ) );
+            block = block.replace( /^/gm, __.repeat( Config.indent_string, indent ) );
             block = block.toString();
         }
         return block
