@@ -1,9 +1,12 @@
-#blue {
-  -webkit-perspective: 600px;
+#items > .item {
+  background-color: #fff;
+  width: 320px;
+  height: 320px;
+  float: left;
+  border: 1px solid #999;
+  margin: 6px;
 }
-#blue > .box {
-  background-color: #f0f0f0;
-}
+
 .tile {
   width: 160px;
   float: left;

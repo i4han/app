@@ -66,15 +66,11 @@ module.exports.layout =
             .navbar.navbar-default.navbar-fixed-top: .container
                 .navbar-header
                     a.navbar-brand(href="{{pathFor 'home'}}") Home
-                .navbar-right
-                    button.navbar-toggle#btn-toggle-collapsed(type="button" data-toggle="collapse" data-target="#navbar-menu")
-                        i.fa.fa-bars
-                .navbar-collapse.collapse#navbar-menu
-                        ul.nav.navbar-nav
-                            li: a(href="{{pathFor 'x3d'}}") X3d
-                            li: a(href="{{pathFor 'profile'}}") Profile
-                            li: a(href="{{pathFor 'help'}}") Help
-                            +dropdownConnect
+                .navbar-left
+                    ul.nav.navbar-nav
+                        li: a(href="{{pathFor 'x3d'}}") X3d
+                        li: a(href="{{pathFor 'profile'}}") Profile
+                        li: a(href="{{pathFor 'help'}}") Help
                 .navbar-right
                     +loginButtons
             """

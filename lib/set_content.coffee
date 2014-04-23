@@ -4,46 +4,60 @@ module.exports.content =
         jade: """
             .primary-content
                 h1 Title
-                +page_nav
+            .primary-content#items
+                each items
+                    .item
+                        +item
+            """
+        created: -> 
+            db.Items = new Meteor.Collection 'items' if !db.Items?
+            Meteor.subscribe 'items'
+
+        rendered: ->
+            $container = $('#items')
+            $container.masonry itemSelector: '.item', columnWidth: 332
+        items: -> db.Items.find {}, sort: created_time: -1
+        stylus: """
+            #items > .item
+                background-color #fff
+                width 320px
+                height 320px
+                float left
+                border 1px solid #999
+                margin 6px
+
+            if 0 
+              transform rotateY( 45deg )
+              -webkit-transform rotateY( 45deg )
+            """
+
+    item:
+        jade: """img(src="{{url}}" height="320" width="320")"""
+        
+
+    about:
+        jade: """
+            .primary-content
+                +x3d
             .primary-content
                 +hello
                 br.double-line
                 +dialog
             .primary-content
                 +color_list
-            .primary-content#blue-box
-                section.container#blue
             """
         rendered: ->
-            $container = $('#blue')
             _.each [1..20], (i) -> $container.append( $("""<div id="tile-#{i}" class="tile box"><h2>Tile #{i}</h2></div>""") ) 
             $('.tile').on 'scrollSpy:enter', -> console.log 'enter:', $(this).attr 'id' 
             $('.tile').on 'scrollSpy:exit', -> console.log 'exit:', $(this).attr 'id' 
             $('.tile').scrollSpy()
-            $container.masonry itemSelector: '.box', columnWidth: 172
-
         stylus: """
-            #blue
-              -webkit-perspective 600px            
-            #blue > .box
-              background-color #f0f0f0 
-            if 0 
-              transform rotateY( 45deg )
-              -webkit-transform rotateY( 45deg )
             .tile
                 width 160px
                 float left
                 border 1px solid #999
                 margin 6px
             """
-
-
-    about:
-        jade: """
-            .primary-content
-                +x3d
-            """
-
         
     profile:
         jade: """
@@ -106,11 +120,11 @@ module.exports.content =
             button.btn.btn-primary Like
             """
         created: -> 
-            _.Colors = Colors = new Meteor.Collection 'colors' if !_.Colors
+            db.Colors = new Meteor.Collection 'colors' if !db.Colors?
             Meteor.subscribe 'colors'
         events:
-            'click button': -> _.Colors.update Session.get( 'session_color' ), $inc: likes: 1 
-        colors: -> _.Colors.find {}, sort: likes: -1, name: 1
+            'click button': -> db.Colors.update Session.get( 'session_color' ), $inc: likes: 1 
+        colors: -> db.Colors.find {}, sort: likes: -1, name: 1
 
         
     color_info:

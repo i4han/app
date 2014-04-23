@@ -4,8 +4,8 @@ var crypto = require('crypto');
 var serialize = require('node-serialize');
 
 require( 'coffee-script/register' );
-var Config = require('../lib/config').__config__;
-var __ = require('../lib/utilities').__;
+var Config = require('../lib/config').Config;
+var __ = require( Config.lib_file ).__;
 
 
 var stringOrFunctionToString = function (what) {

@@ -3,10 +3,10 @@ module.exports.login =
     __events__:
         startup: ->
             console.log 'Start up'
-            if Accounts._verifyEmailToken
-                Accounts.verifyEmail Accounts._verifyEmailToken, ( error ) ->
-                    Accounts._enableAutoLogin()
-                    Accounts.loginSession.set 'justVerifiedEmail', true if !error
+            if Login._verifyEmailToken
+                Login.verifyEmail Login._verifyEmailToken, ( error ) ->
+                    Login._enableAutoLogin()
+                    Login.loginSession.set 'justVerifiedEmail', true if !error
 
 
     _loginButtonsLoggedInDropdown:
@@ -27,14 +27,14 @@ module.exports.login =
         events:
             'click #login-buttons-change-password': ( event ) ->
                 event.stopPropagation()
-                Accounts.loginSession.resetMessages()
-                Accounts.loginSession.set 'inChangePasswordFlow', true
+                Login.loginSession.resetMessages()
+                Login.loginSession.set 'inChangePasswordFlow', true
                 Meteor.flush()
         helpers:
-            displayName: -> Accounts.loginButtons.displayName()
-            inChangePasswordFlow: -> Accounts.loginSession.get('inChangePasswordFlow')
-            inMessageOnlyFlow: -> Accounts.loginSession.get('inMessageOnlyFlow')
-            dropdownVisible: -> Accounts.loginSession.get('dropdownVisible')            
+            displayName: -> Login.loginButtons.displayName()
+            inChangePasswordFlow: -> Login.loginSession.get('inChangePasswordFlow')
+            inMessageOnlyFlow: -> Login.loginSession.get('inMessageOnlyFlow')
+            dropdownVisible: -> Login.loginSession.get('dropdownVisible')            
             
             
     _loginButtonsLoggedOut:
@@ -54,10 +54,10 @@ module.exports.login =
                 .no-services No login services configured
             """
         helpers:
-            dropdown: -> Accounts.loginButtons.dropdown()        
-            services: -> Accounts.loginButtons.getLoginServices()
+            dropdown: -> Login.loginButtons.dropdown()        
+            services: -> Login.loginButtons.getLoginServices()
             singleService: -> 
-                services = Accounts.loginButtons.getLoginServices()
+                services = Login.loginButtons.getLoginServices()
                 throw new Error "Shouldn't be rendering this template with more than one configured service" if services.length != 1
                 services[0]
             configurationLoaded: -> Accounts.loginServicesConfigured()            
@@ -72,8 +72,8 @@ module.exports.login =
                     +_loginButtonsLoggedInSingleLogoutButton
             """
         helpers: 
-            dropdown: -> Accounts.loginButtons.dropdown()      # of cause
-            displayName: -> Accounts.loginButtons.displayName()
+            dropdown: -> Login.loginButtons.dropdown()      # of cause
+            displayName: -> Login.loginButtons.displayName()
             
             
             
@@ -106,41 +106,41 @@ module.exports.login =
                     +_loginButtonsBackToLoginLink
             """
         helpers:
-            inLoginFlow: -> !Accounts.loginSession.get('inSignupFlow')  and !Accounts.loginSession.get 'inForgotPasswordFlow'
-            inSignupFlow: -> Accounts.loginSession.get 'inSignupFlow'
-            inForgotPasswordFlow: -> Accounts.loginSession.get 'inForgotPasswordFlow'
+            inLoginFlow: -> !Login.loginSession.get('inSignupFlow')  and !Login.loginSession.get 'inForgotPasswordFlow'
+            inSignupFlow: -> Login.loginSession.get 'inSignupFlow'
+            inForgotPasswordFlow: -> Login.loginSession.get 'inForgotPasswordFlow'
             showCreateAccountLink: -> !Accounts._options.forbidClientAccountCreation
             showForgotPasswordLink: -> 
-                _.contains ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL", "EMAIL_ONLY"], Accounts.ui._passwordSignupFields()
+                _.contains ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL", "EMAIL_ONLY"], Login.ui._passwordSignupFields()
             fields: ->
                 loginFields = [
                     label: 'Username or email', icon: 'user',                                    visible: -> _.contains( 
-                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL"], Accounts.ui._passwordSignupFields() )
+                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL"], Login.ui._passwordSignupFields() )
                 ,
                     label: 'Username',          icon: 'user'
-                    visible: -> Accounts.ui._passwordSignupFields() == "USERNAME_ONLY"
+                    visible: -> Login.ui._passwordSignupFields() == "USERNAME_ONLY"
                 ,
                     label: 'Email',             icon: 'envelope-o',       type: 'email'
-                    visible: -> Accounts.ui._passwordSignupFields() == "EMAIL_ONLY"
+                    visible: -> Login.ui._passwordSignupFields() == "EMAIL_ONLY"
                 , 
                     label: 'Password',          icon: 'key',              type: 'password' ] 
                 signupFields = [
                     label: 'Username',          icon: 'user',                                    visible: -> _.contains(
-                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Accounts.ui._passwordSignupFields() )
+                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Login.ui._passwordSignupFields() )
                 ,
                     label: 'Email',             icon: 'envelope-o',       type: 'email',         visible: -> _.contains(
-                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "EMAIL_ONLY"], Accounts.ui._passwordSignupFields() )
+                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "EMAIL_ONLY"], Login.ui._passwordSignupFields() )
                 ,
                     name: 'email'
                     label: 'Email (optional)',  icon: 'envelope-o',       type: 'email',         visible: -> 
-                        Accounts.ui._passwordSignupFields() == "USERNAME_AND_OPTIONAL_EMAIL"
+                        Login.ui._passwordSignupFields() == "USERNAME_AND_OPTIONAL_EMAIL"
                 ,
                     label: 'Password',          icon: 'key',              type: 'password'
                 ,
                     label: 'Password again',    icon: 'key',              type: 'password',      visible: -> _.contains(
-                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Accounts.ui._passwordSignupFields() ) ]
-                signupFields = Accounts.ui._options.extraSignupFields.concat signupFields
-                if Accounts.loginSession.get('inSignupFlow') then signupFields else loginFields
+                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Login.ui._passwordSignupFields() ) ]
+                signupFields = Login.ui._options.extraSignupFields.concat signupFields
+                if Login.loginSession.get('inSignupFlow') then signupFields else loginFields
 
                     
     _loginButtonsLoggedOutDropdown:
@@ -154,26 +154,26 @@ module.exports.login =
             """
         helpers:
             additionalClasses: ->
-                if !Accounts.password then false
-                else if Accounts.loginSession.get 'inSignupFlow' then 'login-form-create-account'
-                else if Accounts.loginSession.get 'inForgotPasswordFlow' then 'login-form-forgot-password'
+                if !Login.password then false
+                else if Login.loginSession.get 'inSignupFlow' then 'login-form-create-account'
+                else if Login.loginSession.get 'inForgotPasswordFlow' then 'login-form-forgot-password'
                 else 'login-form-sign-in'
-            dropdownVisible: -> Accounts.loginSession.get 'dropdownVisible'
-            hasPasswordService: -> Accounts.loginButtons.hasPasswordService()
+            dropdownVisible: -> Login.loginSession.get 'dropdownVisible'
+            hasPasswordService: -> Login.loginButtons.hasPasswordService()
             forbidClientAccountCreation: -> Accounts._options.forbidClientAccountCreation # useless
         events:
-            'click #login-buttons-password': -> Accounts.ui.loginOrSignup()
-            'keypress #forgot-password-email': ( event ) -> Accounts.ui.forgotPassword() if event.keyCode == 13
-            'click #login-buttons-forgot-password': ( event ) -> event.stopPropagation() ; Accounts.ui.forgotPassword()
+            'click #login-buttons-password': -> Login.ui.loginOrSignup()
+            'keypress #forgot-password-email': ( event ) -> Login.ui.forgotPassword() if event.keyCode == 13
+            'click #login-buttons-forgot-password': ( event ) -> event.stopPropagation() ; Login.ui.forgotPassword()
             'click #signup-link': ( event ) -> 
                 event.stopPropagation()
-                Accounts.loginSession.resetMessages()
+                Login.loginSession.resetMessages()
                 username = __.trimmedValue 'username'
                 email = __.trimmedValue 'email'
                 usernameOrEmail = __.trimmedValue 'username-or-email'
                 password = __.getValue 'password'
-                Accounts.loginSession.set 'inSignupFlow', true
-                Accounts.loginSession.set 'inForgotPasswordFlow', false
+                Login.loginSession.set 'inSignupFlow', true
+                Login.loginSession.set 'inForgotPasswordFlow', false
                 Meteor.flush();
                 if username != null
                     document.getElementById('username').value = username
@@ -185,11 +185,11 @@ module.exports.login =
                     document.getElementById('email').value = usernameOrEmail
             'click #forgot-password-link': ( event ) ->
                 event.stopPropagation()
-                Accounts.loginSession.resetMessages()
+                Login.loginSession.resetMessages()
                 email = __.trimmedValue 'email'
                 usernameOrEmail = __.trimmedValue 'username-or-email'
-                Accounts.loginSession.set('inSignupFlow', false)
-                Accounts.loginSession.set('inForgotPasswordFlow', true);
+                Login.loginSession.set('inSignupFlow', false)
+                Login.loginSession.set('inForgotPasswordFlow', true);
                 Meteor.flush()
                 if email != null
                     document.getElementById('forgot-password-email').value = email
@@ -197,17 +197,17 @@ module.exports.login =
                     if usernameOrEmail.indexOf('@') != -1
                         document.getElementById('forgot-password-email').value = usernameOrEmail
             'click #back-to-login-link': ->
-                Accounts.loginSession.resetMessages()
+                Login.loginSession.resetMessages()
                 username = __.trimmedValue 'username'
                 email = __.trimmedValue('email') || __.trimmedValue('forgot-password-email')
-                Accounts.loginSession.set 'inSignupFlow', false
-                Accounts.loginSession.set 'inForgotPasswordFlow', false
+                Login.loginSession.set 'inSignupFlow', false
+                Login.loginSession.set 'inForgotPasswordFlow', false
                 Meteor.flush()
                 document.getElementById('username').value = username if document.getElementById 'username'
                 document.getElementById('email').value = email if document.getElementById 'email'
                 document.getElementById('username-or-email').value = email || username if document.getElementById 'username-or-email'
             'keypress #username, keypress #email, keypress #username-or-email, keypress #password, keypress #password-again': ( event ) ->
-                Accounts.ui.loginOrSignup() if event.keyCode == 13
+                Login.ui.loginOrSignup() if event.keyCode == 13
             
             
     _loginButtonsLoggedOutAllServices:
@@ -223,10 +223,10 @@ module.exports.login =
                     +_loginButtonsLoggedOutSingleLoginButton
             """
         helpers:
-            services: -> Accounts.loginButtons.getLoginServices()
+            services: -> Login.loginButtons.getLoginServices()
             isPasswordService: -> this.name == 'password'
-            hasOtherServices: -> Accounts.loginButtons.getLoginServices().length > 1
-            hasPasswordService: -> Accounts.loginButtons.hasPasswordService()
+            hasOtherServices: -> Login.loginButtons.getLoginServices().length > 1
+            hasPasswordService: -> Login.loginButtons.hasPasswordService()
             
             
             
@@ -268,8 +268,8 @@ module.exports.login =
                 .alert.alert-success.no-margin {{infoMessage}}
             """
         helpers:
-            errorMessage: -> Accounts.loginSession.get 'errorMessage'
-            infoMessage: -> Accounts.loginSession.get 'infoMessage'
+            errorMessage: -> Login.loginSession.get 'errorMessage'
+            infoMessage: -> Login.loginSession.get 'infoMessage'
 
 
     _loginButtonsLoggedOutSingleLoginButton:
@@ -283,7 +283,7 @@ module.exports.login =
                             span.text-besides-image(class="configure-text-{{name}}") Configure {{capitalizedName}} Login
             """
         helpers:
-            configured: -> !!Accounts.loginServiceConfiguration.findOne service: this.name
+            configured: -> !!Login.loginServiceConfiguration.findOne service: this.name
             capitalizedName: -> if this.name == 'github' then 'GitHub' else _.str.capitalize this.name
         events:
             'click .login-button': ->
@@ -292,16 +292,16 @@ module.exports.login =
                 callback = ( err ) ->
                     if !err
                         __.closeDropdown()
-                    else if err instanceof Accounts.LoginCancelledError
+                    else if err instanceof Login.LoginCancelledError
                         0
-                    else if err instanceof Accounts.ConfigError
+                    else if err instanceof Login.ConfigError
                         __.configureService serviceName
                     else
                         __.errorMessage err.reason || "Unknown error"
                 loginWithService = Meteor[ "loginWith" + _.str.capitalize serviceName ]
                 options = {}
-                if Accounts.ui._options.requestPermissions[ serviceName ]
-                    options.requestPermissions = Accounts.ui._options.requestPermissions[ serviceName ]
+                if Login.ui._options.requestPermissions[ serviceName ]
+                    options.requestPermissions = Login.ui._options.requestPermissions[ serviceName ]
                 loginWithService options, callback
 
                 
@@ -314,8 +314,8 @@ module.exports.login =
                     .login-button#messages-dialog-dismiss-button Dismiss
             """
         events:
-            'click #messages-dialog-dismiss-button': -> Accounts.loginSession.resetMessages()
-        visible: -> !Accounts.loginButtons.dropdown() && ( Accounts.loginSession.get('infoMessage') || Accounts.loginSession.get('errorMessage') )
+            'click #messages-dialog-dismiss-button': -> Login.loginSession.resetMessages()
+        visible: -> !Login.loginButtons.dropdown() && ( Login.loginSession.get('infoMessage') || Login.loginSession.get('errorMessage') )
 
         
         
@@ -327,8 +327,8 @@ module.exports.login =
                     .login-button#just-verified-dismiss-button Dismiss
             """
         events:
-            'click #just-verified-dismiss-button': -> Accounts.loginSession.set('justVerifiedEmail', false)
-        visible: -> Accounts.loginSession.get('justVerifiedEmail')
+            'click #just-verified-dismiss-button': -> Login.loginSession.set('justVerifiedEmail', false)
+        visible: -> Login.loginSession.get('justVerifiedEmail')
 
         
         
@@ -341,7 +341,7 @@ module.exports.login =
             else
                 .login-buttons-padding
             """
-        dropdown: -> Accounts.loginButtons.dropdown()
+        dropdown: -> Login.loginButtons.dropdown()
 
 
     loginButtons:
@@ -369,14 +369,14 @@ module.exports.login =
                 +_loginButtonsLoggedOut        
             """
         events:
-            'click #login-buttons-logout': -> Meteor.logout -> Accounts.loginSession.closeDropdown() ; Router.go 'home'
+            'click #login-buttons-logout': -> Meteor.logout -> Login.loginSession.closeDropdown() ; Router.go 'home'
             'click #login-buttons-profile': -> $('#login-dropdown-list').removeClass 'open' ; Router.go 'profile'
             'click #login-buttons-settings': -> $('#login-dropdown-list').removeClass 'open' ; Router.go 'settings'
             'click input, click label, click button, click .dropdown-menu, click .alert': ( event ) -> event.stopPropagation()
-            'click .login-close': -> Accounts.loginSession.closeDropdown() ; $('#login-dropdown-list').removeClass 'open' ; console.log "login-close"
+            'click .login-close': -> Login.loginSession.closeDropdown() ; $('#login-dropdown-list').removeClass 'open' ; console.log "login-close"
             'click #login-name-link, click #login-sign-in-link': ( event ) -> 
                 event.stopPropagation()
-                Accounts.loginSession.set 'dropdownVisible', true
+                Login.loginSession.set 'dropdownVisible', true
                 Meteor.flush()
         toggleDropdown: -> $('#login-dropdown-list .dropdown-menu').dropdown 'toggle'  # not used
 
@@ -391,8 +391,8 @@ module.exports.login =
             button.btn.btn-default.login-close#login-button-back-to-menu Close
             """
         events:
-            'keypress #old-password, keypress #password, keypress #password-again': ( event ) -> Accounts.ui.changePassword() if event.keyCode == 13
-            'click #login-buttons-do-change-password': ( event ) -> event.stopPropagation(); Accounts.ui.changePassword()
+            'keypress #old-password, keypress #password, keypress #password-again': ( event ) -> Login.ui.changePassword() if event.keyCode == 13
+            'click #login-buttons-do-change-password': ( event ) -> event.stopPropagation(); Login.ui.changePassword()
             'click #login-buttons-back-to-menu': ( event ) -> event.stopPropagation(); $('#login-dropdown-list').removeClass 'open'
         fields: -> [
             name: 'old-password'
@@ -403,7 +403,7 @@ module.exports.login =
         ,
             name: 'password-again'
             label: 'New Password (again)',                    type: 'password',           visible: -> 
-                _.contains( ["USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Accounts.ui._passwordSignupFields() ) ]
+                _.contains( ["USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Login.ui._passwordSignupFields() ) ]
 
 
     _loginButtonsBackToLoginLink:

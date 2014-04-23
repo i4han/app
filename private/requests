@@ -4,10 +4,10 @@ var _ = require('underscore');
 var request = require('request');
 var mongo = require('mongodb');
 
-var __ = require('../lib/utilities').__;
 require( 'coffee-script/register' );
-var Config = require('../lib/config').__config__;
-__.deepExtend( Config, require('../server/__server_config').__server_config__ );
+var Config = require('../lib/config').Config;
+var __ = require( Config.lib_file ).__;
+__.deepExtend( Config, require('../server/__serverconfig').ServerConfig );
 
 var post = function (url, body) {
     request.post({ url: url, body: body }, function ( error, response, body ) {
@@ -57,6 +57,12 @@ if ( command === 'tag' ) {
     }));
 } else if ( command === 'test' ) {
     post( Config.instagram.callback_url, '{ "name": "Isaac" }' );
+} else if ( command === 'challenge' ) {
+    get( q = Config.instagram.callback_url + '?' + __.queryString({
+        'hub.mode':'test', // ^ includes '?'  ^ intended duplicated '?' to test instagram error
+        'hub.challenge':'hello world'
+    }));
+    console.log( q );
 } else if ( command === 'del' ) {
     del( Config.instagram.subscription_url + '?' + __.queryString({
         client_id: Config.instagram.client_id,
