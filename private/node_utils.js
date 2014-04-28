@@ -2,6 +2,8 @@ var _ = require('underscore');
 var fs = require('fs');
 var crypto = require('crypto');
 var serialize = require('node-serialize');
+var redis = require('redis')
+var rc = redis.createClient();
 
 require( 'coffee-script/register' );
 var Config = require('../lib/config').Config;
@@ -37,7 +39,7 @@ lib = {
         });
     },
     overwriteFile: function (file, data) {
-        fs.writeFile( file, data, { encoding: 'utf8', flag: 'w+' }, function (err) { if (err) throw err; });
+        fs.writeFileSync( file, data, { encoding: 'utf8', flag: 'w+' } );
     },
     indentBlock: function (block, indent) {
         if ( indent ) {
@@ -60,6 +62,7 @@ __.getStorables = function () {
 
 __.saveStorables = function (data) {
     __.overwriteFile( Config.storables, serialize.serialize( data ) );
+    rc.rpush( 'node_utils:log', '64 Storables saved' );
 }
 
 
@@ -77,7 +80,6 @@ __.collectKey = function (obj, kind, storables_hash) {
         return crypto.createHash('md5').update( strSum ).digest('hex');
     }
     var updateFile = function () {
-        console.log( 'Updating ' + template.target_file);
         var fileTarget = template.header ? template.header : '';
         _.each( _.keys(obj), function ( file ) { 
             _.each( _.keys(obj[file]), function ( page ) { 
@@ -89,27 +91,31 @@ __.collectKey = function (obj, kind, storables_hash) {
                 }
             });
         });
-        __.overwriteFile( template.target_file, fileTarget );        
+        __.overwriteFile( template.target_file, fileTarget );
+        console.log( 'Updated ' + template.target_file);
+        rc.rpush( 'node_utils:log', ' 94 fileTarget:' + template.target_file );
     };
     
     var hash = checkSum();
-    fs.exists( template.target_file, function (exists) {
-        if (exists) {
-            if ( storables_hash !== hash )
-                updateFile();   
-        } else
-            updateFile();
-    });
+    if ( fs.existsSync(template.target_file) ) {
+        if ( storables_hash !== hash )
+            updateFile();   
+    } else
+        updateFile();
+    rc.rpush( 'node_utils:log', '103 kind:' + kind );
     return hash;
 }
 
 
-__.collectPages = function ( Pages ) {
+__.collectPages = function ( pages_in_file ) {
    var storables = __.getStorables();
     _.each( Config.templates, function ( type ) {
-        storables[type + '_hash'] = __.collectKey( Pages, type, storables[type + '_hash'] );
+        storables[type + '_hash'] = __.collectKey( pages_in_file, type, storables[type + '_hash'] );
+        rc.rpush( 'node_utils:log', '113 type:' + type );
     });
     __.saveStorables( storables );
+    rc.rpush( 'node_utils:log', '116 done' );
+
 }
 
 

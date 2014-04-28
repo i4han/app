@@ -1,11 +1,12 @@
 module.exports.content =
 
     home:
+        router: path: '/'
         jade: """
-            .primary-content
-                h1 Title
-            .primary-content#items
-                each items
+            .row
+                h1 Just good Title
+            .row#items
+                each items  
                     .item
                         +item
             """
@@ -18,7 +19,7 @@ module.exports.content =
             $container.masonry itemSelector: '.item', columnWidth: 332
         items: -> db.Items.find {}, sort: created_time: -1
         stylus: """
-            #items > .item
+            #items > .item 
                 background-color #fff
                 width 320px
                 height 320px
@@ -31,13 +32,14 @@ module.exports.content =
               -webkit-transform rotateY( 45deg )
             """
 
+        
     item:
         jade: """img(src="{{url}}" height="320" width="320")"""
         
-
     about:
+        router: {}
         jade: """
-            .primary-content
+            .row
                 +x3d
             .primary-content
                 +hello
@@ -54,12 +56,13 @@ module.exports.content =
         stylus: """
             .tile
                 width 160px
-                float left
+                float left 
                 border 1px solid #999
                 margin 6px
             """
         
     profile:
+        router: {}
         jade: """
             .primary-content    
                 .col-sm-4
@@ -95,6 +98,7 @@ module.exports.content =
             
                 
     help:
+        router: {}
         jade: """
             .primary-content
                 .h2 Debug  
@@ -102,11 +106,10 @@ module.exports.content =
             """
         rendered: ->
             container = $('#debug')
-            _.each _.keys( Page ), ( file ) ->
-                _.each _.keys( Page[file] ), ( page ) ->
-                    container.append( $("<h2>#{page}</h2>") )         
-                    _.each _.keys( Page[file][page] ), ( key ) ->
-                        container.append( $("<h3>#{key}</h3><pre>#{Page[file][page][key]}</pre>") ) 
+            _.each _.keys( Pages ), ( name ) ->
+                container.append( $("<h2>#{name}</h2>") )         
+                _.each _.keys( Pages[name] ), ( key ) ->
+                    container.append( $("<h3>#{key}</h3><pre>#{Pages[name][key]}</pre>") ) 
 
 
 
@@ -136,17 +139,27 @@ module.exports.content =
         maybe_selected: -> if Session.equals 'session_color', this._id then 'selected' else 'not_selected'
 
 
-    hello:
+    connect:
+        router: {}
         jade: """
-            | Hello.
+            | Connect
             br.single-line
+            a(href="{{instagram_connect}}") 
+                | Connect with Instagram
             input.btn.btn-default(type="button" value="Click")
             """
+        helpers:
+            instagram_connect: -> Config.instagram.oauth_url + '?' + __.queryString
+                client_id: Config.instagram.client_id
+                redirect_uri: Config.instagram.redirect_uri Meteor.userId()
+                response_type: Config.instagram.response_type
+
         events:
             'click input': -> console.log Router.current().route.name
 
 
-    x3d:
+    __x3d:
+        router: {}
         less: """
             .controls {
                 position: absolute;

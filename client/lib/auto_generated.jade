@@ -1,8 +1,8 @@
 template(name="home")
-    .primary-content
-        h1 Title
-    .primary-content#items
-        each items
+    .row
+        h1 Just good Title
+    .row#items
+        each items  
             .item
                 +item
 
@@ -10,7 +10,7 @@ template(name="item")
     img(src="{{url}}" height="320" width="320")
 
 template(name="about")
-    .primary-content
+    .row
         +x3d
     .primary-content
         +hello
@@ -51,9 +51,11 @@ template(name="color_list")
 template(name="color_info")
     li(class="{{maybe_selected}}") {{name}} {{likes}} 
 
-template(name="hello")
-    | Hello.
+template(name="connect")
+    | Connect
     br.single-line
+    a(href="{{instagram_connect}}") 
+        | Connect with Instagram
     input.btn.btn-default(type="button" value="Click")
 
 template(name="dialog")
@@ -136,28 +138,14 @@ template(name="layout")
 
 template(name="navbar")
     .navbar.navbar-default.navbar-fixed-top: .container
-        .navbar-header
-            a.navbar-brand(href="{{pathFor 'home'}}") Home
-        .navbar-left
+        .navbar-left 
             ul.nav.navbar-nav
-                li: a(href="{{pathFor 'x3d'}}") X3d
+                li: a(href="{{pathFor 'home'}}") Home
                 li: a(href="{{pathFor 'profile'}}") Profile
+                li: a(href="{{pathFor 'connect'}}") Connect
                 li: a(href="{{pathFor 'help'}}") Help
         .navbar-right
             +loginButtons
-
-template(name="dropdownConnect")
-    li.dropdown
-        a.dropdown-toggle#download(data-toggle="dropdown") 
-            | Connect 
-            i.fa.fa-chevron-down
-        ul.dropdown-menu(aria-labelledby="download")
-            li: a(href="{{instagram_connect}}") 
-                | Connect with Instagram
-            li: a(href="#")
-                | Connect with Facebook
-            li: a(href="#") 
-                | Connect with Google+
 
 template(name="page_nav")
     ul#page-nav
@@ -168,9 +156,10 @@ template(name="page_nav")
         li: a Menu
 
 template(name="footer")
-    .primary-content    
-        br.triple-line
-        center About Help Blog Terms info Businesses © 2014 Hello
+    .content
+        .row    
+            br.triple-line
+            center About Help Blog Terms info Businesses © 2014 Hello
 
 template(name="_loginButtonsLoggedInDropdown")
     li.dropdown#login-dropdown-list

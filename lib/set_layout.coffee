@@ -64,37 +64,29 @@ module.exports.layout =
             """
         jade: """
             .navbar.navbar-default.navbar-fixed-top: .container
-                .navbar-header
-                    a.navbar-brand(href="{{pathFor 'home'}}") Home
-                .navbar-left
+                .navbar-left 
                     ul.nav.navbar-nav
-                        li: a(href="{{pathFor 'x3d'}}") X3d
+                        li: a(href="{{pathFor 'home'}}") Home
                         li: a(href="{{pathFor 'profile'}}") Profile
+                        li: a(href="{{pathFor 'connect'}}") Connect
                         li: a(href="{{pathFor 'help'}}") Help
                 .navbar-right
                     +loginButtons
             """
 
 
-    dropdownConnect:
-        jade: """
+    __dropdownConnect:
+        __jade: """
             li.dropdown
                 a.dropdown-toggle#download(data-toggle="dropdown") 
                     | Connect 
                     i.fa.fa-chevron-down
                 ul.dropdown-menu(aria-labelledby="download")
-                    li: a(href="{{instagram_connect}}") 
-                        | Connect with Instagram
                     li: a(href="#")
                         | Connect with Facebook
                     li: a(href="#") 
                         | Connect with Google+
             """
-        helpers:
-            instagram_connect: -> Config.instagram.oauth_url + '?' + __.queryString
-                client_id: Config.instagram.client_id
-                redirect_uri: Config.instagram.redirect_uri Meteor.userId()
-                response_type: Config.instagram.response_type
         
     page_nav:
         jade: """
@@ -109,14 +101,15 @@ module.exports.layout =
 
     footer:
         jade: """
-            .primary-content    
-                br.triple-line
-                center About Help Blog Terms info Businesses © 2014 Hello
+            .content
+                .row    
+                    br.triple-line
+                    center About Help Blog Terms info Businesses © 2014 Hello
             """
                 
             
             
-    responsive:
+    __responsive:
         stylus: """
         $desktop_width = 885px
         $desktop_height = 540px
@@ -225,7 +218,7 @@ module.exports.layout =
                 position: fixed
         """
 
-    theme:
+    __theme:
         stylus: """
 //
 // app.css

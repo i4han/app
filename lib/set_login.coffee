@@ -457,7 +457,7 @@ module.exports.login =
                 span.or-text or
                 span.hline &nbsp; &nbsp; &nbsp;
             """
-    loginStyle:
+    __loginStyle:
         stylus: """
             .dropdown-menu > li > a
                 display: block;

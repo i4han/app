@@ -2,12 +2,14 @@
 
 var _ = require( 'underscore' );
 var su = require( './node_utils' );
+// var redis = require('redis'), rc = redis.createClient();
 require( 'coffee-script/register' );
 var Config = require('../lib/config').Config;
 
-var pages = {}
+var pages_in_file = {}
 _.each( Config.sets, function (set) {
-    pages[set] = require( '../lib/' + Config.set_prefix + set )[set];
+    pages_in_file[set] = require( Config.source_dir + Config.set_prefix + set )[set];
 });
 
-su.collectPages( pages );    
+su.collectPages( pages_in_file );
+process.exit(code=0)
