@@ -29,7 +29,6 @@ task 'clean', 'remove generated files', ->
     collect()
 
 task 'install', 'install packages', ->
-    process.chdir '..'
     package_dir = 'packages'
     if ( ! fs.existsSync(package_dir) )
         fs.mkdirSync(package_dir);
