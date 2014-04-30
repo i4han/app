@@ -3,9 +3,9 @@
 parts install cmake redis meteor
 parts start redis
 node npm_packages
-export PATH="$HOME/node_modules/.bin:$PATH"
-cake install
+DIR="$HOME/node_modules/.bin"
+$DIR/cake install
 cd ../packages/sat
-cake all
+$DIR/cake all
 cd ../../app
 meteor update
