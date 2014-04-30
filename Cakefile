@@ -35,6 +35,3 @@ task 'install', 'install packages', ->
         fs.mkdirSync(package_dir);
     process.chdir(package_dir);
     git_clone 'sat', 'https://github.com/i4han/sat.git'
-    process.chdir 'sat'
-    spawn 'cake', ['all'], stdio: 'inherit'
-
