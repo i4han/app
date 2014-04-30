@@ -5,7 +5,7 @@ parts start redis
 node npm_packages
 DIR="$HOME/node_modules/.bin"
 $DIR/cake install
-cd ../packages/sat
+cd packages/sat
 $DIR/cake all
-cd ../../app
+cd ../..
 meteor update
