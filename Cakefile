@@ -51,3 +51,11 @@ task 'uninstall', 'Uninstall packages', ->
     if fs.existsSync package_dir
         rm_rf package_dir
     process.exit 0
+
+task 'profile', 'Make shell profile', ->
+    home = process.env.HOME
+    cwd = process.cwd()
+    fs.writeFileSync 'profile', """
+        export PATH="#{home}/node_modules/.bin:#{cwd}/packages/utils:$PATH"
+        export NODE_PATH="#{home}/node_modules:$NODE_PATH"
+        """, flag: 'w+'

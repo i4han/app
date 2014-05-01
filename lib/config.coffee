@@ -4,11 +4,11 @@ if !Meteor?
 main = {
     title:            'App'
     home_url:         'http://www.hi16.ca'
-    home_dir:         '/home/action/'
+    home_dir:         process.env.HOME
     autogen_prefix:   'auto_generated'
     callback_port:    3003
     init: ->
-        this.meteor_dir = this.home_dir   + 'workspace/app/'
+        this.meteor_dir = this.home_dir   + 'workspace/'
         this.source_dir = this.meteor_dir + 'lib/'
         this.target_dir = this.meteor_dir + 'client/lib/'
         delete this.init
@@ -30,18 +30,18 @@ module.exports.Config = {
     indent_string:     '    '
     collections:       'connects items updates boxes colors' .split ' '
     instagram:
-        callback_path: '/callback/instagram/'
-        response_type: 'code'
-        grant_type:    'authorization_code'
-        oauth_url:     'https://api.instagram.com/oauth/authorize/'
-        client_id:     '91ee62d198554e1c83305df1dc007335'
-        final_url:      main.home_url
+        callback_path:     '/callback/instagram/'
+        response_type:     'code'
+        grant_type:        'authorization_code'
+        oauth_url:         'https://api.instagram.com/oauth/authorize/'
+        client_id:         '91ee62d198554e1c83305df1dc007335'
+        final_url:          main.home_url
         request_url:       'https://api.instagram.com/oauth/access_token/'
         subscription_url:  'https://api.instagram.com/v1/subscriptions/'
         callback_url:      'http://www.hi16.ca:3003/callback/instagram/?command=update'
-        media_url:     (media_id, access_token) -> 
+        media_url:         (media_id, access_token) -> 
             "https://api.instagram.com/v1/media/#{media_id}/?access_token=#{access_token}"
-        redirect_uri:  ( user_id ) ->  # redirect_uri is instagram's definition.
+        redirect_uri:      ( user_id ) ->  # redirect_uri is instagram's definition.
             "http://www.hi16.ca:3003/callback/instagram/?command=oauth&user_id=#{user_id}"        
     pages:
         jade:
