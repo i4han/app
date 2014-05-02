@@ -84,8 +84,8 @@ module.exports.Config = {
             if !Meteor?
                 this.redis = (require 'redis').createClient()
             else
-                this.redis = (Npm.require 'redis').createClient()            
-        # if !Meteor? sets = ls of set_* in home/lib (*) part.
+                this.redis = (Npm.require 'redis').createClient()
+                this.server_config = this.meteor_dir + 'server/config'
         this.templates  = Object.keys this.pages
         this.auto_generated_files = (this.pages[i].target_file for i in this.templates)
         delete this.init
@@ -97,7 +97,35 @@ module.exports.Config = {
 
 
 
-__ = {};
+__ =
+    queryString: (obj) ->
+        parts = []
+        for i of obj
+            parts.push encodeURIComponent(i) + "=" + encodeURIComponent(obj[i])
+        parts.join "&"
+
+    trim: (str) -> str.trim()
+    capitalize: (string) -> string.charAt(0).toUpperCase() + string.slice(1)
+    dasherize: (str) -> str.trim().replace(/([A-Z])/g, "-$1").replace(/[-_\s]+/g, "-").toLowerCase()
+    prettyJSON: (obj) -> JSON.stringify obj, null, 4
+
+    getValue: (id) ->
+        element = document.getElementById(id)
+        (if element then element.value else null)
+
+    trimmedValue: (id) ->
+        element = document.getElementById(id)
+        (if element then element.value.replace(/^\s*|\s*$/g, "") else null)
+
+    reKey: (obj, oldName, newName) ->
+        if obj.hasOwnProperty(oldName)
+            obj[newName] = obj[oldName]
+            delete obj[oldName]
+        this
+        
+__.renameKeys = (obj, keyObject) ->
+    _.each _.keys keyObject, (key) ->
+        __.reKey obj, key, keyObject[key]
 
 __.repeat = (pattern, count) ->
     return '' if count < 1
@@ -130,7 +158,6 @@ __.flatten = (obj, chained_keys) ->
         else
             toReturn[i] = obj[i]
     toReturn
-
 
 __.log = (arg) ->
     if Config.redis.connected
