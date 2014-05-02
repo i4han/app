@@ -6,7 +6,7 @@ module.exports.content =
             .row
                 h1 Just good Title
             .row#items
-                each items  
+                each items
                     .item
                         +item
             """
@@ -101,7 +101,7 @@ module.exports.content =
         router: {}
         jade: """
             .primary-content
-                .h2 Debug  
+                .h2 Debug..  
             .primary-content#debug
             """
         rendered: ->

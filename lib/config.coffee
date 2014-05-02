@@ -1,31 +1,28 @@
 if !Meteor?
+    _ = require 'underscore'
+    fs = require 'fs'
     stylus = require 'stylus'
+else if Meteor.isServer
+    fs = Npm.require 'fs'
 
 main = {
     title:            'App'
     home_url:         'http://www.hi16.ca'
-    home_dir:         process.env.HOME
     autogen_prefix:   'auto_generated'
     callback_port:    3003
     init: ->
-        this.meteor_dir = this.home_dir   + 'workspace/'
-        this.source_dir = this.meteor_dir + 'lib/'
-        this.target_dir = this.meteor_dir + 'client/lib/'
-        delete this.init
+        if !Meteor? or Meteor.isServer
+            this.home_dir   = process.env.HOME + '/'
+            this.meteor_dir = process.env.METEOR_APP + '/'
+            this.source_dir = this.meteor_dir + 'lib/'
+            this.target_dir = this.meteor_dir + 'client/lib/'
         return this
 }.init()
 
 module.exports.Config = {
     title:             main.title
     home_url:          main.home_url
-    meteor_dir:        main.meteor_dir
-    source_dir:        main.source_dir
-    target_dir:        main.target_dir
     callback_port:     main.callback_port
-    lib_file:          main.meteor_dir + 'lib/utilities.js'
-    storables:         main.meteor_dir + 'private/storables'
-    autogen_prefix:    main.autogen_prefix
-    set_prefix:        'set_'
     sets:              'content dialog form layout login' .split ' '
     indent_string:     '    '
     collections:       'connects items updates boxes colors' .split ' '
@@ -75,24 +72,50 @@ module.exports.Config = {
             format: (name, block) -> block
     auto_generated_files: []
     init: ->
+        this.redis = {}
+        if !Meteor? or Meteor.isServer
+            this.meteor_dir = main.meteor_dir
+            this.source_dir = main.source_dir
+            this.target_dir = main.target_dir
+            this.lib_file   = main.meteor_dir + 'lib/utilities.js'
+            this.storables  = main.meteor_dir + 'private/storables'
+            this.set_prefix = 'set_'
+            this.autogen_prefix = main.autogen_prefix
+            if !Meteor?
+                this.redis = (require 'redis').createClient()
+            else
+                this.redis = (Npm.require 'redis').createClient()            
         # if !Meteor? sets = ls of set_* in home/lib (*) part.
         this.templates  = Object.keys this.pages
         this.auto_generated_files = (this.pages[i].target_file for i in this.templates)
         delete this.init
         return this
+    quit: ->
+        this.redis.quit() if ! _.isEmpty( this.redis ) 
+        
 }.init()
 
 
-if !Meteor?
-    fs = require 'fs'
-    redis = require 'redis'
-    rc = redis.createClient()
-else if Meteor.isServer
-    fs = Npm.require 'fs'
-    redis  = Npm.require 'redis'
-    rc = redis.createClient()
 
 __ = {};
+
+__.repeat = (pattern, count) ->
+    return '' if count < 1
+    result = ''
+    while count > 0
+        result += pattern if count & 1
+        count >>= 1
+        pattern += pattern
+    result
+
+__.deepExtend = (target, source) ->
+    for prop of source
+        if prop of target
+            __.deepExtend target[prop], source[prop]
+        else
+            target[prop] = source[prop]
+    target
+
 
 __.flatten = (obj, chained_keys) ->
     toReturn = {}       
@@ -110,9 +133,9 @@ __.flatten = (obj, chained_keys) ->
 
 
 __.log = (arg) ->
-    if rc?
-        rc.rpush( 'log', (arg + '').toString() );
+    if Config.redis.connected
+        Config.redis.rpush( 'log', arg + '' );
     else
-        console.log( (arg + '').toString() );
+        console.log( arg + '' );
 
 module.exports.__ = __;

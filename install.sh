@@ -10,4 +10,5 @@ cd packages/sat
 $DIR/cake all
 cd ../..
 meteor update
+. profile
 meteor
