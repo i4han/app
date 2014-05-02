@@ -2,8 +2,14 @@ if !Meteor?
     _ = require 'underscore'
     fs = require 'fs'
     stylus = require 'stylus'
-else if Meteor.isServer
-    fs = Npm.require 'fs'
+else if ! Package.underscore._.isEmpty(this.Config) and ! Package.underscore._.isEmpty(this.__)
+    return this.Config
+else
+    _ = this._
+    this.module = exports:{}
+    if Meteor.isServer
+        fs = Npm.require 'fs'
+
 
 main = {
     title:            'App'
@@ -19,7 +25,7 @@ main = {
         return this
 }.init()
 
-module.exports.Config = {
+this.Config = {
     title:             main.title
     home_url:          main.home_url
     callback_port:     main.callback_port
@@ -74,12 +80,15 @@ module.exports.Config = {
     init: ->
         this.redis = {}
         if !Meteor? or Meteor.isServer
-            this.meteor_dir = main.meteor_dir
-            this.source_dir = main.source_dir
-            this.target_dir = main.target_dir
-            this.lib_file   = main.meteor_dir + 'lib/utilities.js'
-            this.storables  = main.meteor_dir + 'private/storables'
-            this.set_prefix = 'set_'
+            this.config_file = main.meteor_dir + 'config.coffee'
+            this.meteor_dir  = main.meteor_dir
+            this.package_dir = main.meteor_dir + 'packages/'
+            this.config_js   = this.package_dir+ 'sat/'
+            this.source_dir  = main.source_dir
+            this.target_dir  = main.target_dir
+            this.lib_file    = main.meteor_dir + 'lib/utilities.js'
+            this.storables   = main.meteor_dir + 'private/storables'
+            this.set_prefix  = 'set_'
             this.autogen_prefix = main.autogen_prefix
             if !Meteor?
                 this.redis = (require 'redis').createClient()
@@ -97,7 +106,7 @@ module.exports.Config = {
 
 
 
-__ =
+this.__ =
     queryString: (obj) ->
         parts = []
         for i of obj
@@ -123,11 +132,10 @@ __ =
             delete obj[oldName]
         this
         
-__.renameKeys = (obj, keyObject) ->
-    _.each _.keys keyObject, (key) ->
-        __.reKey obj, key, keyObject[key]
+this.__.renameKeys = (obj, keyObject) ->
+    _.each _.keys keyObject, (key) -> this.__.reKey obj, key, keyObject[key]
 
-__.repeat = (pattern, count) ->
+this.__.repeat = (pattern, count) ->
     return '' if count < 1
     result = ''
     while count > 0
@@ -136,7 +144,7 @@ __.repeat = (pattern, count) ->
         pattern += pattern
     result
 
-__.deepExtend = (target, source) ->
+this.__.deepExtend = (target, source) ->
     for prop of source
         if prop of target
             __.deepExtend target[prop], source[prop]
@@ -145,11 +153,11 @@ __.deepExtend = (target, source) ->
     target
 
 
-__.flatten = (obj, chained_keys) ->
+this.__.flatten = (obj, chained_keys) ->
     toReturn = {}       
     for i in obj
         if typeof obj[i] == 'object'
-            flatObject = __.flatten obj[i]
+            flatObject = this.__.flatten obj[i]
             for j in flatObject
                 if chained_keys
                     toReturn[i+'_'+j] = flatObject[j]
@@ -159,10 +167,12 @@ __.flatten = (obj, chained_keys) ->
             toReturn[i] = obj[i]
     toReturn
 
-__.log = (arg) ->
-    if Config.redis.connected
-        Config.redis.rpush( 'log', arg + '' );
+this.__.log = (arg) ->
+    if this.Config.redis.connected
+        this.Config.redis.rpush( 'log', arg + '' );
     else
         console.log( arg + '' );
 
-module.exports.__ = __;
+if !Meteor?
+    module.exports.Config = this.Config;
+    module.exports.__ = this.__;
