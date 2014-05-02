@@ -4,17 +4,16 @@ chokidar = require 'chokidar'
 {spawn} = require 'child_process'
 require 'coffee-script/register'
 {Config} = require './config'
-clone = require('nodegit').Repo.clone;
 package_dir = 'packages'
-
+io = stdio: 'inherit'
 isType = (file, type) ->
     path.extname(file) is '.' + type
 
-collect = -> spawn 'collect', [], stdio: 'inherit'  
-meteor = -> spawn 'meteor', [], stdio: 'inherit'  
-git_clone = (dir, url) -> clone url, dir, null, (err, repo) -> throw err if err
+collect = -> spawn 'collect', [], io
+meteor = -> spawn 'meteor', [], io  
+git_clone = (url) -> spawn 'git', ['clone', url], io
 compile = ->
-    spawn 'coffee', [ '--compile', '--bare', '--output', Config.config_js, Config.config_file], stdio: 'inherit'
+    spawn 'coffee', [ '--compile', '--bare', '--output', Config.config_js, Config.config_file], io
         
 rm_rf = (path) ->
     files = [];
@@ -54,7 +53,7 @@ task 'install', 'Install packages', ->
     if ! fs.existsSync package_dir
         fs.mkdirSync package_dir
         process.chdir package_dir
-        git_clone 'sat', 'https://github.com/i4han/sat.git'
+        git_clone 'https://github.com/i4han/sat.git'
 
 task 'uninstall', 'Uninstall packages', ->
     if fs.existsSync package_dir
