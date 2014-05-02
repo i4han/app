@@ -11,4 +11,5 @@ $DIR/cake all
 cd ../..
 meteor update
 . profile
-meteor
+cake reset
+cake watch

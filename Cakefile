@@ -29,10 +29,12 @@ rm_rf = (path) ->
         else
             fs.unlinkSync curPath
     fs.rmdirSync path
+
 task_clean = ->
     for file in Config.auto_generated_files
-        console.log( file + ' has been deleted.' )
-        fs.unlinkSync file if fs.existsSync file    
+        if fs.existsSync file 
+            console.log file + ' has been deleted.'
+            fs.unlinkSync file
         
 task 'watch', 'Start the server', ->
     watcher = chokidar.watch Config.source_dir, persistent:true
