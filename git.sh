@@ -1,21 +1,20 @@
 #!/usr/bin/env bash
 
+gitup() {
+    git add --all
+    if [ -n "$(git status --porcelain)" ]; then 
+        git commit -m $1
+        git push
+    else 
+      echo "no changes";
+    fi
+}
+
 cd ~/workspace
 cake profile
 . profile
-git add --all
-git commit -m $1
-if [ -n "$(git status --porcelain)" ]; then 
-  echo "there are changes"; 
-else 
-  echo "no changes";
-fi
-git push
+gitup $1
 cd bin
-git add --all
-git commit -m $1
-git push
+gitup $1
 cd sat
-git add --all
-git commit -m $1
-git push
+gitup $1
