@@ -19,11 +19,9 @@ cd ~/workspace
 cake profile
 . profile
 gitup $comment
-echo
 
 for i in bin browser sat
 do
     cd $i
     gitup $comment
-    echo
 done
