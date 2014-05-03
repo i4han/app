@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-cd
 parts install redis meteor
 parts start redis
 if [ ! -d "~/node_modules" ]; then
