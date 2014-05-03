@@ -1,5 +1,0 @@
-#!/bin/bash
-
-export APP="$HOME/workspace/app"
-cd $APP
-exec "/home/action/.parts/packages/meteor/0.7.1.2/meteor" "$@"
