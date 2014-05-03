@@ -5,8 +5,6 @@ parts start redis
 node npm_packs
 BIN="$HOME/node_modules/.bin"
 $BIN/cake install
-$BIN/cake config
-read -p "Press any key:"
 $BIN/cake profile
 . profile
 cake config
