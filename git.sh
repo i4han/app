@@ -6,7 +6,7 @@ gitup() {
         git commit -m $1
         git push
     else 
-        echo "no changes";
+        echo "No changes.";
     fi
 }
 
