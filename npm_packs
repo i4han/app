@@ -9,7 +9,7 @@ var home = process.env.HOME
 
 
 var extra = 'bitcore ddp'
-var packages = 'nodegit stylus express coffee-script jade fibers hiredis redis markdown mongodb redis underscore chokidar crypto fs-extra moment node-serialize request' .split(' '); 
+var packages = 'stylus express coffee-script jade fibers hiredis redis markdown mongodb redis underscore chokidar crypto fs-extra moment node-serialize request' .split(' '); 
 process.chdir(home);
 npm.load({}, function (err) {
   if (err) throw (err);

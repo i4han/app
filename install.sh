@@ -3,14 +3,14 @@
 parts install cmake redis meteor
 parts start redis
 node npm_packs
-DIR="$HOME/node_modules/.bin"
-$DIR/cake install
-$DIR/cake profile
+BIN="$HOME/node_modules/.bin"
+$BIN/cake install
+$BIN/cake config
+$BIN/cake profile
+. profile
 cd packages/sat
-$DIR/cake all
+cake all
 cd ../..
 meteor update
-. profile
-cake config
 cake reset
 cake watch
