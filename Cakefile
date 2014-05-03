@@ -66,7 +66,7 @@ task 'profile', 'Make shell profile', ->
         export PATH="#{home}/node_modules/.bin:#{cwd}:#{cwd}/packages/bin:$PATH"
         export NODE_PATH="#{home}/node_modules:#{Config.config_js}"
         export METEOR_APP=#{cwd}
-        export CDPATH=".:#{Config.meteor_dir}:#{Config.package_dir}"
+        export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
         """, flag: 'w+'
 
 Config.quit()

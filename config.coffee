@@ -86,7 +86,6 @@ this.Config = {
             this.config_js   = this.package_dir+ 'sat/'
             this.source_dir  = main.source_dir
             this.target_dir  = main.target_dir
-            this.lib_file    = main.meteor_dir + 'lib/utilities.js'
             this.storables   = main.meteor_dir + 'private/storables'
             this.set_prefix  = 'set_'
             this.autogen_prefix = main.autogen_prefix
