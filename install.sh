@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-parts install cmake redis meteor
+parts install redis meteor
 parts start redis
 node npm_packs
 BIN="$HOME/node_modules/.bin"
