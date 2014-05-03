@@ -7,21 +7,15 @@ if [ ! -d "~/node_modules" ]; then
 fi
 npm install --prefix ~/node_modules npm
 node npm_packs
-BIN="$HOME/node_modules/.bin"
-$BIN/cake install
-$BIN/cake profile
+$HOME/node_modules/.bin/cake install profile
 . profile
-cake config
-cake profile
-cat profile
+cake config profile
 . profile
 cd sat
 cake all
-cd ~/workspace
+cd workspace
 meteor update
 if [ ! -d "client" ]; then
     mkdir client
 fi
-cake reset
-cake watch
-
+cake reset watch
