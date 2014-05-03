@@ -3,8 +3,8 @@
 
 // Run button configuration
   "commands": {
-        "gitup": ". ~/workspace/profile; gitup"
-         
+        "gitup": ". ~/workspace/profile; gitup",
+        "install": "cd ~/workspace; ./install.sh"
   },
 
 // Preview button configuration
