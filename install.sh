@@ -7,8 +7,10 @@ BIN="$HOME/node_modules/.bin"
 $BIN/cake install
 $BIN/cake config
 $BIN/cake profile
+cat profile
 . profile
-cake profile
+$BIN/cake profile
+cat profile
 . profile
 cd sat
 cake all
