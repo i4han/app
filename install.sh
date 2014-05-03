@@ -21,3 +21,4 @@ if [ ! -d "client" ]; then
 fi
 cake reset
 cake watch
+
