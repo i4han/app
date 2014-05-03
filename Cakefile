@@ -63,7 +63,7 @@ task 'profile', 'Make shell profile', ->
     home = process.env.HOME
     cwd = process.cwd()
     fs.writeFileSync 'profile', """
-        export PATH="#{home}/node_modules/.bin:#{cwd}/packages/bin:$PATH"
+        export PATH="#{home}/node_modules/.bin:#{cwd}:#{cwd}/packages/bin:$PATH"
         export NODE_PATH="#{home}/node_modules:#{Config.config_js}"
         export METEOR_APP=#{cwd}
         export CDPATH=".:#{Config.meteor_dir}:#{Config.package_dir}"

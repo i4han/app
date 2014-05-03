@@ -3,7 +3,8 @@
 
 // Run button configuration
   "commands": {
-        "Node version": "node --version"
+        "gitup": "gitup"
+         
   },
 
 // Preview button configuration
