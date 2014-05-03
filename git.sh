@@ -6,7 +6,7 @@ gitup() {
         git commit -m $1
         git push
     else 
-      echo "no changes";
+        echo "no changes";
     fi
 }
 
@@ -14,7 +14,9 @@ cd ~/workspace
 cake profile
 . profile
 gitup $1
-cd bin
-gitup $1
-cd sat
-gitup $1
+
+for i in bin browser sat
+do
+    cd $i
+    gitup $1
+done
