@@ -10,14 +10,20 @@ gitup() {
     fi
 }
 
+if [ $# -eq 0 ]; then
+    comment="regular"
+else
+    comment=$1
+fi
 cd ~/workspace
 cake profile
 . profile
-gitup $1
+gitup $comment
+echo
 
 for i in bin browser sat
 do
-    echo
     cd $i
-    gitup $1
+    gitup $comment
+    echo
 done
