@@ -14,7 +14,7 @@ else
 main = {
     title:            'App'
     home_url:         'http://www.hi16.ca'
-    autogen_prefix:   'auto_generated'
+    autogen_prefix:   'auto'
     callback_port:    3003
     init: ->
         if !Meteor? or Meteor.isServer
@@ -48,32 +48,32 @@ this.Config = {
             "http://www.hi16.ca:3003/callback/instagram/?command=oauth&user_id=#{user_id}"        
     pages:
         jade:
-            target_file: main.target_dir + main.autogen_prefix + '.jade'
+            target_file: main.target_dir + main.autogen_prefix + '1.jade'
             indent: 1
             format: (name, block) ->     """template(name="#{name}")\n#{block}\n\n"""
         stylus:
-            target_file: main.target_dir + main.autogen_prefix + 'z.css'
+            target_file: main.target_dir + main.autogen_prefix + '6.css'
             indent: 0
             format: (name, block) -> stylus( block ).render() + '\n'
         HTML:
-            target_file: main.target_dir + main.autogen_prefix + '.html'
+            target_file: main.target_dir + main.autogen_prefix + '2.html'
             indent: 1
             format: (name, block) ->     """<template name="#{name}">\n#{block}\n</template>"""
         head:
-            target_file: main.target_dir + main.autogen_prefix + '_head.jade'
+            target_file: main.target_dir + main.autogen_prefix + '0.jade'
             indent: 1
             header: 'head\n'
             format: (name, block) -> block
         less:
-            target_file: main.target_dir + main.autogen_prefix + '.less'
+            target_file: main.target_dir + main.autogen_prefix + '5.less'
             indent: 0
             format: (name, block) -> block
         css:
-            target_file: main.target_dir + main.autogen_prefix + '.css'
+            target_file: main.target_dir + main.autogen_prefix + '4.css'
             indent: 0
             format: (name, block) -> block
         styl:
-            target_file: main.target_dir + main.autogen_prefix + '.styl'
+            target_file: main.target_dir + main.autogen_prefix + '3.styl'
             indent: 0
             format: (name, block) -> block
     auto_generated_files: []
@@ -87,7 +87,7 @@ this.Config = {
             this.source_dir  = main.source_dir
             this.target_dir  = main.target_dir
             this.storables   = main.meteor_dir + 'private/storables'
-            this.set_prefix  = 'set_'
+            this.set_prefix  = ''
             this.autogen_prefix = main.autogen_prefix
             if !Meteor?
                 this.redis = (require 'redis').createClient()
