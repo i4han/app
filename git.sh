@@ -17,6 +17,7 @@ gitup $1
 
 for i in bin browser sat
 do
+    echo '\n'
     cd $i
     gitup $1
 done
