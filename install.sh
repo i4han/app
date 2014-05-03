@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
+cd
 parts install redis meteor
 parts start redis
-npm install npm
+if [ ! -d "~/node_modules" ]; then
+    mkdir ~/node_modules
+fi
+npm install --prefix ~/node_modules npm
 node npm_packs
 BIN="$HOME/node_modules/.bin"
 $BIN/cake install
