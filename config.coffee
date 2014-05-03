@@ -14,7 +14,7 @@ else
 main = {
     title:            'App'
     home_url:         'http://www.hi16.ca'
-    autogen_prefix:   'auto'
+    autogen_prefix:   'auto_'
     callback_port:    3003
     init: ->
         if !Meteor? or Meteor.isServer
