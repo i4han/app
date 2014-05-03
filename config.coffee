@@ -21,7 +21,7 @@ main = {
             this.home_dir   = process.env.HOME + '/'
             this.meteor_dir = process.env.METEOR_APP + '/'
             this.source_dir = this.meteor_dir + 'lib/'
-            this.target_dir = this.meteor_dir + 'client/lib/'
+            this.target_dir = this.meteor_dir + 'client/'
         return this
 }.init()
 

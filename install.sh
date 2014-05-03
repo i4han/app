@@ -14,5 +14,8 @@ cd sat
 cake all
 cd ~/workspace
 meteor update
+if [ ! -d "client" ]; then
+    mkdir client
+fi
 cake reset
 cake watch
