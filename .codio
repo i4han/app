@@ -3,7 +3,7 @@
 
 // Run button configuration
   "commands": {
-        "gitup": "gitup"
+        "gitup": ". ~/workspace/profile; gitup"
          
   },
 
