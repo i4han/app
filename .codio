@@ -4,6 +4,7 @@
 // Run button configuration
   "commands": {
         "gitup": ". ~/workspace/profile; gitup",
+        "shell": ". ~/workspace/profile",
         "install": "cd ~/workspace; ./install.sh"
   },
 

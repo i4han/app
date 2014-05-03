@@ -6,10 +6,11 @@ node npm_packs
 BIN="$HOME/node_modules/.bin"
 $BIN/cake install
 $BIN/cake config
+read -p "Press any key:"
 $BIN/cake profile
-cat profile
 . profile
-$BIN/cake profile
+cake config
+cake profile
 cat profile
 . profile
 cd sat
