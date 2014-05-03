@@ -10,9 +10,9 @@ $BIN/cake profile
 . profile
 cake profile
 . profile
-cd packages/sat
+cd sat
 cake all
-cd ../..
+cd ~/workspace
 meteor update
 cake reset
 cake watch
