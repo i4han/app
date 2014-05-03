@@ -8,6 +8,8 @@ $BIN/cake install
 $BIN/cake config
 $BIN/cake profile
 . profile
+cake profile
+. profile
 cd packages/sat
 cake all
 cd ../..
