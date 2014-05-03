@@ -2,6 +2,7 @@
 
 parts install redis meteor
 parts start redis
+npm install npm
 node npm_packs
 BIN="$HOME/node_modules/.bin"
 $BIN/cake install
