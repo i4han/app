@@ -2,7 +2,7 @@ if !Meteor?
     _ = require 'underscore'
     fs = require 'fs'
     stylus = require 'stylus'
-else if ! Package.underscore._.isEmpty(@Config) and ! Package.underscore._.isEmpty(@__)
+else if ! @_.isEmpty(@Config) and ! @_.isEmpty(@__)
     return [@Config, @__]
 else
     _ = @_
@@ -25,7 +25,7 @@ main = {
         return this
 }.init()
 
-this.Config = {
+@Config = {
     title:             main.title
     home_url:          main.home_url
     callback_port:     main.callback_port
@@ -78,7 +78,7 @@ this.Config = {
             format: (name, block) -> block
     auto_generated_files: []
     init: ->
-        this.redis = {}
+        @redis = {}
         if !Meteor? or Meteor.isServer
             @config_file = main.meteor_dir + 'config.coffee'
             @meteor_dir  = main.meteor_dir
@@ -99,8 +99,7 @@ this.Config = {
         delete @init
         return this
     quit: ->
-        this.redis.quit() if ! _.isEmpty( this.redis ) 
-        
+        @redis.quit() if ! _.isEmpty( @redis )    
 }.init()
 
 
