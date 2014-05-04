@@ -2,8 +2,8 @@ if !Meteor?
     _ = require 'underscore'
     fs = require 'fs'
     stylus = require 'stylus'
-else if ! @_.isEmpty(@Config) and ! @_.isEmpty(@__)
-    return [@Config, @__]
+else if ! Package.underscore._.isEmpty(@Config) and ! Package.underscore._.isEmpty(@__)
+    return {Config:@Config, __:@__};
 else
     _ = @_
     @module = exports:{}
