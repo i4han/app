@@ -15,7 +15,7 @@ if [ $# -eq 0 ]; then
 else
     comment=$1
 fi
-cd ~/workspace
+cd $METEOR_APP
 cake profile
 . profile
 gitup $comment

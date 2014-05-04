@@ -13,10 +13,10 @@ cake config profile
 . profile
 cd sat
 cake all
+cd $METEOR_APP
 if [ ! -d "client" ]; then
     mkdir client
 fi
 collect
-cd workspace
 meteor update
 cake reset watch
