@@ -173,5 +173,7 @@ this.__.log = (arg) ->
         console.log( arg + '' );
 
 if !Meteor?
-    module.exports.Config = this.Config;
-    module.exports.__ = this.__;
+    module.exports = {
+        __: this.__,
+        Config: this.Config
+    }

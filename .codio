@@ -5,7 +5,9 @@
   "commands": {
         "gitup": ". ~/workspace/profile; gitup",
         "shell": ". ~/workspace/profile",
-        "install": "cd ~/workspace; ./install.sh"
+        "install": "cd ~/workspace; ./install.sh",
+        "node": ". ~/workspace/profile; node",
+        "coffee": ". ~/workspace/profile; coffee" 
   },
 
 // Preview button configuration
