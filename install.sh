@@ -13,6 +13,7 @@ cake config profile
 . profile
 cd sat
 cake all
+collect
 cd workspace
 meteor update
 if [ ! -d "client" ]; then
