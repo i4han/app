@@ -19,4 +19,4 @@ if [ ! -d "client" ]; then
 fi
 collect
 meteor update
-cake reset watch
+cake watch
