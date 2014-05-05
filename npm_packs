@@ -8,9 +8,11 @@ var spawn = require('child_process').spawn
 var home = process.env.HOME
 
 var extra = 'bitcore'
-var packages = ("underscore express coffee-script jade stylus fibers hiredis redis " +
-                "mongodb chokidar crypto fs-extra moment node-serialize markdown " +
-                "request bitstamp readline") .split(' '); 
+var packages = (
+    "underscore express coffee-script jade stylus fibers hiredis redis " +            
+    "mongodb chokidar crypto fs-extra moment node-serialize markdown "   +
+    "request bitstamp readline"
+).split(' '); 
 process.chdir(home);
 npm.load({}, function (err) {
   if (err) throw (err);
