@@ -7,8 +7,8 @@ if [ ! -d "~/node_modules" ]; then
 fi
 npm install --prefix ~/node_modules npm
 node npm_packs
-$HOME/node_modules/.bin/cake install profile
-read -t 2 -p "Hit ENTER to create profile:"
+$HOME/node_modules/.bin/cake install 
+$HOME/node_modules/.bin/cake profile
 . profile
 cake config profile
 . profile
