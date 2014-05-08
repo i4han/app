@@ -10,22 +10,11 @@ isType = (file, type) ->
     path.extname(file) is '.' + type
 
 collect = -> spawn 'collect', [], io
-meteor = -> spawn 'meteor', [], io  
-git_clone = (url) -> spawn 'git', ['clone', url], io
+meteor = -> spawn 'meteor', [], io
+
 compile = ->
     spawn 'coffee', [ '--compile', '--bare', '--output', Config.config_js, Config.config_file], io
         
-rm_rf = (path) ->
-    files = [];
-    files = fs.readdirSync path
-    files.forEach (file, index) ->
-        curPath = path + "/" + file
-        if fs.lstatSync(curPath).isDirectory()
-            rm_rf curPath
-        else
-            fs.unlinkSync curPath
-    fs.rmdirSync path
-
 task_clean = ->
     for file in Config.auto_generated_files
         if fs.existsSync file 
@@ -49,16 +38,6 @@ task 'reset', 'Reset files', ->
     task_clean()
     collect()
 
-task 'install', 'Install packages', ->
-    if ! fs.existsSync package_dir
-        fs.mkdirSync package_dir
-        process.chdir package_dir
-        git_clone 'https://github.com/i4han/sat.git'
-
-task 'uninstall', 'Uninstall packages', ->
-    if fs.existsSync package_dir
-        rm_rf package_dir
-
 task 'profile', 'Make shell profile', ->
     home = process.env.HOME
     cwd = process.cwd()
@@ -67,6 +46,7 @@ task 'profile', 'Make shell profile', ->
         export NODE_PATH="#{home}/node_modules:#{Config.config_js}"
         export METEOR_APP=#{cwd}
         export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
+
         """, flag: 'w+'
 
 Config.quit()
