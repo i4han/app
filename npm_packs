@@ -15,10 +15,14 @@ var packages = (
 ).split(' '); 
 process.chdir(home);
 npm.load({}, function (err) {
-  if (err) throw (err);
-  packages.map( function(package) {
-      npm.commands.install([package], function (err, data) { if (err) throw (err); });
-  });
-  npm.on("log", function (message) { console.log(message) })
+    if (err) throw (err);
+    packages.map( function(package) {
+        try {
+            require.resolve(package);
+        } catch(e) {
+            npm.commands.install([package], function (err, data) { if (err) throw (err); });
+        }
+    });
+    npm.on("log", function (message) { console.log(message) })
 })
 

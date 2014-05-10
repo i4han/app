@@ -15,5 +15,6 @@ cake config profile
 if [ ! -d "client" ]; then
     mkdir client
 fi
+collect
 meteor update
 cake watch
