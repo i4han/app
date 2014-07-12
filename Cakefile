@@ -46,6 +46,9 @@ task 'profile', 'Make shell profile', ->
         export NODE_PATH="#{home}/node_modules:#{Config.config_js}"
         export METEOR_APP=#{cwd}
         export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
+        if [ "x"`redis-cli ping` != "xPONG" ]; then
+            redis-server &
+        fi
 
         """, flag: 'w+'
 

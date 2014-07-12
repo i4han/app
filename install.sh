@@ -10,7 +10,7 @@ npm install --prefix ~/node_modules npm
 node npm_packs
 $HOME/node_modules/.bin/cake profile
 . profile
-cake config profile
+cake config profile #
 . profile
 if [ ! -d "client" ]; then
     mkdir client
