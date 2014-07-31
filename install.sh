@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-git submodule update --init
+#git submodule update --init
+git submodule foreach git pull origin master
 parts install redis meteor
 parts start redis
 if [ ! -d "~/node_modules" ]; then
@@ -16,5 +17,5 @@ if [ ! -d "client" ]; then
     mkdir client
 fi
 collect
-meteor update
+# meteor update
 cake watch
