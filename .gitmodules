@@ -27,7 +27,3 @@
 	path = packages/blaze-layout
 	url = https://github.com/EventedMind/blaze-layout.git
 	branch = master
-[submodule "packages/jade"]
-	path = packages/jade
-	url = https://github.com/mquandalle/meteor-jade.git
-	branch = master
