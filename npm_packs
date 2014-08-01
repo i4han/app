@@ -11,7 +11,7 @@ var home = process.env.HOME
 var extra = 'bitcore'
 var packages = (
     "underscore express coffee-script jade stylus fibers hiredis redis " +            
-    "mongodb chokidar crypto fs-extra moment node-serialize markdown "   +
+    "mongodb chokidar crypto fs-extra moment node-serialize markdown connect@2.9.0"   +
     "request bitstamp readline"
 ).split(' '); 
 process.chdir(home);
