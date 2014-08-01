@@ -30,3 +30,12 @@
 [submodule "packages/jade"]
 	path = packages/jade
 	url = https://github.com/mquandalle/meteor-jade
+[submodule "packages/famono"]
+	path = packages/famono
+	url = https://github.com/raix/Meteor-famono.git
+[submodule "packages/famous-components"]
+	path = packages/famous-components
+	url = https://github.com/gadicc/meteor-famous-components.git
+[submodule "packages/pince"]
+	path = packages/pince
+	url = https://github.com/mad-eye/pince.git
