@@ -7,16 +7,27 @@
 [submodule "packages/sat"]
 	path = packages/sat
 	url = https://github.com/i4han/sat.git
+[submodule "packages/iron-router"]
+	path = packages/iron-router
+	url = https://github.com/EventedMind/iron-router.git
+	branch = master
+[submodule "packages/iron-layout"]
+	path = packages/iron-layout
+	url = https://github.com/EventedMind/iron-layout.git
+	branch = master
+[submodule "packages/iron-dynamic-template"]
+	path = packages/iron-dynamic-template
+	url = https://github.com/EventedMind/iron-dynamic-template.git
+	branch = master
+[submodule "packages/iron-core"]
+	path = packages/iron-core
+	url = https://github.com/EventedMind/iron-core.git
+	branch = master
 [submodule "packages/blaze-layout"]
 	path = packages/blaze-layout
 	url = https://github.com/EventedMind/blaze-layout.git
 	branch = master
-[submodule "packages/famono"]
-	path = packages/famono
-	url = https://github.com/raix/Meteor-famono.git
-[submodule "packages/famous-components"]
-	path = packages/famous-components
-	url = https://github.com/gadicc/meteor-famous-components.git
-[submodule "packages/pince"]
-	path = packages/pince
-	url = https://github.com/mad-eye/pince.git
+[submodule "packages/jade"]
+	path = packages/jade
+	url = https://github.com/mquandalle/meteor-jade.git
+	branch = master
