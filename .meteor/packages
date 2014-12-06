@@ -9,9 +9,7 @@ less
 coffeescript
 stylus
 accounts-password
-iron-router
 jquery
-jade
 autopublish
 underscore
 sat
