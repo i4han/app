@@ -16,5 +16,5 @@ if [ ! -d "client" ]; then
     mkdir client
 fi
 collect
-meteor update
+# meteor update
 cake watch
