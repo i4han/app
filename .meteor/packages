@@ -13,8 +13,9 @@ jquery
 autopublish
 underscore
 sat
-browser
 blaze
 iron:router
 mquandalle:jade
+mizzao:bootstrap-3
+fortawesome:fontawesome
 
