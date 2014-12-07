@@ -3,4 +3,3 @@ dump.rdb
 client/auto*
 private/storables
 lib/*
-packages/*
