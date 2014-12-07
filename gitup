@@ -20,7 +20,7 @@ cake profile
 . profile
 gitup $comment
 
-for i in sat home
+for i in home
 do
     cd $i
     gitup $comment
