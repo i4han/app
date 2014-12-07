@@ -2,3 +2,4 @@ profile
 dump.rdb
 client/auto*
 private/storables
+packages/*
