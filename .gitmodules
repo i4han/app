@@ -4,3 +4,6 @@
 [submodule "packages/sat"]
 	path = packages/sat
 	url = https://github.com/i4han/sat.git
+[submodule "packages/home"]
+	path = packages/home
+	url = https://github.com/i4han/home.git
