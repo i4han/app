@@ -1,6 +1,3 @@
-[submodule "packages/bin"]
-	path = packages/bin
-	url = https://github.com/i4han/bin.git
 [submodule "packages/sat"]
 	path = packages/sat
 	url = https://github.com/i4han/sat.git

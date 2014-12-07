@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if [ -z "$METEOR_APP" -o -z "$1" ]; then
+    echo "Usage: homedir your_home_directory"
+    exit 1
+fi
+
+if [ "$(ls -A $DIR)" ]; then
+    rm $METEOR_APP/lib/*
+fi
+
+ln $METEOR_APP/packages/$1/*.coffee $METEOR_APP/lib/
