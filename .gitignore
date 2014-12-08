@@ -1,5 +1,5 @@
 profile
 dump.rdb
-client/auto*
+client/*
 private/storables
 lib/*

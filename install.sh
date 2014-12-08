@@ -12,14 +12,13 @@ $HOME/node_modules/.bin/cake profile
 . profile
 cake config profile #
 . profile
-
 for i in client lib private
 do
     if [ ! -d "$i" ]; then
         mkdir "$i"
     fi
 done
-
+homedir home
 collect
 # meteor update
 cake watch
