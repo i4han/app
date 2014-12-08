@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 echo "Starting up..."
-[ -e ~/.installed ] || . install.sh
+[ -e ~/.installed ] || echo "Install.sh first."; exit 0
 [ "x"`redis-cli ping` == "xPONG" ] || parts start redis
-
 . profile
 cake watch
