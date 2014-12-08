@@ -10,7 +10,7 @@ var home = process.env.HOME
 
 var extra = 'bitcore'
 var removed = 'jade moment markdown bitstamp readline'
-var packages = "underscore express coffee-script stylus fs-extra fibers hiredis redis mongodb chokidar crypto node-serialize request" .split(' ')
+var packages = "coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar crypto node-serialize request" .split(' ')
 process.chdir(home);
 npm.load({}, function (err) {
     if (err) throw (err);
