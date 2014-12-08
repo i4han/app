@@ -9,8 +9,9 @@ done
 
 [ -d ~/node_modules ] || mkdir ~/node_modules
 
+read -n1 -r -p "Installing npm." key
 npm install --prefix ~/node_modules npm
-read -n1 -r -p "Press any key to install npm packages." key
+read -n1 -r -p "Installing npm packages." key
 node npm_packs
 
 read -n1 -r -p "Creating profile." key
