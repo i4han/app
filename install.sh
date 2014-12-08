@@ -8,6 +8,14 @@ do
 done
 
 [ -d ~/node_modules ] || mkdir ~/node_modules
-# npm install --prefix ~/node_modules npm
-# node npm_packs
+npm install --prefix ~/node_modules npm
+node npm_packs
+
+if [ ! -e profile ]; then
+    $HOME/node_modules/.bin/cake profile
+    . profile
+    cake config profile
+fi
+. profile
+
 > ~/.installed
