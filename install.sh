@@ -9,8 +9,12 @@ done
 
 [ -d ~/node_modules ] || mkdir ~/node_modules
 
-npm install --prefix ~/node_modules npm
-node npm_packs
+for j in coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar node-serialize request
+do
+    echo "Installing $j."
+    npm install --prefix ~/node_modules $j
+done
+
 
 if [ ! -e profile ]; then
     $HOME/node_modules/.bin/cake profile
