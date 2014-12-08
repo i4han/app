@@ -5,11 +5,4 @@ echo "Starting up..."
 [ "x"`redis-cli ping` == "xPONG" ] || parts start redis
 
 . profile
-
-for i in client lib private
-do
-    [ -d "$i" ] || mkdir "$i"
-done
-[ "$(ls -A lib)" ] || homedir home
-collect
 cake watch

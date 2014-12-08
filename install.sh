@@ -12,7 +12,7 @@ done
 for j in coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar node-serialize request
 do
     echo "Installing $j."
-    npm install --prefix ~/node_modules $j
+    npm install --prefix ~ $j
 done
 
 
@@ -24,5 +24,12 @@ fi
 . profile
 
 [ "x"`redis-cli ping` == "xPONG" ] || parts start redis
+
+for i in client lib private
+do
+    [ -d "$i" ] || mkdir "$i"
+done
+[ "$(ls -A lib)" ] || homedir home
+collect
 
 > ~/.installed
