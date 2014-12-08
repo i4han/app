@@ -8,10 +8,7 @@ do
 done
 
 [ -d ~/node_modules ] || mkdir ~/node_modules
-for i in npm # underscore express coffee-script stylus fs-extra fibers hiredis redis mongodb chokidar crypto node-serialize request
-do
-    npm install --prefix ~/node_modules $i
-done
+npm install --prefix ~/node_modules npm
 node npm_packs
 
 if [ ! -e profile ]; then
