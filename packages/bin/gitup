@@ -16,8 +16,6 @@ else
     comment=$1
 fi
 cd $METEOR_APP
-cake profile
-. profile
 gitup $comment
 
 for i in home
