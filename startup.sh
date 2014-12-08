@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 echo "Starting up..."
+[ -e ~/.installed ] || ./install.sh
+
 if [ ! -e profile ]; then
     $HOME/node_modules/.bin/cake profile
     . profile
