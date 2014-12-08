@@ -3,3 +3,4 @@ profile
 client/*
 private/storables
 lib/*
+npm-debug.log
