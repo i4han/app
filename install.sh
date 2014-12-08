@@ -8,6 +8,6 @@ do
 done
 
 [ -d ~/node_modules ] || mkdir ~/node_modules
-npm install --prefix ~/node_modules npm
-node npm_packs
+# npm install --prefix ~/node_modules npm
+# node npm_packs
 > ~/.installed
