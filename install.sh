@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+npm install --prefix ~/node_modules npm
+
 git submodule update --init
 
 for i in redis meteor
@@ -8,8 +10,8 @@ do
 done
 
 [ -d ~/node_modules ] || mkdir ~/node_modules
-npm install --prefix ~/node_modules npm
-#node npm_packs
+
+node npm_packs
 
 
 > ~/.installed
