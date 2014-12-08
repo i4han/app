@@ -2,6 +2,7 @@
 
 echo "Starting up..."
 [ -e ~/.installed ] || . install.sh
+[ "x"`redis-cli ping` == "xPONG" ] || parts start redis
 
 if [ ! -e profile ]; then
     $HOME/node_modules/.bin/cake profile
@@ -15,6 +16,5 @@ do
     [ -d "$i" ] || mkdir "$i"
 done
 [ "$(ls -A lib)" ] || homedir home
-[ "x"`redis-cli ping` == "xPONG" ] || parts start redis
 collect
 cake watch

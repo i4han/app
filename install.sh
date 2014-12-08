@@ -4,7 +4,7 @@ git submodule update --init
 
 for i in redis meteor
 do
-    [[ `parts list` == *'$i'* ]] || parts install $i
+    [[ `parts list` == *"$i"* ]] || parts install $i
 done
 
 [ -d ~/node_modules ] || mkdir ~/node_modules

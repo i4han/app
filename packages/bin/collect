@@ -93,7 +93,7 @@ var collectKey = function (obj, kind, storables_hash) {
             });
         });
         __.overwriteFile( template.target_file, fileTarget );
-        console.log( 'Updated ' + template.target_file);
+//        console.log( 'Updated ' + template.target_file);
         Config.redis.rpush( 'node_utils:log', ' 97 fileTarget:' + template.target_file );
     };
     
