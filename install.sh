@@ -1,24 +1,13 @@
 #!/usr/bin/env bash
 
 git submodule update --init
-parts install redis meteor
-parts start redis
-if [ ! -d "~/node_modules" ]; then
-    mkdir ~/node_modules
-fi
+
+for i in redis meteor
+do
+    [[ `parts list` == *'$i'* ]] || parts install $i
+done
+
+[ -d ~/node_modules ] || mkdir ~/node_modules
 npm install --prefix ~/node_modules npm
 node npm_packs
-$HOME/node_modules/.bin/cake profile
-. profile
-cake config profile #
-. profile
-for i in client lib private
-do
-    if [ ! -d "$i" ]; then
-        mkdir "$i"
-    fi
-done
-homedir home
-collect
-# meteor update
-cake watch
+
