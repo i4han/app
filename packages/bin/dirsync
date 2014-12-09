@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+[ -z "$METEOR_APP" ] || ( echo "Set $METEOR_APP." && exit 0 )
+[ "$(ls -A $METEOR_APP/lib)" ] && rm $METEOR_APP/lib/* 
+
+for i in home accounts
+do
+    ln $METEOR_APP/packages/$i/*.coffee $METEOR_APP/lib/
+done
