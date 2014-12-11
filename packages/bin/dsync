@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+[ -n "$METEOR_APP" ] || ( echo "dirsync: Set \$METEOR_APP." && exit 0 )
+[ ! "$(ls -A $METEOR_LIB)" ] || rm $METEOR_LIB/* 
+
+while read line
+do
+    ln $PACKAGES/$line/*.coffee $METEOR_LIB
+done < $PACKAGES/.modules
