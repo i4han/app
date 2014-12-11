@@ -52,7 +52,8 @@ task 'profile', 'Make shell profile', ->
         export METEOR_LIB=#{cwd}/lib
         export PACKAGES=#{cwd}/packages
         export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
-        [ "x"`redis-cli ping` == "xPONG" ] || parts start redis
+        [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
+
         """, flag: 'w+'
 
 Config.quit()

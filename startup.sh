@@ -4,4 +4,3 @@ echo "Starting up..."
 [ -e ~/.installed ] || ( echo "Install.sh first." && exit 0 )
 [ "x"`redis-cli ping` == "xPONG" ] || parts start redis
 cake watch
-[ "$(ls -A /tmp)" ] && echo "Not Empty" 
