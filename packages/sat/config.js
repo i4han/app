@@ -40,7 +40,6 @@ this.Config = {
   title: main.title,
   home_url: main.home_url,
   callback_port: main.callback_port,
-  sets: 'content dialog form layout login'.split(' '),
   indent_string: '    ',
   collections: 'connects items updates boxes colors'.split(' '),
   instagram: {

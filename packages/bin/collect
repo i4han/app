@@ -118,6 +118,19 @@ var collectPages = function (pages_in_file) {
     Config.redis.rpush( 'node_utils:log', '118 done' );
 };
 
+var filesFromDir = function(dir) {
+//    var fs = require('fs'); 
+    var results = [];
+
+    fs.readdirSync(dir).forEach(function(file) {
+        file = dir+'/'+file;
+        var stat = fs.statSync(file);
+        if (stat && stat.isDirectory()) {
+            results = results.concat( filesFromDir(file))
+        } else results.push(file);
+    });
+    return results;
+};
 
 (function () {
     rc = Config.redis;
@@ -131,7 +144,12 @@ var collectPages = function (pages_in_file) {
     rc.expire('collect:run', 1);
     require('coffee-script/register');
     var pages_in_file = {}
-    _.each( Config.sets, function (set) { pages_in_file[set] = require( Config.source_dir + set )[set]; });
+    var set = '';
+    
+    _.each( filesFromDir(Config.source_dir), function (file) {
+        set = file.replace(/.*?([^\/]+)\.coffee$/, "$1");    
+        pages_in_file[set] = require( Config.source_dir + set )[set]; 
+    });
     collectPages( pages_in_file );
     Config.quit();
 }.call(this));

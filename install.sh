@@ -15,7 +15,7 @@ do
     npm install --prefix ~ $j
 done
 
-
+[ "$(ls -A lib)" ] || homedir home
 if [ ! -e profile ]; then
     $HOME/node_modules/.bin/cake profile
     . profile

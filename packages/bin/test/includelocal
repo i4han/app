@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+var fs = require("fs");
+var es = require("event-stream");
+
+fs.createReadStream(process.argv[2])
+    .pipe(es.split("\n"))
+    .pipe(es.mapSync(function(data) {
+        if (data.search(/#include\s+["']([^"']+)["']/) != -1) {
+            return fs.readFileSync( RegExp.$1 + '.coffee', 'utf8')
+        };
+        return data;
+    }))
+    .pipe(es.join("\n"))
+    .pipe(es.wait())
+    .pipe(es.mapSync(function(data) {
+        return '#!/usr/bin/env node' + data;
+    }))
+    .pipe(process.stdout)

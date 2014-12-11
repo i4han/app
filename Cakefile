@@ -10,15 +10,17 @@ isType = (file, type) ->
     path.extname(file) is '.' + type
 
 collect = -> spawn 'collect', [], io
+dirsync = -> spawn 'dirsync', [], io
 meteor = -> spawn 'meteor', [], io
 
 compile = ->
     spawn 'coffee', [ '--compile', '--bare', '--output', Config.config_js, Config.config_file], io
         
 task_clean = ->
+    dirsync()
     for file in Config.auto_generated_files
         if fs.existsSync file 
-            console.log file + ' has been deleted.'
+#            console.log file + ' has been deleted.'
             fs.unlinkSync file
         
 task 'watch', 'Start the server', ->

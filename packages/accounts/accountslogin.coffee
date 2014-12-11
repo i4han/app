@@ -1,8 +1,7 @@
-module.exports.login =
+module.exports.accountslogin =
 
     __events__:
         startup: ->
-            console.log 'Start up'
             if Login._verifyEmailToken
                 Login.verifyEmail Login._verifyEmailToken, ( error ) ->
                     Login._enableAutoLogin()

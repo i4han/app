@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-[ -z "$METEOR_APP" ] || ( echo "Set $METEOR_APP." && exit 0 )
-[ "$(ls -A $METEOR_APP/lib)" ] && rm $METEOR_APP/lib/* 
+[ -n "$METEOR_APP" ] || ( echo "dirsync: Set \$METEOR_APP." && exit 0 )
+[ ! "$(ls -A $METEOR_LIB)" ] || rm $METEOR_LIB/* 
 
-for i in home accounts
+while read line
 do
-    ln $METEOR_APP/packages/$i/*.coffee $METEOR_APP/lib/
-done
+    ln $PACKAGES/$line/*.coffee $METEOR_LIB
+done < $PACKAGES/.modules

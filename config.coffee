@@ -1,4 +1,4 @@
-if !Meteor?
+vi if !Meteor?
     _ = require 'underscore'
     fs = require 'fs'
     stylus = require 'stylus'
@@ -29,7 +29,7 @@ main = {
     title:             main.title
     home_url:          main.home_url
     callback_port:     main.callback_port
-    sets:              'content dialog form layout login' .split ' '
+#    sets:              'content dialog form layout login' .split ' '
     indent_string:     '    '
     collections:       'connects items updates boxes colors' .split ' '
     instagram:

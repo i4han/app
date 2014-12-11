@@ -13,10 +13,8 @@ jquery
 autopublish
 underscore
 sat
-blaze
 iron:router
 mquandalle:jade
 mizzao:bootstrap-3
 fortawesome:fontawesome
 accounts
-
