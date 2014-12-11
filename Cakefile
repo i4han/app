@@ -43,15 +43,16 @@ task 'reset', 'Reset files', ->
 task 'profile', 'Make shell profile', ->
     home = process.env.HOME
     cwd = process.cwd()
-    fs.writeFileSync 'profile', """
+    fs.writeFileSync '../.bashrc', """
+        # .bashrc
+        # This is created shell script. Edit Cakefile. 
         export PATH="#{home}/node_modules/.bin:#{cwd}:#{cwd}/packages/bin:$PATH"
         export NODE_PATH="#{home}/node_modules:#{Config.config_js}"
         export METEOR_APP=#{cwd}
+        export METEOR_LIB=#{cwd}/lib
+        export PACKAGES=#{cwd}/packages
         export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
-        if [ "x"`redis-cli ping` != "xPONG" ]; then
-            redis-server &
-        fi
-
+        [ "x"`redis-cli ping` == "xPONG" ] || parts start redis
         """, flag: 'w+'
 
 Config.quit()

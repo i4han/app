@@ -9,19 +9,19 @@ done
 
 [ -d ~/node_modules ] || mkdir ~/node_modules
 
-for j in coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar node-serialize request
+for j in coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar node-serialize request event-stream
 do
     echo "Installing $j."
     npm install --prefix ~ $j
 done
 
 [ "$(ls -A lib)" ] || homedir home
-if [ ! -e profile ]; then
+if [ ! -e ../.bashrc ]; then
     $HOME/node_modules/.bin/cake profile
-    . profile
+    . ../.bashrc
     cake config profile
 fi
-. profile
+. ../.bashrc
 
 [ "x"`redis-cli ping` == "xPONG" ] || parts start redis
 
