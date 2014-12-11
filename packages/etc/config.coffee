@@ -1,3 +1,7 @@
+#!/usr/bin/env coffee
+# Only Cakefile read this file to create sat/config.js
+# 
+
 if !Meteor?
     _ = require 'underscore'
     fs = require 'fs'
@@ -80,10 +84,10 @@ main = {
     init: ->
         @redis = {}
         if !Meteor? or Meteor.isServer
-            @config_file = main.meteor_dir + 'config.coffee'
             @meteor_dir  = main.meteor_dir
             @package_dir = main.meteor_dir + 'packages/'
-            @config_js   = @package_dir    + 'sat/'
+            @config_file = @package_dir + 'etc/config.coffee'
+            @config_js   = @package_dir + 'sat/'
             @source_dir  = main.source_dir
             @target_dir  = main.target_dir
             @storables   = main.meteor_dir + 'private/storables'

@@ -1,10 +1,10 @@
-fs = require 'fs-extra'
+fs = require 'fs'
 path = require 'path'
 chokidar = require 'chokidar'
 {spawn} = require 'child_process'
 require 'coffee-script/register'
-{Config} = require './config'
 package_dir = 'packages'
+{Config} = require './' + package_dir + '/etc/config.coffee'
 io = stdio: 'inherit'
 isType = (file, type) ->
     path.extname(file) is '.' + type

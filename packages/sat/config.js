@@ -116,9 +116,9 @@ this.Config = {
     var i;
     this.redis = {};
     if ((typeof Meteor === "undefined" || Meteor === null) || Meteor.isServer) {
-      this.config_file = main.meteor_dir + 'config.coffee';
       this.meteor_dir = main.meteor_dir;
       this.package_dir = main.meteor_dir + 'packages/';
+      this.config_file = this.package_dir + 'etc/config.coffee';
       this.config_js = this.package_dir + 'sat/';
       this.source_dir = main.source_dir;
       this.target_dir = main.target_dir;
