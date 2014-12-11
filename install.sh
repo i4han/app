@@ -20,6 +20,9 @@ if [ ! -e ../.bashrc ]; then
     $HOME/node_modules/.bin/cake profile
     . ../.bashrc
     cake config profile
+else
+    echo '.bashrc exists. Can not proceed.'
+    exit 0
 fi
 . ../.bashrc
 
