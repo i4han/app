@@ -18,14 +18,14 @@ done
 [ "$(ls -A lib)" ] || homedir home
 if [ ! -e ../.bashrc ]; then
     $HOME/node_modules/.bin/cake profile
-    . ../.bashrc
+    . ~/.bashrc
     cake config 
     cake profile
 else
     echo '.bashrc exists. Can not proceed.'
     exit 0
 fi
-. ../.bashrc
+. ~/.bashrc
 
 [ "x"`redis-cli ping` == "xPONG" ] || parts start redis
 
@@ -33,7 +33,7 @@ for i in client lib private
 do
     [ -d "$i" ] || mkdir "$i"
 done
-[ "$(ls -A lib)" ] || homedir home
+[ "$(ls -A lib)" ] || dsync
 collect
 
 > ~/.installed
