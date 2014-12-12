@@ -1,21 +1,12 @@
 var dns = require('dns');    
-var os = require('os');    
-var hostname = os.hostname();   
-console.log("Short hostname = ", hostname);     
-hostname = 'fresh-private.codio.com'
-dns.lookup(hostname, function (err, add, fam) {       
-    if (err)    
-    {    
-             console.log("The error = ", JSON.stringify(err));    
-             return;    
-    }    
-    console.log('addr: ' + add);     
-    console.log('family: ' + fam);    
-    dns.reverse( add, function(err, domains){    
-        if (err) {    
-            console.log("The reverse lookup error = ", JSON.stringify(err));    
-            return;    
-        }    
-        console.log("The full domain name ", domains);    
-    });    
-})
+var exec = require('child_process').exec;
+
+exec('ls', function (err, stdout, stderr){});
+
+exec('curl ifconfig.me', function (err, stdout, stderr) {
+    console.log('stdout:' + stdout);
+    var addr = '' + stdout
+    dns.reverse('54.224.72.30', function(err, domain) {
+        console.log( domain );
+    });
+});

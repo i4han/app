@@ -15,6 +15,8 @@ do
     npm install --prefix ~ $j
 done
 
+packages/bin/include packages/etc/config.source > packages/etc/config.coffee
+
 if [ ! -e ../.bashrc ]; then
     $HOME/node_modules/.bin/cake profile
     . ~/.bashrc

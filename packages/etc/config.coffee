@@ -1,4 +1,4 @@
-#!/usr/bin/env coffee
+#!/usr/bin/env node#!/usr/bin/env coffee
 # Source code is config.orgin other files are compiled by the source.
 # config.origin -> (include) -> config.coffee used by Cakefile
 # config.coffee -> (coffee)  -> sat/config.js used by Meteor, collect
@@ -31,7 +31,11 @@ main = {
 
 local = { title: '', home_url: '', collections: '' }
     
-#include local This is where local config files to be located.
+local = 
+    title:       'Application'
+    home_url:    'bless-diesel.codio.io'
+    module:      'accounts dialog form' .split ' '
+    collections: 'connects items updates boxes colors' .split ' '
 
 @Config = {
     title:             local.title

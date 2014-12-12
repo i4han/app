@@ -8,8 +8,8 @@ fs.createReadStream(process.argv[2])
         if (data.search(/^#include\s+["']([^"']+)["']/) != -1) {
             return fs.readFileSync( RegExp.$1 + '.coffee', 'utf8');
         };
-        if (data.search(/^#include\s+local\s*$/) != -1) {
-            return "# local file here";
+        if (data.search(/^#include\s+local\s*.*/) != -1) {
+            return fs.readFileSync( process.env.PACKAGES + '/' + process.env.MAIN + '/_local.config', 'utf8');
         };
         
         return data;

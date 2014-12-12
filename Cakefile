@@ -1,7 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 chokidar = require 'chokidar'
-{spawn} = require 'child_process'
+{spawn, exec} = require 'child_process'
 require 'coffee-script/register'
 package_dir = 'packages'
 {Config} = require './' + package_dir + '/etc/config.coffee'
@@ -14,7 +14,8 @@ dsync = -> spawn 'dsync', [], io
 meteor = -> spawn 'meteor', [], io
 
 compile = ->
-    spawn 'coffee', [ '--compile', '--bare', '--output', Config.config_js, Config.config_file], io
+    exec 'include ' + Config.config_source + ' | coffee -sc --bare > ' + Config.config_js, (err, stdout, stderr) -> console.log err if err
+#    spawn 'coffee', [ '--compile', '--bare', '--output', Config.config_js, Config.config_file], io
         
 task_clean = ->
     dsync()
@@ -49,6 +50,7 @@ task 'profile', 'Make shell profile', ->
         export PATH="#{home}/node_modules/.bin:#{cwd}:#{cwd}/packages/bin:$PATH"
         export NODE_PATH="#{home}/node_modules:#{Config.config_js}"
         export METEOR_APP=#{cwd}
+        export MAIN=startup
         export METEOR_LIB=#{cwd}/lib
         export PACKAGES=#{cwd}/packages
         export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
