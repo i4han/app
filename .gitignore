@@ -2,6 +2,7 @@ profile
 *.rdb
 client/*
 private/storables
-lib/*
+lib/*.coffee
 npm-debug.log
 packages/etc/config.coffee
+packages/sat/config.js

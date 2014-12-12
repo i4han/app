@@ -4,9 +4,9 @@ var _ = require('underscore');
 var fs = require('fs');
 var crypto = require('crypto');
 var serialize = require('node-serialize');
-var config = require('config');
-var Config = config.Config;
-var __ = config.__;
+var conf = require('config');
+var Config = conf.Config;
+var __ = conf.__;
 
 
 var stringOrFunctionToString = function (what) {

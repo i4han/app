@@ -27,6 +27,7 @@ else
     exit 0
 fi
 . ~/.bashrc
+include packages/etc/config.source > packages/etc/config.coffee
 
 [ "x"`redis-cli ping` == "xPONG" ] || parts start redis
 

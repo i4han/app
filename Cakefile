@@ -48,7 +48,7 @@ task 'profile', 'Make shell profile', ->
         # .bashrc
         # This is created shell script. Edit Cakefile. 
         export PATH="#{home}/node_modules/.bin:#{cwd}:#{cwd}/packages/bin:$PATH"
-        export NODE_PATH="#{home}/node_modules:#{Config.config_js}"
+        export NODE_PATH="#{home}/node_modules:#{Config.config_js_dir}"
         export METEOR_APP=#{cwd}
         export MAIN=startup
         export METEOR_LIB=#{cwd}/lib
