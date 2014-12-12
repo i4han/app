@@ -1,6 +1,7 @@
 #!/usr/bin/env coffee
 # Only Cakefile read this file to create sat/config.js
-# 
+# config.origin -> (include) -> config.coffee by Cakefile
+# config.coffee -> (coffee) -> sat/config.js  by Meteor, collect
 
 if !Meteor?
     _ = require 'underscore'
@@ -28,6 +29,8 @@ main = {
             @target_dir = @meteor_dir + 'client/'
         return this
 }.init()
+
+#include local
 
 @Config = {
     title:             main.title
