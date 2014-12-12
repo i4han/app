@@ -4,3 +4,4 @@ client/*
 private/storables
 lib/*
 npm-debug.log
+packages/etc/config.coffee
