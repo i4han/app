@@ -7,6 +7,8 @@ do
     [[ `parts list` =~ $i ]] || parts install $i
 done
 
+parts start redis
+
 [ -d ~/node_modules ] || mkdir ~/node_modules
 
 for j in coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar node-serialize request event-stream
@@ -29,7 +31,6 @@ fi
 . ~/.bashrc
 include packages/etc/config.source > packages/etc/config.coffee
 
-parts start redis
 
 for i in client lib private
 do
