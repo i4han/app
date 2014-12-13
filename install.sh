@@ -29,7 +29,7 @@ fi
 . ~/.bashrc
 include packages/etc/config.source > packages/etc/config.coffee
 
-[ "x"`redis-cli ping` == "xPONG" ] || parts start redis
+parts start redis
 
 for i in client lib private
 do
