@@ -2,9 +2,7 @@ fs = require 'fs'
 path = require 'path'
 chokidar = require 'chokidar'
 {spawn, exec} = require 'child_process'
-require 'coffee-script/register'
-package_dir = 'packages'
-{Config} = require 'config'
+{Config} = require './packages/sat/config'
 io = stdio: 'inherit'
 isType = (file, type) ->
     path.extname(file) is '.' + type
