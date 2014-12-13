@@ -32,11 +32,12 @@ fi
 include packages/etc/config.source > packages/etc/config.coffee
 
 
-for i in client lib private
+for i in client private
 do
     [ -d "$i" ] || mkdir "$i"
 done
-[ "$(ls -A lib)" ] || dsync
+
+dsync
 collect
 
 > ~/.installed

@@ -44,15 +44,20 @@ local = {
 local = {
   title: 'Application',
   home_url: 'bless-diesel.codio.io',
-  module: 'accounts dialog form'.split(' '),
+  modules: 'accounts dialog form'.split(' '),
   collections: 'connects items updates boxes colors'.split(' ')
 };
+
+if (main == null) {
+  module.exports = local;
+}
 
 this.Config = {
   title: local.title,
   home_url: local.home_url,
   callback_port: main.callback_port,
   indent_string: '    ',
+  local_config: '_config.coffee',
   collections: local.collections,
   instagram: {
     callback_path: '/callback/instagram/',

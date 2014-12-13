@@ -132,7 +132,7 @@ var filesFromDir = function(dir) {
     return results;
 };
 
-(function () {
+( function () {
     rc = Config.redis;
     rc.get('collect:run', function (err, reply) {
         if(reply == 'true') {
@@ -152,6 +152,6 @@ var filesFromDir = function(dir) {
     });
     collectPages( pages_in_file );
     Config.quit();
-}.call(this));
+}.call(this) );
 
 

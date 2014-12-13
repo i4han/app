@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 var fs = require("fs");
 var es = require("event-stream");
+var path = require("path");
+try {
+    var Config = require("config").Config;
+    local_config = Config.local_config
+} catch(e) {
+    local_config = '_config.coffee';
+}
 
 fs.createReadStream(process.argv[2])
     .pipe(es.split("\n"))
@@ -10,7 +17,7 @@ fs.createReadStream(process.argv[2])
         };
         if (data.search(/^#include\s+local\s*.*/) != -1) {
             if ( process.env.PACKAGES && process.env.MAIN ) {
-                return fs.readFileSync( process.env.PACKAGES + '/' + process.env.MAIN + '/_local.config', 'utf8');
+                return fs.readFileSync( path.join( process.env.PACKAGES, process.env.MAIN, local_config), 'utf8');
             } else {
                 return '# $PACKAGES and/or $MAIN has not defined.';
             }

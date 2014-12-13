@@ -1,7 +1,7 @@
 #!/usr/bin/env coffee
 # Source code is config.orgin other files are compiled by the source.
 # config.origin -> (include) -> config.coffee used by Cakefile
-# config.coffee -> (coffee)  -> sat/config.js used by Meteor, collect
+# config.coffee -> (coffee)  -> sat/config.js used by Meteor, dsync, collect
 
 if !Meteor?
     _ = require 'underscore'
@@ -38,6 +38,7 @@ local = { title: '', home_url: '', collections: '' }
     home_url:          local.home_url
     callback_port:     main.callback_port
     indent_string:     '    '
+    local_config:      '_config.coffee'
     collections:       local.collections
     instagram:
         callback_path:     '/callback/instagram/'
