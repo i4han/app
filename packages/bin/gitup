@@ -17,9 +17,3 @@ else
 fi
 cd $METEOR_APP
 gitup $comment
-
-for i in home
-do
-    cd $i
-    gitup $comment
-done

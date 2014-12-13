@@ -9,9 +9,11 @@ module.exports.index =
                 .col-md-8
                     h1 #{Config.title}
             .row#items
-                each items
-                    .item
-                        +item
+                .col-md-1
+                .col-md-8
+                    each items
+                        .item
+                            +item
             """
         created: -> 
             db.Items = new Meteor.Collection 'items' if !db.Items?

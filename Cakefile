@@ -1,8 +1,15 @@
 main = 'startup'
+{spawn, exec} = require 'child_process'
+
+try
+    (require 'redis').createClient().get('a')
+catch e
+    console.log 'Starting redis.'
+    exec 'parts start redis', (err, stdout, stderr) -> {}
+
 fs = require 'fs'
 path = require 'path'
 chokidar = require 'chokidar'
-{spawn, exec} = require 'child_process'
 {Config} = require './packages/sat/config'
 io = stdio: 'inherit'
 isType = (file, type) ->
@@ -11,6 +18,7 @@ isType = (file, type) ->
 collect = -> spawn 'collect', [], io
 dsync = -> spawn 'dsync', [], io
 meteor = -> spawn 'meteor', [], io
+
 
 deldir = (path) ->
     if fs.existsSync path
