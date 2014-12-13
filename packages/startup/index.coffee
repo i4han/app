@@ -2,11 +2,12 @@ module.exports.index =
 
     home:
         router: path: '/'
-        jade: """
+        jade: (Config) -> 
+            """
             .row
                 .col-md-1
                 .col-md-8
-                    h1 {{title}}
+                    h1 #{Config.title}
             .row#items
                 each items
                     .item
@@ -18,9 +19,10 @@ module.exports.index =
 
         rendered: ->
             $container = $('#items')
-            $container.masonry itemSelector: '.item', columnWidth: 332
-        items: -> db.Items.find {}, sort: created_time: -1
-        title: -> Config.title
+            # $container.masonry itemSelector: '.item', columnWidth: 332
+        helpers:
+            items: -> db.Items.find {}, sort: created_time: -1
+            title: -> Config.title
         stylus: """
             #items > .item 
                 background-color #fff
@@ -31,8 +33,8 @@ module.exports.index =
                 margin 6px
 
             if 0 
-              transform rotateY( 45deg )
-              -webkit-transform rotateY( 45deg )
+                transform rotateY( 45deg )
+                -webkit-transform rotateY( 45deg )
             """
 
         

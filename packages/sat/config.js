@@ -44,7 +44,7 @@ local = {
 local = {
   title: 'Application',
   home_url: 'bless-diesel.codio.io',
-  modules: 'accounts dialog form'.split(' '),
+  modules: 'accounts dialog form responsive theme_clean'.split(' '),
   collections: 'connects items updates boxes colors'.split(' ')
 };
 
