@@ -18,13 +18,13 @@ else
 if fs.existsSync main_path
     ( fs.readdirSync main_path ).forEach (file, index) ->
         if file.search(/^[^_]+\.coffee$/) != -1
-            fs.linkSync( path.join( main_path, file ), path.join( lib, file ) )
+            fs.symlinkSync( path.join( main_path, file ), path.join( lib, file ) )
         else if file == local_config
             modules = (require path.join( packages, main, local_config )).modules
             modules.forEach (module) ->
                 module_path = path.join( packages, module )
                 if fs.existsSync module_path
                     ( fs.readdirSync module_path ).forEach (file, index) ->
-                        if file.search(/^[^_]+\.coffee$/) != -1
-                            fs.linkSync( path.join( module_path, file),  path.join( lib, file ) ) 
+                        if file.search(/^[^_].+\.coffee$/) != -1
+                            fs.symlinkSync( path.join( module_path, file),  path.join( lib, file ) ) 
 Config.quit();

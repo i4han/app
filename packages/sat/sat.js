@@ -65,19 +65,19 @@ Sat.init = function () {
                 delete pages_in_file[file].__events__.startup
             }
             _.each( _.filter( _.keys( pages_in_file[file] ), function (key) { 
-                    return ! ( (__.isLowerCase(key, 0) || key.charAt(0) === '_') && __.isLowerCase(key, 1) ); 
+                    return ! ( (__.isLowerCase(key, 0) || key.charAt(0) === '_') && __.isLowerCase(key, 1) );  // remove pages those name is not 'smallcase' or '_smallcase'
                 }), function (name) {
                     delete Pages[name];
             });
         });
-        if (startup) 
+        if (startup)  // Set startup fuctions.
             Meteor.startup(function() {
                 _.each(startup, function(func) { func() });
             });
         var router_map = {};
-        _.each(_.keys(Pages), function(name) {
-            _.each(_.keys(Pages[name]), function(key) {
-                if (key.substring(0, 2) !== '__' && _.indexOf(Config.templates, key) === -1 )
+        _.each(_.keys(Pages), function(name) {           // Pages name: key:  name should be unique.
+            _.each(_.keys(Pages[name]), function(key) {  // __key will be ignored including __events__. Defined keys = [helpers, events, router]
+                if (key.substring(0, 2) !== '__' && _.indexOf(Config.templates, key) === -1 ) 
                     if (key === 'helpers')
                         Template[name].helpers( Pages[name].helpers );
                     else if (key === 'events')

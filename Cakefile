@@ -1,3 +1,4 @@
+main = 'startup'
 fs = require 'fs'
 path = require 'path'
 chokidar = require 'chokidar'
@@ -55,10 +56,11 @@ task 'profile', 'Make shell profile', ->
     fs.writeFileSync '../.bashrc', """
         # .bashrc
         # This is created shell script. Edit Cakefile. 
+
+        export MAIN=#{main}
         export PATH="#{home}/node_modules/.bin:#{cwd}:#{cwd}/packages/bin:$PATH"
         export NODE_PATH="#{home}/node_modules:#{Config.config_js_dir}"
         export METEOR_APP=#{cwd}
-        export MAIN=startup
         export METEOR_LIB=#{cwd}/lib
         export PACKAGES=#{cwd}/packages
         export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
