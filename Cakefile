@@ -75,6 +75,20 @@ task 'profile', 'Make shell profile', ->
         [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
 
         """, flag: 'w+'
+    
+task 'git', 'github.com auto login', ->
+    prompt = require 'prompt'
+    prompt.start()
+    prompt.get {name:'password', hidden: true}, (err, result) ->
+        fs.writeFileSync '../.netrc', """
+            machine github.com
+                login i4han
+                password #{result.password}
+
+            """, flag: 'w+'
+        Config.quit()
+        process.exit(1)
+            
 
 Config.quit()
 
