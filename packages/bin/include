@@ -31,3 +31,7 @@ fs.createReadStream(process.argv[2])
         return '#!/usr/bin/env node' + data;
     }))
     .pipe(process.stdout)
+
+if (Config) {
+    Config.quit();
+}

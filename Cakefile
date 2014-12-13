@@ -4,7 +4,7 @@ chokidar = require 'chokidar'
 {spawn, exec} = require 'child_process'
 require 'coffee-script/register'
 package_dir = 'packages'
-{Config} = require './' + package_dir + '/etc/config.coffee'
+{Config} = require 'config'
 io = stdio: 'inherit'
 isType = (file, type) ->
     path.extname(file) is '.' + type
@@ -34,7 +34,7 @@ task_clean = ->
             fs.unlinkSync file
         
 task 'watch', 'Start the server', ->
-    conf = chokidar.watch Config.config_file, persistent:true
+    conf = chokidar.watch Config.config_source, persistent:true
     conf.on 'change', (file) -> compile()
     watcher = chokidar.watch Config.source_dir, persistent:true
     watcher.on 'add', (file) ->

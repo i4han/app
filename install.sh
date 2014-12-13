@@ -9,7 +9,9 @@ done
 
 parts start redis
 
-[ -d ~/node_modules ] || mkdir ~/node_modules
+NODE_MODULES=~/node_modules
+
+[ -d $NODE_MODULES ] || mkdir $NODE_MODULES
 
 for j in coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar node-serialize request event-stream
 do
@@ -17,10 +19,10 @@ do
     npm install --prefix ~ $j
 done
 
-packages/bin/include packages/etc/config.source > packages/etc/config.coffee
+packages/bin/include packages/etc/config.coffee | $NODE_MODULES/.bin/coffee -sc --bare packages/sat/config.js
 
 if [ ! -e ../.bashrc ]; then
-    $HOME/node_modules/.bin/cake profile
+    $NODE_MODULES/.bin/cake profile
     . ~/.bashrc
     cake config 
     cake profile
@@ -29,8 +31,6 @@ else
     exit 0
 fi
 . ~/.bashrc
-include packages/etc/config.source > packages/etc/config.coffee
-
 
 for i in client private
 do

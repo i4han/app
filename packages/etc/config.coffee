@@ -1,7 +1,7 @@
 #!/usr/bin/env coffee
 # Source code is config.orgin other files are compiled by the source.
-# config.origin -> (include) -> config.coffee used by Cakefile
-# config.coffee -> (coffee)  -> sat/config.js used by Meteor, dsync, collect
+# config.coffee -> include | coffee -sc --bare -> config.js
+# sat/config.js used by Cakefile, Meteor, dsync, collect
 
 if !Meteor?
     _ = require 'underscore'
@@ -90,8 +90,7 @@ local = { title: '', home_url: '', collections: '' }
         if !Meteor? or Meteor.isServer
             @meteor_dir    = main.meteor_dir
             @package_dir   = main.meteor_dir + 'packages/'
-            @config_source = @package_dir + 'etc/config.source'
-            @config_file   = @package_dir + 'etc/config.coffee'
+            @config_source = @package_dir + 'etc/config.coffee'
             @config_js_dir = @package_dir + 'sat/'
             @config_js     = @config_js_dir + 'config.js'
             @source_dir    = main.source_dir
