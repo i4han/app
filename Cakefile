@@ -78,6 +78,9 @@ task 'profile', 'Make shell profile', ->
     
 task 'git', 'github.com auto login', ->
     prompt = require 'prompt'
+    prompt.message = ''
+    prompt.delimiter = ''
+    prompt.color = false
     prompt.start()
     prompt.get {name:'password', hidden: true}, (err, result) ->
         fs.writeFileSync '../.netrc', """
