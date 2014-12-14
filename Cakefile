@@ -2,10 +2,12 @@ main = 'startup'
 {spawn, exec} = require 'child_process'
 
 try
+    console.log 'Connecting redis.'
     (require 'redis').createClient().get('a')
 catch e
     console.log 'Starting redis.'
     exec 'parts start redis', (err, stdout, stderr) -> {}
+    
 
 fs = require 'fs'
 path = require 'path'
@@ -18,7 +20,6 @@ isType = (file, type) ->
 collect = -> spawn 'collect', [], io
 dsync = -> spawn 'dsync', [], io
 meteor = -> spawn 'meteor', [], io
-
 
 deldir = (path) ->
     if fs.existsSync path
@@ -57,6 +58,8 @@ task 'reset', 'Reset files', ->
     task_clean()
     dsync()
     collect()
+    
+task 'redis', 'Start redis', -> {}
 
 task 'profile', 'Make shell profile', ->
     home = process.env.HOME
