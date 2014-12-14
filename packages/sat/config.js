@@ -130,7 +130,7 @@ this.Config = {
   },
   auto_generated_files: [],
   init: function() {
-    var e, i, _redis;
+    var i;
     this.redis = {};
     if ((typeof Meteor === "undefined" || Meteor === null) || Meteor.isServer) {
       this.meteor_dir = main.meteor_dir;
@@ -144,17 +144,7 @@ this.Config = {
       this.set_prefix = '';
       this.autogen_prefix = main.autogen_prefix;
       if (typeof Meteor === "undefined" || Meteor === null) {
-        _redis = require('redis');
-        this.redis = _redis.createClient();
-        try {
-          this.redis.get('a');
-        } catch (_error) {
-          e = _error;
-          (require('child_process')).exec('parts start redis', function(err, stdout, stderr) {
-            return {};
-          });
-          this.redis = _redis.createClient();
-        }
+        this.redis = (require('redis')).createClient();
       } else {
         this.redis = (Npm.require('redis')).createClient();
         this.server_config = this.meteor_dir + 'server/config';

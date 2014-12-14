@@ -1,14 +1,7 @@
 main = 'startup'
 {spawn, exec} = require 'child_process'
-
-try
-    console.log 'Connecting redis.'
-    (require 'redis').createClient().get('a')
-catch e
-    console.log 'Starting redis.'
-    exec 'parts start redis', (err, stdout, stderr) -> {}
-    
-
+exec 'parts start redis', (err, stdout, stderr) -> {}
+  
 fs = require 'fs'
 path = require 'path'
 chokidar = require 'chokidar'
