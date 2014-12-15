@@ -11,7 +11,7 @@ parts start redis
 NODE_MODULES=~/node_modules
 [ -d $NODE_MODULES ] || mkdir $NODE_MODULES
 
-for j in coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar node-serialize request event-stream prompt
+for j in coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar node-serialize request event-stream prompt jade
 do
     echo "Installing $j."
     npm install --prefix ~ $j

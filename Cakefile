@@ -3,7 +3,19 @@ main = 'startup'
 fs = require 'fs'
 path = require 'path'
 chokidar = require 'chokidar'
-{Config} = require './packages/sat/config'
+try
+    {Config} = require './packages/sat/config'
+catch e
+    console.log 'Temporary Config used.'
+    Config = 
+        config_source: 'packages/etc/config.coffee'
+        config_js:     'packages/sat/config.js'
+        config_js_dir: '/home/codie/sat'
+        meteor_dir:    '/home/codio/workspace'
+        package_dir:   '/home/codio/workspace/packages'
+        auto_generated_files: 'auto_'
+        quit: -> {}
+        
 {spawn, exec} = require 'child_process'
 exec 'parts start redis', (err, stdout, stderr) -> {}
 
@@ -26,7 +38,6 @@ deldir = (path) ->
 compile = ->    
     exec 'include ' + Config.config_source + ' | coffee -sc --bare > ' + Config.config_js, (err, stdout, stderr) -> 
         console.log err if err
-#    spawn 'coffee', [ '--compile', '--bare', '--output', Config.config_js, Config.config_file], io
         
 task_clean = ->
     deldir process.env.METEOR_LIB 
@@ -64,11 +75,11 @@ task 'profile', 'Make shell profile', ->
         # This is created shell script. Edit Cakefile. 
 
         export MAIN=#{main}
-        export PATH="#{home}/node_modules/.bin:#{cwd}:#{cwd}/packages/bin:$PATH"
-        export NODE_PATH="#{home}/node_modules:#{Config.config_js_dir}"
+        export PACKAGES=#{cwd}/packages
+        export PATH="#{home}/node_modules/.bin:#{cwd}:$PACKAGES/bin:$PATH"
+        export NODE_PATH="#{home}/node_modules:#{Config.config_js_dir}:$PACKAGES/$MAIN"
         export METEOR_APP=#{cwd}
         export METEOR_LIB=#{cwd}/lib
-        export PACKAGES=#{cwd}/packages
         export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
         [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
 

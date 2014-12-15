@@ -24,7 +24,6 @@ module.exports.index =
             # $container.masonry itemSelector: '.item', columnWidth: 332
         helpers:
             items: -> db.Items.find {}, sort: created_time: -1
-            title: -> Config.title
         stylus: """
             #items > .item 
                 background-color #fff
@@ -33,12 +32,9 @@ module.exports.index =
                 float left
                 border 1px solid #999
                 margin 6px
-
-            if 0 
                 transform rotateY( 45deg )
                 -webkit-transform rotateY( 45deg )
             """
-
         
     item:
         jade: """img(src="{{url}}" height="320" width="320")"""
@@ -47,10 +43,8 @@ module.exports.index =
         router: {}
         jade: """
             .row
-                +x3d
-            .primary-content
                 +hello
-                br.double-line
+                +br(height='36px')
                 +dialog
             .primary-content
                 +color_list
@@ -71,25 +65,22 @@ module.exports.index =
     profile:
         router: {}
         jade: """
-            .primary-content    
+            .row 
+                .col-sm-2
                 .col-sm-4
-                .col-sm-6
-                    br.double-line
+                    +br(height='36px')
                     each fields
                         +formField
-                        br.half-line
-                .col-sm-2
-                    br  
+                        +br(height='9px')
+            .row
+                | &npsp;
             """
         fields: -> [
-            title: 'Your name'
-            label: 'Name',   icon: 'user'
-        ,
-            title: 'Mobile Phone Number'
-            label: 'Mobile', icon: 'mobile'
-        ,
-            title: 'Your home Zip code' 
-            label: 'Zip',    icon: 'envelope' ]
+            title: 'Your name',           label: 'Name',   icon: 'user'
+        ,   
+            title: 'Mobile Phone Number', label: 'Mobile', icon: 'mobile'
+        ,   
+            title: 'Your home Zip code',  label: 'Zip',    icon: 'envelope' ]
         events:
             'focus input#name': -> $('input#name').attr('data-content',  Template['popover_name'].render().value).popover('show')
 
@@ -133,14 +124,12 @@ module.exports.index =
 
     layout:
         jade: """
-            +navbar
+            +navbar(list="home|Home profile|Profile connect|Connect help|Help" style="fixed-top")
             .content
-                br.triple-line
+                +br(height='54px')
                 +yield
             .footer
                 +footer
-            if 0
-                .container-fluid#main-body: .row
             """
         head: (Config) -> 
             """
@@ -152,7 +141,7 @@ module.exports.index =
         jade: """
             .content
                 .row    
-                    br.triple-line
-                    center About Help Blog Terms info Businesses © 2014 Hello
+                    +br(height='54px')
+                    center © Businesses 2014
             """
                 

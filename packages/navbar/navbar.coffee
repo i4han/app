@@ -1,6 +1,26 @@
 module.exports.navbar =
 
     navbar:
+        jade: (Config) ->
+            _ = require 'underscore'
+            _.templateSettings = interpolate: /\[(.+?)\]/g
+            menu = ''
+            Config.navbar.list.forEach (list) -> 
+                val = list.split '|'
+                menu += ( _.template """            li: a(href="{{pathFor '[name]'}}") [link]\n""" ) { name:val[0], link:val[1] } 
+                
+            """
+            .navbar.navbar-default.navbar-#{Config.navbar.style}: .container
+                .navbar-left 
+                    ul.nav.navbar-nav
+            #{menu}
+                .navbar-right
+                    +loginButtons
+            """
+
+        rendered: ->
+            console.log Template.currentData().name
+            
         stylus: """
             .navbar-inner
                 padding 0              
@@ -45,18 +65,6 @@ module.exports.navbar =
             .dropdown-toggle > i.fa-chevron-down
                 padding-left 4px
             """
-        jade: """
-            .navbar.navbar-default.navbar-fixed-top: .container
-                .navbar-left 
-                    ul.nav.navbar-nav
-                        li: a(href="{{pathFor 'home'}}") Home
-                        li: a(href="{{pathFor 'profile'}}") Profile
-                        li: a(href="{{pathFor 'connect'}}") Connect
-                        li: a(href="{{pathFor 'help'}}") Help
-                .navbar-right
-                    +loginButtons
-            """
-
 
         
     page_nav:

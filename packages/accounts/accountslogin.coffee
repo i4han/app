@@ -77,7 +77,7 @@ module.exports.accountslogin =
             
             
     _loginButtonsLoggedOutPasswordService:
-        stylus: """
+        styl_compile: """
             #login-other-options
                 padding-top 8px
             """
@@ -254,7 +254,7 @@ module.exports.accountslogin =
 
             
     _loginButtonsMessages:
-        stylus: """
+        styl_compile: """
             #login-dropdown-list > .alert
                 margin 0 0 10px 0
                 padding 5px 10px
@@ -344,7 +344,7 @@ module.exports.accountslogin =
 
 
     loginButtons:
-        stylus: """
+        styl_compile: """
             #login-buttons
                 line-height 15px
                 float right
@@ -411,7 +411,7 @@ module.exports.accountslogin =
             """
 
     _forgotPasswordForm:
-        stylus: """
+        styl_compile: """
             .input-group
                 width 100%            
             .input-group-addon
@@ -457,7 +457,7 @@ module.exports.accountslogin =
                 span.hline &nbsp; &nbsp; &nbsp;
             """
     __loginStyle:
-        stylus: """
+        styl_compile: """
             .dropdown-menu > li > a
                 display: block;
                 padding: 5px 8px;
@@ -481,4 +481,80 @@ module.exports.accountslogin =
                 margin-bottom 5px
                 border-bottom-left-radius 5px
                 border-bottom-right-radius 5px
+            #login-buttons-reset-password-modal, #login-buttons-enroll-account-modal
+              .modal-content
+                margin-top: 30%;
+
+            .login-buttons-dropdown-align-left
+              &#login-buttons + li
+                .dropdown-menu
+                  float: left;
+                  left: 0;
+                  right: auto;
+
+            .login-buttons-dropdown-align-right
+              &#login-buttons + li
+                .dropdown-menu
+                  float: right;
+                  right: 0;
+                  left: auto;
+            .or
+              text-align: center
+
+            #login-buttons
+              display: none;
+
+            #login-dropdown-list a
+              cursor: pointer;
+
+            .dropdown-menu
+              top 50px
+              margin 0px
+              font-weight 200
+              text-align left
+              line-height 20px
+              border-radius 1px
+
+              &#logged-in-dropdown
+                right 0
+                left auto
+                width 186px
+                padding-left 0px
+                padding-right 0px
+                padding-top 5px
+                padding-bottom 5px
+
+            .dropdown-menu > li > a
+              font-weight 200
+
+            .dropdown-menu-icon
+              margin-right 12px
+
+            .dropdown-menu-link
+              line-height 25px
+
+
+
+            // login dropdown
+
+            li#login-dropdown-list
+              float right
+              width 100px
+              line-height 50px
+              display table-cell
+              text-align right
+              vertical-align middle
+
+              .dropdown
+                height 50px
+
+            #login-dropdown-list input
+            #login-dropdown-list input:first-of-type
+            #login-dropdown-list input:last-of-type
+              margin-bottom 0px
+              border-top-left-radius 0px
+              border-top-right-radius 5px
+              border-bottom-left-radius 0px
+              border-bottom-right-radius 5px
+
             """

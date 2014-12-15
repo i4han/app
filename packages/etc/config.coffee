@@ -6,6 +6,7 @@
 if !Meteor?
     _ = require 'underscore'
     fs = require 'fs'
+    jade = require 'jade'
     stylus = require 'stylus'
 else if ! Package.underscore._.isEmpty(@Config) and ! Package.underscore._.isEmpty(@__)
     return {Config:@Config, __:@__}
@@ -29,9 +30,9 @@ main = {
         return this
 }.init()
 
-local = { title: '', home_url: '', collections: '' }
+local = {}
     
-#include local This is where local config files to be located.
+#include local <- This is where local config files to be located.
 
 @Config = {
     title:             local.title
@@ -40,6 +41,7 @@ local = { title: '', home_url: '', collections: '' }
     indent_string:     '    '
     local_config:      '_config.coffee'
     collections:       local.collections
+    navbar:            local.navbar
     instagram:
         callback_path:     '/callback/instagram/'
         response_type:     'code'
@@ -58,19 +60,19 @@ local = { title: '', home_url: '', collections: '' }
         jade:
             target_file: main.target_dir + main.autogen_prefix + '1.jade'
             indent: 1
-            format: (name, block) ->     """template(name="#{name}")\n#{block}\n\n"""
-        stylus:
-            target_file: main.target_dir + main.autogen_prefix + '6.css'
-            indent: 0
-            format: (name, block) -> stylus( block ).render() + '\n'
+            format: (name, block) -> """template(name="#{name}")\n#{block}\n\n"""
+        jade_compile:
+            target_file: main.target_dir + main.autogen_prefix + '2.html'
+            indent: 1
+            format: (name, block) -> jade.compile( """template(name="#{name}")\n#{block}\n\n""", null )()
         HTML:
             target_file: main.target_dir + main.autogen_prefix + '2.html'
             indent: 1
-            format: (name, block) ->     """<template name="#{name}">\n#{block}\n</template>"""
+            format: (name, block) -> """<template name="#{name}">\n#{block}\n</template>"""
         head:
             target_file: main.target_dir + main.autogen_prefix + '0.jade'
             indent: 1
-            header: 'head\n'
+            header: 'head\n'                  #  'doctype html\n' has not suppored by jade
             format: (name, block) -> block
         less:
             target_file: main.target_dir + main.autogen_prefix + '5.less'
@@ -84,6 +86,11 @@ local = { title: '', home_url: '', collections: '' }
             target_file: main.target_dir + main.autogen_prefix + '3.styl'
             indent: 0
             format: (name, block) -> block
+        styl_compile:
+            target_file: main.target_dir + main.autogen_prefix + '6.css'
+            indent: 0
+            format: (name, block) -> stylus( block ).render() + '\n'
+
     auto_generated_files: []
     init: ->
         @redis = {}
