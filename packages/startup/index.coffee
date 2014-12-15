@@ -72,8 +72,7 @@ module.exports.index =
                     each fields
                         +formField
                         +br(height='9px')
-            .row
-                | &npsp;
+            .row &npsp;
             """
         fields: -> [
             title: 'Your name',           label: 'Name',   icon: 'user'
