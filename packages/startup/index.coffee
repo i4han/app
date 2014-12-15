@@ -1,5 +1,20 @@
 module.exports.index =
 
+    layout:
+        jade: """
+            +navbar(list="home|Home profile|Profile connect|Connect help|Help" style="fixed-top") 
+            .content
+                +br(height='54px')
+                +yield
+            .footer
+                +footer
+            """
+        head: (Config) -> 
+            """
+            title #{Config.title}
+            link(href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet" type="text/css")
+            """
+
     home:
         router: path: '/'
         jade: (Config) -> 
@@ -60,8 +75,7 @@ module.exports.index =
                 float left 
                 border 1px solid #999
                 margin 6px
-            """
-        
+            """    
     profile:
         router: {}
         jade: """
@@ -72,21 +86,36 @@ module.exports.index =
                     each fields
                         +formField
                         +br(height='9px')
-            .row &npsp;
+            .row &nbsp;
             """
-        fields: -> [
-            title: 'Your name',           label: 'Name',   icon: 'user'
-        ,   
-            title: 'Mobile Phone Number', label: 'Mobile', icon: 'mobile'
-        ,   
-            title: 'Your home Zip code',  label: 'Zip',    icon: 'envelope' ]
+        helpers:
+            fields: -> [
+                title: 'Your name',           label: 'Name',   icon: 'user'
+            ,   
+                title: 'Mobile Phone Number', label: 'Mobile', icon: 'mobile'
+            ,   
+                title: 'Your home Zip code',  label: 'Zip',    icon: 'envelope' ]
         events:
-            'focus input#name': -> $('input#name').attr('data-content',  Template['popover_name'].render().value).popover('show')
-
-            
-            
-            
-                
+            'focus input#name': -> $('input#name').attr('data-content',  Template['popover_name'].renderFunction().value).popover('show')
+            'focus input#mobile': -> $('input#mobile').attr('data-content',  Template['popover_mobile'].renderFunction().value).popover('show')
+            'focus input#zip': -> $('input#zip').attr('data-content',  Template['popover_zip'].renderFunction().value).popover('show')
+    popover_name:
+        jade: """
+            ul 
+                li Write your name.
+                li No longer then 12 letters.
+            """
+    popover_mobile:
+        jade: """
+            ul 
+                li Write your phone number.
+            """
+    popover_zip:
+        jade: """
+            ul 
+                li Write your zipcode.
+            """
+        
     help:
         router: {}
         jade: """
@@ -121,20 +150,6 @@ module.exports.index =
             'click input': -> console.log Router.current().route.name
                                                              
 
-    layout:
-        jade: """
-            +navbar(list="home|Home profile|Profile connect|Connect help|Help" style="fixed-top")
-            .content
-                +br(height='54px')
-                +yield
-            .footer
-                +footer
-            """
-        head: (Config) -> 
-            """
-            title #{Config.title}
-            link(href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet" type="text/css")
-            """
 
     footer:
         jade: """

@@ -17,7 +17,9 @@ catch e
         quit: -> {}
         
 {spawn, exec} = require 'child_process'
-exec 'parts start redis', (err, stdout, stderr) -> {}
+redis = (func) ->
+    exec 'parts start redis', (err, stdout, stderr) ->
+        func() if func
 
 
 io = stdio: 'inherit'
@@ -35,19 +37,24 @@ deldir = (path) ->
             fs.unlinkSync curPath unless (fs.lstatSync curPath).isDirectory()
                 
 
-compile = ->    
-    exec 'include ' + Config.config_source + ' | coffee -sc --bare > ' + Config.config_js, (err, stdout, stderr) -> 
-        console.log err if err
-        
-task_clean = ->
+configure = (func) ->
+    redis ->
+        exec 'include ' + Config.config_source + ' | coffee -sc --bare > ' + Config.config_js, (err, stdout, stderr) -> 
+            func() if func
+            console.log err if err
+
+reset = ->
+    clean_up()
+    dsync()
+    collect()
+    
+            
+clean_up = ->
     deldir process.env.METEOR_LIB 
-#    exec 'rm ' + process.env.METEOR_LIB + '/*', (err, stdout, stderr) -> console.log err if err
     for file in Config.auto_generated_files
-        if fs.existsSync file 
-#            console.log file + ' has been deleted.'
-            fs.unlinkSync file
-        
-task 'watch', 'Start the server', ->
+        fs.unlinkSync file if fs.existsSync file
+
+start_up = ->
     conf = chokidar.watch Config.config_source, persistent:true
     conf.on 'change', (file) -> compile()
     watcher = chokidar.watch Config.source_dir, persistent:true
@@ -57,16 +64,14 @@ task 'watch', 'Start the server', ->
         collect() if isType file, 'coffee'
     meteor()
 
-task 'config', 'Compile config file.', -> compile()
-task 'clean', 'Remove generated files', -> task_clean()
+        
+task 'start', 'Start the server', ->
+    redis start_up
 
-task 'reset', 'Reset files', ->
-    task_clean()
-    dsync()
-    collect()
-    
-task 'redis', 'Start redis', -> {}
-
+task 'config', 'Compile config file.', -> configure null
+task 'clean', 'Remove generated files', -> clean_up()
+task 'reset', 'Reset files', -> configure reset     
+task 'redis', 'Start redis', -> redis null
 task 'profile', 'Make shell profile', ->
     home = process.env.HOME
     cwd = process.cwd()
@@ -85,7 +90,7 @@ task 'profile', 'Make shell profile', ->
 
         """, flag: 'w+'
     
-task 'git', 'github.com auto login', ->
+task 'gitpass', 'github.com auto login', ->
     prompt = require 'prompt'
     prompt.message = 'github'
     prompt.start()

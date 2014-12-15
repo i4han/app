@@ -54,7 +54,6 @@ li.selected
   opacity: 0.50
 
 
-
 .fa
   width 10px
   height 10px

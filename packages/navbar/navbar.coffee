@@ -7,8 +7,7 @@ module.exports.navbar =
             menu = ''
             Config.navbar.list.forEach (list) -> 
                 val = list.split '|'
-                menu += ( _.template """            li: a(href="{{pathFor '[name]'}}") [link]\n""" ) { name:val[0], link:val[1] } 
-                
+                menu += ( _.template """            li: a(href="{{pathFor '[name]'}}") [link]\n""" ) { name:val[0], link:val[1] }                 
             """
             .navbar.navbar-default.navbar-#{Config.navbar.style}: .container
                 .navbar-left 
@@ -17,10 +16,28 @@ module.exports.navbar =
                 .navbar-right
                     +loginButtons
             """
-
-        rendered: ->
-            console.log Template.currentData().name
-            
+        styl: """
+            li#login-dropdown-list
+                width 100px
+                line-height 50px
+                display table-cell
+                text-align center
+                vertical-align middle
+            .navbar-left > ul > li > a
+                width 80px
+                text-align center
+            .navbar-right > li:hover
+            .navbar-left > ul > li:hover
+            .navbar-nav > li > a:hover
+                text-decoration none
+                color black
+                background-color white
+            .dropdown-toggle > i.fa-chevron-down
+                padding-left 4px
+            .navbar-nav > li > a:focus  // it dosen't affect
+                color black
+                background-color white
+            """
         stylus: """
             .navbar-inner
                 padding 0              
@@ -38,11 +55,6 @@ module.exports.navbar =
             .navbar-right > li > a.dropdown-toggle
                 color #555
                 padding-right 12px
-            .navbar-right > li:hover   
-            .navbar-nav > li > a:hover
-                text-decoration none
-                color black
-                background-color #eee      
             .navbar-header > a.navbar-brand:focus
             .navbar-right > li > a.dropdown-toggle:focus
             .navbar-nav > li > a:focus
@@ -62,8 +74,6 @@ module.exports.navbar =
             .fa-bars:before
                 font-size 18px
                 content "\f0c9"
-            .dropdown-toggle > i.fa-chevron-down
-                padding-left 4px
             """
 
         

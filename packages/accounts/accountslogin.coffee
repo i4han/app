@@ -537,14 +537,6 @@ module.exports.accountslogin =
 
             // login dropdown
 
-            li#login-dropdown-list
-              float right
-              width 100px
-              line-height 50px
-              display table-cell
-              text-align right
-              vertical-align middle
-
               .dropdown
                 height 50px
 

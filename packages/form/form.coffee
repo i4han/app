@@ -12,7 +12,7 @@ module.exports.form =
             visible: -> if this.visible == undefined then true else if typeof this.visible == 'function' then this.visible() else this.visible
             name: -> this.name or __.dasherize this.label.toLowerCase().trim()
             title: -> this.title
-        stylus: """
+        styl_compile: """
             .popover
                 width 240px
             .popover-inner

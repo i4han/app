@@ -81,14 +81,14 @@ var collectKey = function (obj, kind, storables_hash) {
         return crypto.createHash('md5').update( strSum ).digest('hex');
     }
     var updateFile = function () {
-        var fileTarget = template.header ? template.header : '';
+        var fileTarget = template.header ? template.header : '';  // change: attach header later
         _.each( _.keys(obj), function ( file ) { 
             _.each( _.keys(obj[file]), function ( page ) { 
                 var block = stringOrFunctionToString( obj[file][page][kind] );
                 if ( block ) {
                     block = __.indentBlock( block, template.indent );
                     var target = template.format.call( this, page, block );
-                    fileTarget += target;
+                    fileTarget += target;   // fileTarget order attach top or bottom
                 }
             });
         });
@@ -112,21 +112,18 @@ var collectPages = function (pages_in_file) {
     var storables = getStorables();
     _.each( Config.templates, function ( type ) {
         storables[type + '_hash'] = collectKey( pages_in_file, type, storables[type + '_hash'] );
-        Config.redis.rpush( 'node_utils:log', '117 type:' + type );
     });
     saveStorables( storables );
-    Config.redis.rpush( 'node_utils:log', '118 done' );
 };
 
 var filesFromDir = function(dir) {
-//    var fs = require('fs'); 
     var results = [];
 
     fs.readdirSync(dir).forEach(function(file) {
-        file = dir+'/'+file;
+        file = dir + '/' + file;
         var stat = fs.statSync(file);
         if (stat && stat.isDirectory()) {
-            results = results.concat( filesFromDir(file))
+            results = results.concat( filesFromDir(file) )
         } else results.push(file);
     });
     return results;
@@ -140,7 +137,7 @@ var filesFromDir = function(dir) {
             process.exit(code=0);
         } 
     });
-    rc.set('collect:run', 'true');
+    rc.set('collect:run', 'true'); // prevent race condition.
     rc.expire('collect:run', 1);
     require('coffee-script/register');
     var pages_in_file = {}
