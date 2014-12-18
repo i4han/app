@@ -1,16 +1,18 @@
 App
 ===
-
 Meteor app
 
 Install
 -------
 Codio
-Choose 'install' on menu.
+run ./install.sh
 
 Todo
 ----
 - Style clean up.
-- OSX installation.
 - Automated page listing.
 - Form generator.
+- Restructure bin, app, module, etc, home directories
+- Server side rendering
+- accounts.coffee, transfer accounts.js to coffee
+- dsync into Cakefile

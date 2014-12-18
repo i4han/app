@@ -45,14 +45,11 @@ body
 li.selected
   background-color #a4c5ff
 
-
 .container-fluid#main-body
   padding-top 70px
-  
 
 .modal-backdrop
   opacity: 0.50
-
 
 .fa
   width 10px

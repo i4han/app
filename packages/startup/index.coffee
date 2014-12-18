@@ -2,7 +2,7 @@ module.exports.index =
 
     layout:
         jade: """
-            +navbar(list="home|Home profile|Profile connect|Connect help|Help" style="fixed-top") 
+            +navbar 
             .content
                 +br(height='54px')
                 +yield

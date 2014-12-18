@@ -41,7 +41,7 @@ local = {}
     indent_string:     '    '
     local_config:      '_config.coffee'
     collections:       local.collections
-    navbar:            local.navbar
+    $:                 local.$
     instagram:
         callback_path:     '/callback/instagram/'
         response_type:     'code'
@@ -105,8 +105,9 @@ local = {}
             @storables     = main.meteor_dir + 'private/storables'
             @set_prefix    = ''
             @autogen_prefix = main.autogen_prefix
-            if !Meteor?
-                @redis = (require 'redis').createClient()
+            if !Meteor?               
+                redis = require 'redis'
+                @redis = redis.createClient()
             else
                 @redis = (Npm.require 'redis').createClient()
                 @server_config = @meteor_dir + 'server/config'
@@ -188,7 +189,6 @@ local = {}
         console.log( arg + '' );
 
 if !Meteor?
-    module.exports = {
-        __: @__,
+    module.exports =
+        __: @__
         Config: @Config
-    }

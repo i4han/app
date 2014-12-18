@@ -5,38 +5,51 @@ module.exports.navbar =
             _ = require 'underscore'
             _.templateSettings = interpolate: /\[(.+?)\]/g
             menu = ''
-            Config.navbar.list.forEach (list) -> 
-                val = list.split '|'
-                menu += ( _.template """            li: a(href="{{pathFor '[name]'}}") [link]\n""" ) { name:val[0], link:val[1] }                 
+            Config.$.navbar.list.forEach (list) -> 
+                menu += ( _.template """            li: a(href="{{pathFor '[name]'}}") [link]\n""" ) { name:list[0], link:list[1] }                 
             """
-            .navbar.navbar-default.navbar-#{Config.navbar.style}: .container
+            .navbar.navbar-default.navbar-#{Config.$.navbar.style}: .container
                 .navbar-left 
                     ul.nav.navbar-nav
             #{menu}
                 .navbar-right
                     +loginButtons
             """
-        styl: """
+        styl_compile: (Config) -> """
+            #login-buttons
+                height 50px
+                width #{Config.$.navbar.login.width}
             li#login-dropdown-list
-                width 100px
-                line-height 50px
+                width #{Config.$.navbar.login.width}
+                height #{Config.$.navbar.height}
                 display table-cell
                 text-align center
                 vertical-align middle
+            .navbar-default .navbar-nav > li > a
+                color #{Config.$.navbar.text.color}
             .navbar-left > ul > li > a
-                width 80px
+                width #{Config.$.navbar.text.width}
                 text-align center
             .navbar-right > li:hover
             .navbar-left > ul > li:hover
             .navbar-nav > li > a:hover
                 text-decoration none
-                color black
-                background-color white
+                color #{Config.$.navbar.hover.color}
+                background-color #{Config.$.navbar.hover.background_color}
             .dropdown-toggle > i.fa-chevron-down
                 padding-left 4px
-            .navbar-nav > li > a:focus  // it dosen't affect
-                color black
-                background-color white
+            //.navbar-nav > li > a:focus  // it dosen't affect
+            //    color black
+            //    background-color white
+            #login-dropdown-list > a
+                width #{Config.$.navbar.login.width}
+                height #{Config.$.navbar.height}
+                color #{Config.$.navbar.text.color}
+                text-decoration none
+                cursor pointer
+                padding ( ( #{Config.$.navbar.height} - #{Config.$.navbar.text.height} ) / 2 )
+            #login-dropdown-list > a:hover
+                background-color #{Config.$.navbar.hover.background_color}
             """
         stylus: """
             .navbar-inner

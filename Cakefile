@@ -18,8 +18,7 @@ catch e
         
 {spawn, exec} = require 'child_process'
 redis = (func) ->
-    exec 'parts start redis', (err, stdout, stderr) ->
-        func() if func
+    exec 'parts start redis', (err, stdout, stderr) -> func() if func
 
 
 io = stdio: 'inherit'
@@ -39,7 +38,8 @@ deldir = (path) ->
 
 configure = (func) ->
     redis ->
-        exec 'include ' + Config.config_source + ' | coffee -sc --bare > ' + Config.config_js, (err, stdout, stderr) -> 
+        exec 'include ' + Config.config_source + ' | coffee -sc --bare > ' + Config.config_js, (err, stdout, stderr) ->
+            require './packages/sat/config'
             func() if func
             console.log err if err
 
@@ -87,6 +87,7 @@ task 'profile', 'Make shell profile', ->
         export METEOR_LIB=#{cwd}/lib
         export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
         [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
+        alias re='parts start redis'
 
         """, flag: 'w+'
     
