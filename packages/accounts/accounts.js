@@ -7,10 +7,10 @@ Login.loginSession = {
     return this._set(key, value);
   },
   _set: function(key, value) {
-    return Session.set("Meteor.loginButtons." + key, value);
+    return Session.set("login." + key, value);
   },
   get: function(key) {
-    return Session.get('Meteor.loginButtons.' + key);
+    return Session.get('loign.' + key);
   },
   closeDropdown: function() {
     this.set('inSignupFlow', false);
