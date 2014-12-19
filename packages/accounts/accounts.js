@@ -1,12 +1,6 @@
 Login = {};
 Login.loginSession = {
   set: function(key, value) {
-    if (_.contains(['errorMessage', 'infoMessage'], key)) {
-      throw new Error("Use errorMessage() or infoMessage().");
-    }
-    return this._set(key, value);
-  },
-  _set: function(key, value) {
     return Session.set("login." + key, value);
   },
   get: function(key) {
@@ -21,13 +15,13 @@ Login.loginSession = {
     return this.resetMessages;
   },
   infoMessage: function(message) {
-    this._set("errorMessage", null);
-    this._set("infoMessage", message);
+    this.set("errorMessage", null);
+    this.set("infoMessage", message);
     return this.ensureMessageVisible;
   },
   errorMessage: function(message) {
-    this._set("errorMessage", message);
-    this._set("infoMessage", null);
+    this.set("errorMessage", message);
+    this.set("infoMessage", null);
     return this.ensureMessageVisible;
   },
   isMessageDialogVisible: function() {
@@ -37,10 +31,6 @@ Login.loginSession = {
     if (!this.isMessageDialogVisible) {
       return this.set("dropdownVisible", true);
     }
-  },
-  resetMessages: function() {
-    this._set("errorMessage", null);
-    return this._set("infoMessage", null);
   },
   configureService: function(name) {
     this.set('configureLoginServiceDialogVisible', true);
