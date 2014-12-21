@@ -6,13 +6,31 @@ closeDropdown = ->
     ('inSignupFlow inForgotPasswordFlow inChangePasswordFlow inMessageOnlyFlow dropdownVisible'.split ' ').forEach (key) ->
         Session.set 'login.' + key , false
     resetMessages()
-orTest => (array) ->
+orTest = -> (array) ->
     array.forEach (key) -> 
         return true if Session.get key 
     return false
 ensureMessageVisible = ->
     if ! orTest 'resetPasswordToken enrollAccountToken justVerifiedEmail'.split ' '
         Session.set 'dropdownVisible', true
+
+errorMessage = -> (message) ->
+    Session.set "login.errorMessage", message
+    Session.set "login.infoMessage", null
+    ensureMessageVisible()
+ 
+login = ->
+    resetMessages();
+    username = __.getValue('username');
+    email = __.getValue('email');
+    usernameOrEmail = __.trim(__.getValue('username-or-email'));
+    password = __.getValue('password');
+    loginSelector = null
+    loginSelector = username: username if username?
+    loginSelector = email: email if email?
+    loginSelector = usernameOrEmail;
+    Meteor.loginWithPassword loginSelector, password, (error, result) ->
+        if error then errorMessage error.reason || "Unknown error" else closeDropdown()
 
 
 module.exports.accounts =
@@ -193,7 +211,10 @@ module.exports.accounts =
             hasPasswordService: -> Login.loginButtons.hasPasswordService()
             forbidClientAccountCreation: -> Accounts._options.forbidClientAccountCreation # useless
         events:
-            'click #login-buttons-password': -> Login.ui.loginOrSignup()
+            'click #login-buttons-password': -> if Session.get 'inSignupFlow' then Signup() else login()
+            'keypress #username, keypress #email, keypress #username-or-email, keypress #password, keypress #password-again': ( event ) ->
+                ( if Session.get 'inSignupFlow' then Signup() else login() ) if event.keyCode == 13
+
             'keypress #forgot-password-email': ( event ) -> Login.ui.forgotPassword() if event.keyCode == 13
             'click #login-buttons-forgot-password': ( event ) -> event.stopPropagation() ; Login.ui.forgotPassword()
             'click #signup-link': ( event ) -> 
@@ -236,10 +257,7 @@ module.exports.accounts =
                 Meteor.flush()
                 document.getElementById('username').value = username if document.getElementById 'username'
                 document.getElementById('email').value = email if document.getElementById 'email'
-                document.getElementById('username-or-email').value = email || username if document.getElementById 'username-or-email'
-            'keypress #username, keypress #email, keypress #username-or-email, keypress #password, keypress #password-again': ( event ) ->
-                Login.ui.loginOrSignup() if event.keyCode == 13
-            
+                document.getElementById('username-or-email').value = email || username if document.getElementById 'username-or-email'            
             
     _loginButtonsLoggedOutAllServices: # dropdown-menu
         jade: """

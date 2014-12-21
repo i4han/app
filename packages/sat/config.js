@@ -6,12 +6,13 @@ if (typeof Meteor === "undefined" || Meteor === null) {
   fs = require('fs');
   jade = require('jade');
   stylus = require('stylus');
-} else if (!Package.underscore._.isEmpty(this.Config) && !Package.underscore._.isEmpty(this.__)) {
-  return {
-    Config: this.Config,
-    __: this.__
-  };
 } else {
+  if (!(Package.underscore._.isEmpty(this.Config) || Package.underscore._.isEmpty(this.__))) {
+    return {
+      Config: this.Config,
+      __: this.__
+    };
+  }
   _ = this._;
   this.module = {
     exports: {}
@@ -126,6 +127,7 @@ this.Config = {
       target_file: main.target_dir + main.autogen_prefix + '2.html',
       indent: 1,
       format: function(name, block) {
+        console.log("template(name=\"" + name + "\")\n" + block + "\n\n");
         return jade.compile("template(name=\"" + name + "\")\n" + block + "\n\n", null)();
       }
     },

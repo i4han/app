@@ -2,7 +2,7 @@ db = {}, Pages = {};
 Sat = { isServer: false, isClient: false };
 __ = this.__
 Config = this.Config
-module = { exports:{} }
+module = { exports:{} } // why?
 
 __.deepExtend = function (target, source) {
     for (var prop in source)

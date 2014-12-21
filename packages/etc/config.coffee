@@ -8,13 +8,11 @@ if !Meteor?
     fs = require 'fs'
     jade = require 'jade'
     stylus = require 'stylus'
-else if ! Package.underscore._.isEmpty(@Config) and ! Package.underscore._.isEmpty(@__)
-    return {Config:@Config, __:@__}
 else
+    return {Config:@Config, __:@__} unless Package.underscore._.isEmpty(@Config) or Package.underscore._.isEmpty(@__)
     _ = @_
     @module = exports:{}
-    if Meteor.isServer
-        fs = Npm.require 'fs'
+    fs = Npm.require 'fs' if Meteor.isServer
 
 
 main = {

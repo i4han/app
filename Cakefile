@@ -5,16 +5,20 @@ path = require 'path'
 chokidar = require 'chokidar'
 try
     {Config} = require './packages/sat/config'
+    
 catch e
     console.log 'Temporary Config used.'
-    Config = 
-        config_source: 'packages/etc/config.coffee'
-        config_js:     'packages/sat/config.js'
-        config_js_dir: '/home/codie/sat'
-        meteor_dir:    '/home/codio/workspace'
-        package_dir:   '/home/codio/workspace/packages'
-        auto_generated_files: 'auto_'
-        quit: -> {}
+    Config = {}
+    
+Config = { 
+    config_source: 'packages/etc/config.coffee'
+    config_js:     'packages/sat/config.js'
+    config_js_dir: '/home/codie/sat'
+    meteor_dir:    '/home/codio/workspace'
+    package_dir:   '/home/codio/workspace/packages'
+    auto_generated_files: 'auto_'
+    quit: -> {} 
+} unless Config? and Object.keys(Config).length
         
 {spawn, exec} = require 'child_process'
 redis = (func) ->
@@ -56,7 +60,7 @@ clean_up = ->
 
 start_up = ->
     conf = chokidar.watch Config.config_source, persistent:true
-    conf.on 'change', (file) -> compile()
+    conf.on 'change', (file) -> configure null
     watcher = chokidar.watch Config.source_dir, persistent:true
     watcher.on 'add', (file) ->
         collect() if isType file, 'coffee'

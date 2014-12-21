@@ -3,11 +3,8 @@
 
 // Run button configuration
   "commands": {
-        "gitup": ". ~/workspace/profile; gitup",
-        "shell": ". ~/workspace/profile",
-        "install": "cd ~/workspace; ./install.sh",
-        "node": ". ~/workspace/profile; node",
-        "coffee": ". ~/workspace/profile; coffee" 
+        "Node version": "node --version",
+	"Edit": "rsub {{path}}/{{filename}}"
   },
 
 // Preview button configuration

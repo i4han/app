@@ -83,7 +83,7 @@ var collectKey = function (obj, kind, storables_hash) {
     var updateFile = function () {
         var fileTarget = template.header ? template.header : '';  // change: attach header later
         _.each( _.keys(obj), function ( file ) { 
-            _.each( _.keys(obj[file]), function ( page ) { 
+            _.each( _.keys(obj[file]), function ( page ) {
                 var block = stringOrFunctionToString( obj[file][page][kind] );
                 if ( block ) {
                     block = __.indentBlock( block, template.indent );
