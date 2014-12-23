@@ -3,8 +3,8 @@
 
 // Run button configuration
   "commands": {
-        "Node version": "node --version",
-	"Edit": "rsub {{path}}/{{filename}}"
+      	"Edit": "rsub {{path}}/{{filename}}",
+        "Node version": "node --version"
   },
 
 // Preview button configuration

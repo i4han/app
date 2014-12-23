@@ -62,7 +62,7 @@ local = {}
         jade_compile:
             target_file: main.target_dir + main.autogen_prefix + '2.html'
             indent: 1
-            format: (name, block) -> jade.compile( """template(name="#{name}")\n#{block}\n\n""", null )()
+            format: (name, block) -> console.log name + block; console.log """template(name="#{name}")\n#{block}\n\n"""; jade.compile( """template(name="#{name}")\n#{block}\n\n""", null )()
         HTML:
             target_file: main.target_dir + main.autogen_prefix + '2.html'
             indent: 1

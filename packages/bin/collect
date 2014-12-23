@@ -75,6 +75,8 @@ var collectKey = function (obj, kind, storables_hash) {
     var checkSum = function () {
         _.each( _.keys(obj), function ( file ) {
             _.each( _.keys( obj[file] ), function ( page ) {
+                console.log( file + '/' + page + '/' + kind );
+                console.log( stringOrFunctionToString( obj[file][page][kind] ) );
                 strSum += stringOrFunctionToString( obj[file][page][kind] );
             });
         });

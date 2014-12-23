@@ -2,6 +2,7 @@
 
 git submodule update --init
 
+
 for i in redis meteor
 do
     [[ `parts list` =~ $i ]] || parts install $i
@@ -17,6 +18,10 @@ do
     npm install --prefix ~ $j
 done
 
+for k in rmate
+do
+    gem install $k
+done
 packages/bin/include packages/etc/config.coffee | $NODE_MODULES/.bin/coffee -sc --bare > packages/sat/config.js
 
 if [ ! -e ../.bashrc ]; then

@@ -92,6 +92,7 @@ task 'profile', 'Make shell profile', ->
         export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
         [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
         alias re='parts start redis'
+        alias sl='rmate -p 8080'
 
         """, flag: 'w+'
     

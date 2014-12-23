@@ -1,7 +1,6 @@
 module.exports.theme_clean =
     br:
         jade_compile: """
-
             br(style='line-height:{{height}}')
             """
 
