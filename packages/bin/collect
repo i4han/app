@@ -75,8 +75,8 @@ var collectKey = function (obj, kind, storables_hash) {
     var checkSum = function () {
         _.each( _.keys(obj), function ( file ) {
             _.each( _.keys( obj[file] ), function ( page ) {
-                console.log( file + '/' + page + '/' + kind );
-                console.log( stringOrFunctionToString( obj[file][page][kind] ) );
+//                console.log( file + '/' + page + '/' + kind );
+//                console.log( 'SoF: ' + stringOrFunctionToString( obj[file][page][kind] ) );
                 strSum += stringOrFunctionToString( obj[file][page][kind] );
             });
         });
@@ -90,6 +90,8 @@ var collectKey = function (obj, kind, storables_hash) {
                 if ( block ) {
                     block = __.indentBlock( block, template.indent );
                     var target = template.format.call( this, page, block );
+//                    console.log( 'target:' + target )
+//                    console.log( 'file:' + fileTarget )
                     fileTarget += target;   // fileTarget order attach top or bottom
                 }
             });

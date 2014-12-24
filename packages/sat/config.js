@@ -127,8 +127,6 @@ this.Config = {
       target_file: main.target_dir + main.autogen_prefix + '2.html',
       indent: 1,
       format: function(name, block) {
-        console.log(name + block);
-        console.log("template(name=\"" + name + "\")\n" + block + "\n\n");
         return jade.compile("template(name=\"" + name + "\")\n" + block + "\n\n", null)();
       }
     },
