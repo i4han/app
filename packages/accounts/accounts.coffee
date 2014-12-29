@@ -6,20 +6,30 @@ closeDropdown = ->
     ('inSignupFlow inForgotPasswordFlow inChangePasswordFlow inMessageOnlyFlow dropdownVisible'.split ' ').forEach (key) ->
         Session.set 'login.' + key , false
     resetMessages()
+    console.log 'close dropdown'
+    
 orTest = -> (array) ->
     array.forEach (key) -> 
         return true if Session.get key 
     return false
+
 ensureMessageVisible = ->
     if ! orTest 'resetPasswordToken enrollAccountToken justVerifiedEmail'.split ' '
         Session.set 'dropdownVisible', true
 
-errorMessage = -> (message) ->
+errorMessage = (message) ->
+    message = if message then message else "Unknown error"
     Session.set "login.errorMessage", message
     Session.set "login.infoMessage", null
     ensureMessageVisible()
+    
+infoMessage = (message) ->
+    Session.set "login.errorMessage", null
+    Session.set "login.infoMessage", message
+    ensureMessageVisible()
  
 login = ->
+    console.log 'login'
     resetMessages();
     username = __.getValue('username');
     email = __.getValue('email');
@@ -29,24 +39,92 @@ login = ->
     loginSelector = username: username if username?
     loginSelector = email: email if email?
     loginSelector = usernameOrEmail;
-    Meteor.loginWithPassword loginSelector, password, (error, result) ->
-        if error then errorMessage error.reason || "Unknown error" else closeDropdown()
+    Meteor.loginWithPassword loginSelector, password, (err, result) -> 
+        if err then errorMessage err.reason else closeDropdown()
 
+signup = ->
+    console.log 'signup'
+    resetMessages()
+    options =
+        username: __.trimmedValue 'username'
+        email: __.trimmedValue 'email'
+        password: __.getValue 'password'
+        profile: {}
+    Accounts.createUser options, (err) ->
+        if err then errorMessage err.reason else closeDropdown()
+
+changePassword = ->
+    resetMessages()
+    oldPassword = __.getValue 'old-password'
+    password = __.getValue 'password'
+    Accounts.changePassword oldPassword, password, (err) ->
+       if err
+           errorMessage err.reason
+       else 
+           infoMessage "Password changed"
+           Meteor.setTimeout ->
+               resetMessages()
+               closeDropdown()
+               $('#login-dropdown-list').removeClass 'open'
+           , 
+               3000
+forgotPassword = ->
+    resetMessages();
+    email = __.trimmedValue "forgot-password-email"
+    infoMessage "Email sent"
+
+
+get_username = ->
+    user = Meteor.user()  
+    return 'no name' if !user?    
+    (user.profile and user.profile.name) or user.username or (user.emails and user.emails[0] and user.emails[0].address)
+
+loginFlow = -> ! Session.get('login.inSignupFlow') and ! Session.get('login.inForgotPasswordFlow')    
 
 module.exports.accounts =
 
-    __events__:
-        startup: ->
-            if Login._verifyEmailToken
-                Login.verifyEmail Login._verifyEmailToken, ( error ) ->
-                    Login._enableAutoLogin()
-                    Session.set 'login.justVerifiedEmail', true if !error
+    login: 
+        styl_compile: """
+            #login-buttons
+                float right
+                border 0            
+            #login-buttons + li
+                .dropdown-menu
+                    float: right;
+                    right: 0;
+                    left: auto;
 
+            """
+        jade: """
+            ul.nav.navbar-nav#login-buttons
+                if currentUser
+                    if loggingIn
+                        if dropdown 
+                            +_loginButtonsLoggingIn
+                        else
+                            .login-buttons-with-only-one-button
+                                +_loginButtonsLoggingInSingleLoginButton
+                    else
+                        +_loginButtonsLoggedIn
+                else
+                    +dropdown_logged_out       
+            """
+        events:
+            'click #login-buttons-logout': -> Meteor.logout -> closeDropdown() ; Router.go 'home'
+            'click #login-buttons-profile': -> $('#login-dropdown-list').removeClass 'open' ; Router.go 'profile'
+            'click #login-buttons-settings': -> $('#login-dropdown-list').removeClass 'open' ; Router.go 'settings'
+            'click input, click label, click button, click .dropdown-menu, click .alert': ( event ) -> event.stopPropagation()
+            'click .login-close': -> closeDropdown() ; $('#login-dropdown-list').removeClass 'open' ; console.log "login-close"
+            'click #login-name-link, click #login-sign-in-link': ( event ) -> 
+                event.stopPropagation()
+                Session.set 'login.dropdownVisible', true
+                Meteor.flush()
+#        toggleDropdown: -> $('#login-dropdown-list .dropdown-menu').dropdown 'toggle'  # not used
 
     _loginButtonsLoggedInDropdown:
         jade: """
             li.dropdown#login-dropdown-list
-                a.dropdown-toggle#login-id(data-toggle="dropdown") {{displayName}}
+                a.dropdown-toggle#login-id(data-toggle="dropdown") {{username}}
                     i.fa(class="fa-chevron-down")
                 if inMessageOnlyFlow
                     .dropdown-menu
@@ -80,117 +158,125 @@ module.exports.accounts =
                 Session.set 'login.inChangePasswordFlow', true
                 Meteor.flush()
         helpers:
-            displayName: -> Login.loginButtons.displayName()
+            username: -> get_username()
             inChangePasswordFlow: -> Session.get 'login.inChangePasswordFlow'
             inMessageOnlyFlow: -> Session.get 'login.inMessageOnlyFlow'
             dropdownVisible: -> Session.get 'login.dropdownVisible'         
-            
-            
-    _loginButtonsLoggedOut:
-        jade: """
-            if services
-                if configurationLoaded
-                    if dropdown
-                        +_loginButtonsLoggedOutDropdown
-                    else
-                        with singleService
-                            .login-buttons-with-only-one-button
-                                if loggingIn
-                                    +_loginButtonsLoggingInSingleLoginButton
-                                else
-                                    +_loginButtonsLoggedOutSingleLoginButton
-            else
-                .no-services No login services configured
-            """
-        helpers:
-            dropdown: -> Login.loginButtons.dropdown()        
-            services: -> Login.loginButtons.getLoginServices()
-            singleService: -> 
-                services = Login.loginButtons.getLoginServices()
-                throw new Error "Shouldn't be rendering this template with more than one configured service" if services.length != 1
-                services[0]
-            configurationLoaded: -> Accounts.loginServicesConfigured()            
-            
-            
-    _loginButtonsLoggedIn:
-        jade: """
-            if dropdown
-                +_loginButtonsLoggedInDropdown
-            else
-                .login-buttons-with-only-one-button
-                    +_loginButtonsLoggedInSingleLogoutButton
-            """
-        helpers: 
-            dropdown: -> Login.loginButtons.dropdown()      # of cause
-            displayName: -> Login.loginButtons.displayName()
-            
-            
-            
-    _loginButtonsLoggedOutPasswordService:
+                        
+    dropdown_logged_out:
         styl_compile: """
+            .dropdown-menu
+                top 50px
+                margin 0px
+                font-weight 200
+                text-align left
+                line-height 14px
+                border-radius 0px
+                &#logged-in-dropdown
+                    right 0
+                    left auto
+                    width 186px
+                    padding 5px 0px
+            .dropdown-menu-icon
+                margin-right 12px
             #login-other-options
                 padding-top 8px
-            .dropdown-menu-link
                 line-height 25px
+            #dropdown-menu-buttons
+                text-align center
             """
         jade: """
-            if inForgotPasswordFlow
-                +_forgotPasswordForm
-            else
-                each fields
-                    +formField
-                +_loginButtonsMessages
-                button.btn.btn-primary#login-buttons-password(type="button")
-                    if inSignupFlow
-                        | Create
-                    else
-                        | Sign in
-                if inLoginFlow
+            li.dropdown#login-dropdown-list
+                a.dropdown-toggle(data-toggle="dropdown")
+                    | Sign In
+                    i.fa.fa-chevron-down
+                .dropdown-menu
+                    each fields
+                        +form
+                    br
+                    +_loginButtonsMessages
+                    #dropdown-menu-buttons
+                        each buttons
+                            +button
                     #login-other-options
-                        if showForgotPasswordLink
-                            a.dropdown-menu-link#forgot-password-link Forgot password?
-                        if showCreateAccountLink
-                            a.dropdown-menu-link#signup-link Create account
-                else
-                    +_loginButtonsBackToLoginLink
+                        each links
+                            +link
             """
         helpers:
-            inLoginFlow: -> ! Session.get('login.inSignupFlow')  and ! Session.get 'login.inForgotPasswordFlow'
-            inSignupFlow: -> Session.get 'login.inSignupFlow'
-            inForgotPasswordFlow: -> Session.get 'login.inForgotPasswordFlow'
-            showCreateAccountLink: -> !Accounts._options.forbidClientAccountCreation
-            showForgotPasswordLink: -> 
-                _.contains ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL", "EMAIL_ONLY"], Login.ui._passwordSignupFields()
-            fields: ->
-                loginFields = [
-                    label: 'Username or email', icon: 'user',                                    visible: -> _.contains( 
-                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL"], Login.ui._passwordSignupFields() )
+            links: -> [
+                    label: 'Forgot password?', id:'forgot-password-link', class:'dropdown-menu-link', visible: -> loginFlow()
+                ,   
+                    label: 'Create account',   id:'signup-link',          class:'dropdown-menu-link', visible: -> loginFlow()
+                ,   label: 'Back to login',    id:'back-to-login-link',   class:'dropdown-menu-link', visible: -> ! loginFlow() ]
+            buttons: -> [
+                    label: 'Reset Password',   id:'login-buttons-forgot-password', type:'button',     visible: -> Session.get 'login.inForgotPasswordFlow'                    
                 ,
+                    label: 'Sign up',          id:'login-buttons-password',        type:'button',     visible: -> Session.get 'login.inSignupFlow'
+                ,   label: 'Sign in',          id:'login-buttons-password',        type:'button',     visible: -> loginFlow() ]                
+            fields: -> 
+                return if Session.get 'login.inSignupFlow' then [
                     label: 'Username',          icon: 'user'
-                    visible: -> Login.ui._passwordSignupFields() == "USERNAME_ONLY"
                 ,
                     label: 'Email',             icon: 'envelope-o',       type: 'email'
-                    visible: -> Login.ui._passwordSignupFields() == "EMAIL_ONLY"
-                , 
-                    label: 'Password',          icon: 'key',              type: 'password' ] 
-                signupFields = [
-                    label: 'Username',          icon: 'user',                                    visible: -> _.contains(
-                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Login.ui._passwordSignupFields() )
+                ,   label: 'Password',          icon: 'key',              type: 'password'
+                ,   
+                    label: 'Password again',    icon: 'key',              type: 'password',      visible: -> false ]
+                else if Session.get 'login.inForgotPasswordFlow' then [ 
+                    label: 'Email',             icon: 'envelope-o',       type: 'email',         id:'forgot-password-email' ]
+                else [
+                    label: 'Username or email', icon: 'user'
                 ,
-                    label: 'Email',             icon: 'envelope-o',       type: 'email',         visible: -> _.contains(
-                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_EMAIL", "EMAIL_ONLY"], Login.ui._passwordSignupFields() )
-                ,
-                    name: 'email'
-                    label: 'Email (optional)',  icon: 'envelope-o',       type: 'email',         visible: -> 
-                        Login.ui._passwordSignupFields() == "USERNAME_AND_OPTIONAL_EMAIL"
-                ,
-                    label: 'Password',          icon: 'key',              type: 'password'
-                ,
-                    label: 'Password again',    icon: 'key',              type: 'password',      visible: -> _.contains(
-                        ["USERNAME_AND_EMAIL_CONFIRM", "USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Login.ui._passwordSignupFields() ) ]
-                signupFields = Login.ui._options.extraSignupFields.concat signupFields
-                if Session.get '.login.inSignupFlow' then signupFields else loginFields
-
+                    label: 'Username',          icon: 'user',                                    visible: -> false
+                ,   
+                    label: 'Email',             icon: 'envelope-o',       type: 'email',         visible: -> false
+                ,   label: 'Password',          icon: 'key',              type: 'password' ]
+        events:
+            'click #login-buttons-password': -> console.log 'button'; if Session.get 'login.inSignupFlow' then signup() else login()
+            'keypress #username, keypress #email, keypress #username-or-email, keypress #password, keypress #password-again': ( event ) ->
+                ( if Session.get 'login.inSignupFlow' then signup() else login() ) if event.keyCode == 13
+            'keypress #forgot-password-email': ( event ) -> forgotPassword() if event.keyCode == 13
+            'click #login-buttons-forgot-password': ( event ) -> event.stopPropagation() ; forgotPassword()
+            'click #signup-link': ( event ) -> 
+                event.stopPropagation()
+                resetMessages()
+                username = __.trimmedValue 'username'
+                email = __.trimmedValue 'email'
+                usernameOrEmail = __.trimmedValue 'username-or-email'
+                password = __.getValue 'password'
+                Session.set 'login.inSignupFlow', true
+                Session.set 'login.inForgotPasswordFlow', false
+                Meteor.flush();
+                if username != null
+                    document.getElementById('username').value = username
+                else if email != null
+                    document.getElementById('email').value = email
+                else if usernameOrEmail != null and usernameOrEmail.indexOf('@') == -1
+                    document.getElementById('username').value = usernameOrEmail
+                else
+                    document.getElementById('email').value = usernameOrEmail
+            'click #forgot-password-link': ( event ) ->
+                event.stopPropagation()
+                resetMessages()
+                email = __.trimmedValue 'email'
+                usernameOrEmail = __.trimmedValue 'username-or-email'
+                Session.set('login.inSignupFlow', false)
+                Session.set('login.inForgotPasswordFlow', true);
+                Meteor.flush()
+                if email != null
+                    document.getElementById('forgot-password-email').value = email
+                else if usernameOrEmail != null
+                    if usernameOrEmail.indexOf('@') != -1
+                        document.getElementById('forgot-password-email').value = usernameOrEmail
+            'click #back-to-login-link': ->
+                resetMessages()
+                username = __.trimmedValue 'username'
+                email = __.trimmedValue('email') || __.trimmedValue('forgot-password-email')
+                Session.set 'login.inSignupFlow', false
+                Session.set 'login.inForgotPasswordFlow', false
+                Meteor.flush()
+                document.getElementById('username').value = username if document.getElementById 'username'
+                document.getElementById('email').value = email if document.getElementById 'email'
+                document.getElementById('username-or-email').value = email || username if document.getElementById 'username-or-email'            
                     
     _loginButtonsLoggedOutDropdown:
         jade: """
@@ -199,7 +285,7 @@ module.exports.accounts =
                     | Sign In
                     i.fa.fa-chevron-down
                 .dropdown-menu
-                    +_loginButtonsLoggedOutAllServices
+                    +password_service_loggedout
             """
         helpers:
             additionalClasses: ->
@@ -209,14 +295,12 @@ module.exports.accounts =
                 else 'login-form-sign-in'
             dropdownVisible: -> Session.get 'login.dropdownVisible'
             hasPasswordService: -> Login.loginButtons.hasPasswordService()
-            forbidClientAccountCreation: -> Accounts._options.forbidClientAccountCreation # useless
         events:
-            'click #login-buttons-password': -> if Session.get 'inSignupFlow' then Signup() else login()
+            'click #login-buttons-password': -> console.log 'button'; if Session.get 'login.inSignupFlow' then signup() else login()
             'keypress #username, keypress #email, keypress #username-or-email, keypress #password, keypress #password-again': ( event ) ->
-                ( if Session.get 'inSignupFlow' then Signup() else login() ) if event.keyCode == 13
-
-            'keypress #forgot-password-email': ( event ) -> Login.ui.forgotPassword() if event.keyCode == 13
-            'click #login-buttons-forgot-password': ( event ) -> event.stopPropagation() ; Login.ui.forgotPassword()
+                ( if Session.get 'login.inSignupFlow' then signup() else login() ) if event.keyCode == 13
+            'keypress #forgot-password-email': ( event ) -> forgotPassword() if event.keyCode == 13
+            'click #login-buttons-forgot-password': ( event ) -> event.stopPropagation() ; forgotPassword()
             'click #signup-link': ( event ) -> 
                 event.stopPropagation()
                 resetMessages()
@@ -265,20 +349,15 @@ module.exports.accounts =
                 unless hasPasswordService
                     +_loginButtonsMessages
                 if isPasswordService
-                    if hasOtherServices
-                        +_loginButtonsLoggedOutPasswordServiceSeparator
-                    +_loginButtonsLoggedOutPasswordService
+                    +password_service_loggedout
                 else
                     +_loginButtonsLoggedOutSingleLoginButton
             """
         helpers:
             services: -> Login.loginButtons.getLoginServices()
             isPasswordService: -> this.name == 'password'
-            hasOtherServices: -> Login.loginButtons.getLoginServices().length > 1
             hasPasswordService: -> Login.loginButtons.hasPasswordService()
-            
-            
-            
+                        
             
     _loginButtonsLoggedInDropdownActions:
         styl_compile: (Config) -> """
@@ -314,9 +393,9 @@ module.exports.accounts =
             
     _loginButtonsMessages:
         styl_compile: """
-            #login-dropdown-list > .alert
-                margin 0 0 10px 0
-                padding 5px 10px
+            #login-dropdown-list .alert
+                padding 6px
+                margin-bottom 14px
             """
         jade: """
             if errorMessage
@@ -400,76 +479,72 @@ module.exports.accounts =
             """
         dropdown: -> Login.loginButtons.dropdown()
 
-
-    loginButtons: # style_compile
-        styl_compile: """
-            #login-buttons
-                float right
-                border 0
-            .login-buttons-dropdown-align-left
-              &#login-buttons + li
-                .dropdown-menu
-                  float: left;
-                  left: 0;
-                  right: auto;
-            .login-buttons-dropdown-align-right
-              &#login-buttons + li
-                .dropdown-menu
-                  float: right;
-                  right: 0;
-                  left: auto;
-
-            """
+    _loginButtonsLoggedOut:
         jade: """
-            ul.nav.navbar-nav.login-buttons-dropdown-align-right#login-buttons
-                if currentUser
-                    if loggingIn
-                        if dropdown 
-                            +_loginButtonsLoggingIn
-                        else
-                            .login-buttons-with-only-one-button
-                                +_loginButtonsLoggingInSingleLoginButton
+            if services
+                if configurationLoaded
+                    if dropdown
+                        +_loginButtonsLoggedOutDropdown
                     else
-                        +_loginButtonsLoggedIn
-                else
-                    +_loginButtonsLoggedOut        
+                        with singleService
+                            .login-buttons-with-only-one-button
+                                if loggingIn
+                                    +_loginButtonsLoggingInSingleLoginButton
+                                else
+                                    +_loginButtonsLoggedOutSingleLoginButton
+            else
+                .no-services No login services configured
             """
-        events:
-            'click #login-buttons-logout': -> Meteor.logout -> closeDropdown() ; Router.go 'home'
-            'click #login-buttons-profile': -> $('#login-dropdown-list').removeClass 'open' ; Router.go 'profile'
-            'click #login-buttons-settings': -> $('#login-dropdown-list').removeClass 'open' ; Router.go 'settings'
-            'click input, click label, click button, click .dropdown-menu, click .alert': ( event ) -> event.stopPropagation()
-            'click .login-close': -> closeDropdown() ; $('#login-dropdown-list').removeClass 'open' ; console.log "login-close"
-            'click #login-name-link, click #login-sign-in-link': ( event ) -> 
-                event.stopPropagation()
-                Session.set 'login.dropdownVisible', true
-                Meteor.flush()
-        toggleDropdown: -> $('#login-dropdown-list .dropdown-menu').dropdown 'toggle'  # not used
+        helpers:
+            dropdown: -> Login.loginButtons.dropdown()        
+            services: -> Login.loginButtons.getLoginServices()
+            singleService: -> 
+                services = Login.loginButtons.getLoginServices()
+                throw new Error "Shouldn't be rendering this template with more than one configured service" if services.length != 1
+                services[0]
+            configurationLoaded: -> Accounts.loginServicesConfigured()            
+            
+            
+    _loginButtonsLoggedIn:
+        jade: """
+            if dropdown
+                +_loginButtonsLoggedInDropdown
+            else
+                .login-buttons-with-only-one-button
+                    +_loginButtonsLoggedInSingleLogoutButton
+            """
+        helpers: 
+            dropdown: -> Login.loginButtons.dropdown()      # of cause
+            username: -> username()
+            
+        
+
 
 
                 
     _loginButtonsChangePassword:
         jade: """
             each fields
-                +formField
+                +form
             +_loginButtonsMessages
             button.btn.btn-primary#login-buttons-do-change-password Change password
             button.btn.btn-default.login-close#login-button-back-to-menu Close
             """
         events:
-            'keypress #old-password, keypress #password, keypress #password-again': ( event ) -> Login.ui.changePassword() if event.keyCode == 13
-            'click #login-buttons-do-change-password': ( event ) -> event.stopPropagation(); Login.ui.changePassword()
+            'keypress #old-password, keypress #password, keypress #password-again': ( event ) -> changePassword() if event.keyCode == 13
+            'click #login-buttons-do-change-password': ( event ) -> event.stopPropagation(); changePassword()
             'click #login-buttons-back-to-menu': ( event ) -> event.stopPropagation(); $('#login-dropdown-list').removeClass 'open'
-        fields: -> [
-            name: 'old-password'
-            label: 'Current Password', icon: 'key',           type: 'password'
-        ,
-            name: 'password'
-            label: 'New Password',     icon: 'asterisk',      type: 'password'
-        ,
-            name: 'password-again'
-            label: 'New Password (again)',                    type: 'password',           visible: -> 
-                _.contains( ["USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Login.ui._passwordSignupFields() ) ]
+        helpers:
+            fields: -> [
+                id: 'old-password'
+                label: 'Current Password', icon: 'key',           type: 'password'
+            ,
+                id: 'password'
+                label: 'New Password',     icon: 'asterisk',      type: 'password'
+            ,
+                id: 'password-again'
+                label: 'New Password (again)',                    type: 'password',           visible: -> 
+                    _.contains( ["USERNAME_AND_OPTIONAL_EMAIL", "USERNAME_ONLY"], Login.ui._passwordSignupFields() ) ]
 
 
     _loginButtonsBackToLoginLink:
@@ -499,7 +574,7 @@ module.exports.accounts =
 
     _loginButtonsLoggedInSingleLogoutButton:
         jade: """
-            .login-text-and-button: .login-display-name {{displayName}}
+            .login-text-and-button: .login-display-name {{username}}
             .login-button.single-login-button#login-buttons-logout Sign Out
             """
 
@@ -516,13 +591,6 @@ module.exports.accounts =
                 +_loginButtonsLoggingIn
             """
 
-    _loginButtonsLoggedOutPasswordServiceSeparator:
-        jade: """
-            .or
-                span.hline &nbsp; &nbsp; &nbsp;
-                span.or-text or
-                span.hline &nbsp; &nbsp; &nbsp;
-            """
     _resetPasswordDialog:
         jade: """
             if inResetPasswordFlow
@@ -597,23 +665,4 @@ module.exports.accounts =
             .or
               text-align: center
 
-            .dropdown-menu
-              top 50px
-              margin 0px
-              font-weight 200
-              text-align left
-              line-height 20px
-              border-radius 0px
-
-              &#logged-in-dropdown
-                right 0
-                left auto
-                width 186px
-                padding-left 0px
-                padding-right 0px
-                padding-top 5px
-                padding-bottom 5px
-
-            .dropdown-menu-icon
-              margin-right 12px
             """

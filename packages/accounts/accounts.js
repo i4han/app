@@ -51,6 +51,7 @@ if (!Login.loginButtons) {
   Login.loginButtons = {};
 }
 
+/*
 Login.loginButtons.displayName = function() {
   var user;
   user = Meteor.user();
@@ -66,6 +67,7 @@ Login.loginButtons.displayName = function() {
     return '';
   }
 };
+*/
 
 Login.loginButtons.getLoginServices = function() {
   var services;

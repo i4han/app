@@ -16,7 +16,6 @@ else
 
 
 main = {
-    title:            'App'
     autogen_prefix:   'auto_'
     callback_port:    3003
     init: ->
@@ -126,19 +125,16 @@ local = {}
             parts.push encodeURIComponent(i) + "=" + encodeURIComponent(obj[i])
         parts.join "&"
 
-    trim: (str) -> str.trim()
+    trim: (str) -> if str? then str.trim() else null
     capitalize: (string) -> string.charAt(0).toUpperCase() + string.slice(1)
     dasherize: (str) -> str.trim().replace(/([A-Z])/g, "-$1").replace(/[-_\s]+/g, "-").toLowerCase()
     prettyJSON: (obj) -> JSON.stringify obj, null, 4
-
     getValue: (id) ->
         element = document.getElementById(id)
-        (if element then element.value else null)
-
+        if element then element.value else null
     trimmedValue: (id) ->
         element = document.getElementById(id)
-        (if element then element.value.replace(/^\s*|\s*$/g, "") else null)
-
+        if element then element.value.replace(/^\s*|\s*$/g, "") else null
     reKey: (obj, oldName, newName) ->
         if obj.hasOwnProperty(oldName)
             obj[newName] = obj[oldName]

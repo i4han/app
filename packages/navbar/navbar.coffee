@@ -13,7 +13,7 @@ module.exports.navbar =
                     ul.nav.navbar-nav
             #{menu}
                 .navbar-right
-                    +loginButtons
+                    +login
             """
         styl_compile: (Config) -> """
             #login-buttons

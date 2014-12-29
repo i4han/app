@@ -23,7 +23,6 @@ if (typeof Meteor === "undefined" || Meteor === null) {
 }
 
 main = {
-  title: 'App',
   autogen_prefix: 'auto_',
   callback_port: 3003,
   init: function() {
@@ -228,7 +227,11 @@ this.__ = {
     return parts.join("&");
   },
   trim: function(str) {
-    return str.trim();
+    if (str != null) {
+      return str.trim();
+    } else {
+      return null;
+    }
   },
   capitalize: function(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
