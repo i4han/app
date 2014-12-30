@@ -21,7 +21,7 @@ local =
                     width: '250px'
                     padding: '25px'
                     a:
-                        height: '30px'
+                        height: '24px'
                         hover:
                             background_color: '#eee'
             text:

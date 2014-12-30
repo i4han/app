@@ -84,7 +84,7 @@ module.exports.index =
                 .col-sm-4
                     +br(height='36px')
                     each fields
-                        +formField
+                        +form
                         +br(height='9px')
             .row &nbsp;
             """

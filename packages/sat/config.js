@@ -64,7 +64,7 @@ local = {
           width: '250px',
           padding: '25px',
           a: {
-            height: '30px',
+            height: '24px',
             hover: {
               background_color: '#eee'
             }
@@ -130,7 +130,7 @@ this.Config = {
       }
     },
     HTML: {
-      target_file: main.target_dir + main.autogen_prefix + '2.html',
+      target_file: main.target_dir + main.autogen_prefix + '3.html',
       indent: 1,
       format: function(name, block) {
         return "<template name=\"" + name + "\">\n" + block + "\n</template>";
@@ -145,21 +145,21 @@ this.Config = {
       }
     },
     less: {
-      target_file: main.target_dir + main.autogen_prefix + '5.less',
+      target_file: main.target_dir + main.autogen_prefix + '7.less',
       indent: 0,
       format: function(name, block) {
         return block;
       }
     },
     css: {
-      target_file: main.target_dir + main.autogen_prefix + '4.css',
+      target_file: main.target_dir + main.autogen_prefix + '5.css',
       indent: 0,
       format: function(name, block) {
         return block;
       }
     },
     styl: {
-      target_file: main.target_dir + main.autogen_prefix + '3.styl',
+      target_file: main.target_dir + main.autogen_prefix + '4.styl',
       indent: 0,
       format: function(name, block) {
         return block;

@@ -63,7 +63,7 @@ local = {}
             indent: 1
             format: (name, block) -> jade.compile( """template(name="#{name}")\n#{block}\n\n""", null )()  
         HTML:
-            target_file: main.target_dir + main.autogen_prefix + '2.html'
+            target_file: main.target_dir + main.autogen_prefix + '3.html'
             indent: 1
             format: (name, block) -> """<template name="#{name}">\n#{block}\n</template>"""
         head:
@@ -72,15 +72,15 @@ local = {}
             header: 'head\n'                  #  'doctype html\n' has not suppored by jade
             format: (name, block) -> block
         less:
-            target_file: main.target_dir + main.autogen_prefix + '5.less'
+            target_file: main.target_dir + main.autogen_prefix + '7.less'
             indent: 0
             format: (name, block) -> block
         css:
-            target_file: main.target_dir + main.autogen_prefix + '4.css'
+            target_file: main.target_dir + main.autogen_prefix + '5.css'
             indent: 0
             format: (name, block) -> block
         styl:
-            target_file: main.target_dir + main.autogen_prefix + '3.styl'
+            target_file: main.target_dir + main.autogen_prefix + '4.styl'
             indent: 0
             format: (name, block) -> block
         styl_compile:
