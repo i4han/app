@@ -155,14 +155,16 @@ module.exports.accounts =
             """
         jade: "each items\n    +menu"
         helpers:
-            items: -> [
-                    label: 'Profile',         id: 'login-buttons-profile',         icon: 'list-alt'
+            items: ->
+                style = 'height: 30px; padding: 7px 20px;' 
+                [
+                    label: 'Profile',         id: 'login-buttons-profile',         style: style, icon: 'list-alt'
                 ,
-                    label: 'Settings',        id: 'login-buttons-help',            icon: 'cog'
-                ,   label: 'Change Password', id: 'login-buttons-change-password', icon: 'key'
+                    label: 'Settings',        id: 'login-buttons-help',            style: style, icon: 'cog'
+                ,   label: 'Change Password', id: 'login-buttons-change-password', style: style, icon: 'key'
                 ,
                     label: '-'
-                ,   label: 'Sign Out',        id: 'login-buttons-logout',          icon: 'sign-out']
+                ,   label: 'Sign Out',        id: 'login-buttons-logout',          style: style, icon: 'sign-out']
 
     change_password:
         jade: """

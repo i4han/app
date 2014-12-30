@@ -50,7 +50,7 @@ module.exports.form =
                 if divider
                     li.divider
                 else
-                    li: a(id="{{id}}" class="{{class}}")
+                    li: a(id="{{id}}" class="{{class}}" style="{{style}}")
                         i.fa(class="fa-{{icon}}" class="{{icon_class}}")
                         | {{label}}
             """
@@ -58,7 +58,8 @@ module.exports.form =
             visible: -> is_visible() 
             id: -> @id
             icon: -> @icon
-            class: -> @class or ''
+            class: -> @class or 'menu-list'
+            style: -> @style
             icon_class: -> @icon_class or 'dropdown-menu-icon'
             label: -> @label
             divider: -> true if @label is '-'
