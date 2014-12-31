@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-git submodule update --init
-
+#git submodule update --init
 
 for i in redis meteor
 do
