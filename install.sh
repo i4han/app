@@ -23,7 +23,7 @@ do
     gem install $k
 done
 
-bin/include lib/config.coffee | $NODE_MODULES/.bin/coffee -sc --bare > packages/sat/config.js
+bin/include lib/config.coffee | $NODE_MODULES/.bin/coffee -sc --bare > app/packages/sat/config.js
 
 if [ ! -e ../.bashrc ]; then
     $NODE_MODULES/.bin/cake profile
