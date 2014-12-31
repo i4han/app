@@ -5,8 +5,8 @@ module.exports.navbar =
             _ = require 'underscore'
             _.templateSettings = interpolate: /\[(.+?)\]/g
             menu = ''
-            Config.$.navbar.list.forEach (list) -> 
-                menu += ( _.template """            li: a(href="{{pathFor '[name]'}}") [link]\n""" ) { name:list[0], link:list[1] }                 
+            Config.$.navbar.list.forEach (a) -> 
+                menu += ( _.template """            li: a(href="{{pathFor '[path]'}}") [label]\n""" ) { path:a.path, label:a.label }                 
             """
             .navbar.navbar-default.navbar-#{Config.$.navbar.style}: .container
                 .navbar-left 

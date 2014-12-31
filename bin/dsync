@@ -1,0 +1,25 @@
+#!/usr/bin/env coffee
+fs = require 'fs'
+path = require 'path'
+Config = (require 'config').Config
+
+module_lib = process.env.MODULE_LIB
+meteor_lib = process.env.METEOR_LIB
+local_config = Config.local_config
+
+if fs.existsSync meteor_lib
+    ( fs.readdirSync meteor_lib ).forEach (file, index) ->
+        fs.unlinkSync path.join( meteor_lib, file )
+else
+    fs.mkdirSync meteor_lib
+    
+if fs.existsSync main_path
+    ( fs.readdirSync module_lib ).forEach (file, index) ->
+        if file == local_config
+            modules = (require path.join Config.site_dir, local_config ).modules
+            modules.forEach (module) ->
+                module_path = path.join module_lib, module + '.coffee'
+                fs.symlinkSync module_path,  meteor_lib if fs.existsSync module_path
+        else        
+            fs.symlinkSync( path.join( main_path, file ), path.join( meteor_lib, file ) )
+Config.quit();

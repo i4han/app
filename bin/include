@@ -6,7 +6,7 @@ try {
     var Config = require("config").Config;
     local_config = Config.local_config
 } catch(e) {
-    local_config = '_config.coffee';
+    local_config = 'local.coffee';
 }
 
 fs.createReadStream(process.argv[2])
@@ -16,13 +16,12 @@ fs.createReadStream(process.argv[2])
             return fs.readFileSync( RegExp.$1 + '.coffee', 'utf8');
         };
         if (data.search(/^#include\s+local\s*.*/) != -1) {
-            if ( process.env.PACKAGES && process.env.MAIN ) {
-                return fs.readFileSync( path.join( process.env.PACKAGES, process.env.MAIN, local_config), 'utf8');
+            if ( process.env.SITE ) {
+                return fs.readFileSync( path.join( process.env.SITE, local_config), 'utf8');
             } else {
-                return '# $PACKAGES and/or $MAIN has not defined.';
+                return '# $SITE has not defined.';
             }
         };
-        
         return data;
     }))
     .pipe(es.join("\n"))

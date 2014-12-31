@@ -9,16 +9,16 @@ local =
     collections: 'connects items updates boxes colors' .split ' '
     $:
         navbar:
-            list:    ('home|Home profile|Profile connect|Connect help|Help'.split ' ').map (a) -> a.split '|'
+            list:    ('Home Profile Connect Help' .split ' ').map (a) -> path:a.toLowerCase(), label:a
             style:   'fixed-top'
             height:  '50px'
             color:   '#777'
             border:  '1px'
-            border_color:  'black'
+            border_color:    'black'
             login:
-                width: '100px'
+                width:       '100px'
                 dropdown:
-                    width: '250px'
+                    width:   '250px'
                     padding: '25px'
                     a:
                         height: '24px'

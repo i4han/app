@@ -1,21 +1,25 @@
-main = 'startup'
+site = 'site'
   
 fs = require 'fs'
 path = require 'path'
 chokidar = require 'chokidar'
 try
-    {Config} = require './packages/sat/config'
-    
+    {Config} = require './app/packages/sat/config'    
 catch e
-    console.log 'Temporary Config used.'
-    Config = {}
+    {Config} = require "./lib/config"
+    
+cwd = process.cwd()    
+home = process.env.HOME
+
     
 Config = { 
-    config_source: 'packages/etc/config.coffee'
-    config_js:     'packages/sat/config.js'
-    config_js_dir: '/home/codie/sat'
-    meteor_dir:    '/home/codio/workspace'
-    package_dir:   '/home/codio/workspace/packages'
+    meteor_dir:    cwd + '/app'
+    sync_dir:    cwd + '/app/lib'
+    package_dir:   cwd + '/app/packages'
+    config_js_dir: cwd + '/app/packages/sat'
+    config_source: cwd + '/lib/config.coffee'
+    config_js:     cwd + '/app/packages/sat/config.js'
+    site_dir:      cwd + '/' + site        
     auto_generated_files: 'auto_'
     quit: -> {} 
 } unless Config? and Object.keys(Config).length
@@ -31,8 +35,11 @@ isType = (file, type) ->
 
 collect = -> spawn 'collect', [], io
 dsync = -> spawn 'dsync', [], io
-meteor = -> spawn 'meteor', [], io
+meteor = ->
+    cd Config.meteor_dir
+    spawn 'meteor', [], io
 
+cd = (dir) -> process.chdir dir
 deldir = (path) ->
     if fs.existsSync path
         ( fs.readdirSync path ).forEach (file, index) -> 
@@ -43,7 +50,7 @@ deldir = (path) ->
 configure = (func) ->
     redis ->
         exec 'include ' + Config.config_source + ' | coffee -sc --bare > ' + Config.config_js, (err, stdout, stderr) ->
-            require './packages/sat/config'
+            require './app/packages/sat/config'
             func() if func
             console.log err if err
 
@@ -54,7 +61,7 @@ reset = ->
     
             
 clean_up = ->
-    deldir process.env.METEOR_LIB 
+    deldir Config.sync_dir 
     for file in Config.auto_generated_files
         fs.unlinkSync file if fs.existsSync file
 
@@ -77,19 +84,19 @@ task 'clean', 'Remove generated files', -> clean_up()
 task 'reset', 'Reset files', -> configure reset     
 task 'redis', 'Start redis', -> redis null
 task 'profile', 'Make shell profile', ->
-    home = process.env.HOME
-    cwd = process.cwd()
     fs.writeFileSync '../.bashrc', """
         # .bashrc
         # This is created shell script. Edit Cakefile. 
 
-        export MAIN=#{main}
-        export PACKAGES=#{cwd}/packages
-        export PATH="#{home}/node_modules/.bin:#{cwd}:$PACKAGES/bin:$PATH"
-        export NODE_PATH="#{home}/node_modules:#{Config.config_js_dir}:$PACKAGES/$MAIN"
-        export METEOR_APP=#{cwd}
-        export METEOR_LIB=#{cwd}/lib
-        export CDPATH=".:#{home}:#{Config.meteor_dir}:#{Config.package_dir}"
+        export WORKSPACE=#{cwd}      # no use
+        export SITE=#{cwd}/#{site}   # include
+        export MODULE_LIB=#{cwd}/lib
+        export METEOR_APP=#{cwd}/app
+        export METEOR_LIB=$METEOR_APP/lib
+        export PACKAGES=$METEOR_APP/packages
+        export PATH="#{home}/node_modules/.bin:#{cwd}/bin:$PATH"
+        export NODE_PATH="#{home}/node_modules:#{Config.config_js_dir}:$SITE"
+        export CDPATH=".:#{home}:$METEOR_APP:$SITE"
         [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
         alias re='parts start redis'
         alias sl='rmate -p 8080'
@@ -109,7 +116,28 @@ task 'gitpass', 'github.com auto login', ->
             """, flag: 'w+'
         Config.quit()
         process.exit(1)
-            
+
+task 'sync', 'Sync source to meteor client files.', ->
+    local_config = Config.local_config
+    site_dir = Config.site_dir
+    sync_dir = Config.sync_dir
+    if fs.existsSync sync_dir
+        ( fs.readdirSync sync_dir ).forEach (file, index) ->
+            fs.unlinkSync path.join( sync_dir, file )
+    else
+        fs.mkdirSync sync_dir
+
+    if fs.existsSync site_dir
+        ( fs.readdirSync site_dir ).forEach (file, index) ->
+            if file == local_config
+                modules = (require path.join site_dir, local_config ).modules
+                modules.forEach (module) ->
+                    module_path = path.join Config.module_dir, module + '.coffee'
+                    sync_path = path.join sync_dir, module + '.coffee'
+                    fs.symlinkSync module_path, sync_path if fs.existsSync module_path
+            else        
+                fs.symlinkSync( path.join( site_dir, file ), path.join( sync_dir, file ) )
+
 
 Config.quit()
 

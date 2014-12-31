@@ -1,4 +1,4 @@
-#!/usr/bin/env coffee
+ß#!/usr/bin/env coffee
 # Source code is config.orgin other files are compiled by the source.
 # config.coffee -> include | coffee -sc --bare -> config.js
 # sat/config.js used by Cakefile, Meteor, dsync, collect
@@ -21,7 +21,10 @@ main = {
     init: ->
         if !Meteor? or Meteor.isServer
             @home_dir   = process.env.HOME + '/'
-            @meteor_dir = process.env.METEOR_APP + '/'
+            @workspace  = @home_dir   + 'workspace/'
+            @site_dir   = @workspace  + 'site/'
+            @module_dir = @workspace  + 'lib/'            
+            @meteor_dir = @workspace  + 'app/'
             @source_dir = @meteor_dir + 'lib/'
             @target_dir = @meteor_dir + 'client/'
         return this
@@ -36,7 +39,7 @@ local = {}
     home_url:          local.home_url
     callback_port:     main.callback_port
     indent_string:     '    '
-    local_config:      '_config.coffee'
+    local_config:      'local.coffee'
     collections:       local.collections
     $:                 local.$
     instagram:
@@ -93,10 +96,14 @@ local = {}
         @redis = {}
         if !Meteor? or Meteor.isServer
             @meteor_dir    = main.meteor_dir
-            @package_dir   = main.meteor_dir + 'packages/'
-            @config_source = @package_dir + 'etc/config.coffee'
-            @config_js_dir = @package_dir + 'sat/'
+            @meteor_lib    = @meteor_dir + 'lib/'
+            @package_dir   = @meteor_dir + 'packages/'
+            @config_js_dir = @package_dir   + 'sat/'
             @config_js     = @config_js_dir + 'config.js'
+            @module_dir    = main.module_dir
+            @config_source = @module_dir + '/config.coffee'
+            @site_dir      = main.site_dir
+            @sync_dir      = @meteor_lib
             @source_dir    = main.source_dir
             @target_dir    = main.target_dir
             @storables     = main.meteor_dir + 'private/storables'

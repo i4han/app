@@ -1,7 +1,6 @@
-profile
 *.rdb
-client/*
-private/storables
-lib/*.coffee
+app/client/*
+app/private/storables
+app/lib/*.coffee
+app/packages/sat/config.js
 npm-debug.log
-packages/sat/config.js
