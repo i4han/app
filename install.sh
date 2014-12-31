@@ -22,7 +22,8 @@ for k in rmate
 do
     gem install $k
 done
-packages/bin/include packages/etc/config.coffee | $NODE_MODULES/.bin/coffee -sc --bare > packages/sat/config.js
+
+bin/include lib/config.coffee | $NODE_MODULES/.bin/coffee -sc --bare > packages/sat/config.js
 
 if [ ! -e ../.bashrc ]; then
     $NODE_MODULES/.bin/cake profile
@@ -38,9 +39,9 @@ cake profile
 
 for i in client private
 do
-    [ -d "$i" ] || mkdir "$i"
+    [ -d "app/$i" ] || mkdir "app/$i"
 done
 
-dsync
+cake sync
 collect
 

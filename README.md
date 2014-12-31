@@ -9,13 +9,16 @@ run ./install.sh
 
 Todo
 ----
+v Restructure bin, app, module, etc, home directories
+v dsync into Cakefile
+v accounts.coffee, transfer accounts.js to coffee
+- Server side rendering
+- watch config file 'cake config'
+- watch lib files 'cake sync'
 - Style clean up.
 - Automated page listing.
 - Form generator.
-- Restructure bin, app, module, etc, home directories
-- Server side rendering
-- accounts.coffee, transfer accounts.js to coffee
-- dsync into Cakefile
+- merge files in client
 
 Host codio
         Hostname ssh2.codio.com
