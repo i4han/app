@@ -61,7 +61,7 @@ local = {}
             target_file: main.target_dir + main.autogen_prefix + '1.jade'
             indent: 1
             format: (name, block) -> """template(name="#{name}")\n#{block}\n\n"""
-        jade_compile:
+        jade$:
             target_file: main.target_dir + main.autogen_prefix + '2.html'
             indent: 1
             format: (name, block) -> jade.compile( """template(name="#{name}")\n#{block}\n\n""", null )()  
@@ -86,7 +86,7 @@ local = {}
             target_file: main.target_dir + main.autogen_prefix + '4.styl'
             indent: 0
             format: (name, block) -> block
-        styl_compile:
+        styl$:
             target_file: main.target_dir + main.autogen_prefix + '6.css'
             indent: 0
             format: (name, block) -> stylus( block ).render() + '\n'

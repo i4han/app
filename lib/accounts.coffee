@@ -83,7 +83,7 @@ loginFlow = -> ! Session.get('login.inSignupFlow') and ! Session.get('login.inFo
 module.exports.accounts =
 
     login: 
-        styl_compile: """
+        styl$: """
             #login-buttons
                 float right
                 border 0            
@@ -119,7 +119,7 @@ module.exports.accounts =
                 .dropdown-menu(id="{{id}}")
                     +Template.dynamic(template=template)
             """
-        styl_compile: (Config) -> """
+        styl$: (Config) -> """
             #login-dropdown-list input
                 margin-bottom 0px
                 border-top-left-radius 0px
@@ -144,7 +144,7 @@ module.exports.accounts =
             username: -> get_username()
 
     dropdown_menu_logged_in:
-        styl_compile: (Config) -> """
+        styl$: (Config) -> """
             .dropdown-menu a
                 display block
                 padding 0px 8px
@@ -200,7 +200,7 @@ module.exports.accounts =
                 label: 'New Password (again)',                    type: 'password',           visible: -> false ]
                         
     dropdown_logged_out:
-        styl_compile: """
+        styl$: """
             .dropdown-menu
                 top 50px
                 margin 0px
@@ -303,7 +303,7 @@ module.exports.accounts =
                 Meteor.flush()
                     
     login_messages:
-        styl_compile: """
+        styl$: """
             #login-dropdown-list .alert
                 padding 6px
                 margin-bottom 14px

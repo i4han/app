@@ -14,14 +14,14 @@ module.exports.form =
             visible: -> if @visible == undefined then true else if typeof @visible == 'function' then @visible() else @visible
             id: -> @id or __.dasherize @label.toLowerCase().trim()
             title: -> @title
-        styl_compile: """
+        styl$: """
             .popover
                 width 240px
             .popover-inner
                 width 100%
             """
     button:
-        styl_compile: """
+        styl$: """
             .btn
                 margin-top 5px
             """

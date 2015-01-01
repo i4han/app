@@ -2,12 +2,14 @@ module.exports.index =
 
     layout:
         jade: """
-            +navbar 
-            .content
-                +br(height='54px')
-                +yield
-            .footer
-                +footer
+            +navbar
+            #wrapper
+                +sidebar
+                #page-content-wrapper
+                    .container-fluid
+                        +yield
+                        .footer
+                            +footer
             """
         head: (Config) -> 
             """

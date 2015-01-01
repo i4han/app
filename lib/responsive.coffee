@@ -1,7 +1,7 @@
 module.exports.responsive =
 
     __responsive:  # __ means "do not make template."
-        stylus: """
+        styl$: """
         $desktop_width = 885px
         $desktop_height = 540px
         $tablet_height = 800px

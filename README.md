@@ -12,13 +12,15 @@ Todo
 - ~~Restructure bin, app, module, etc, home directories~~
 - ~~dsync into Cakefile~~
 - ~~accounts.coffee, transfer accounts.js to coffee~~
+- ~~side menu~~
 - Server side rendering
 - watch config file 'cake config'
 - watch lib files 'cake sync'
-- Style clean up.
+- Style, theme clean up.
 - Automated page listing.
 - Form generator.
 - merge files in client
+- dialog
 
 
     Host codio
