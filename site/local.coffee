@@ -1,15 +1,19 @@
+
+#include begin
+
+index_file = 'index'
 if !Meteor?
     require 'coffee-script/register'
-    index = (require 'index.coffee').index
-
+    index = (require index_file + '.coffee')[index_file]    
+    
 local = 
     title:       'Application'
     home_url:    'bless-diesel.codio.io'
-    modules:     'accounts dialog navbar form responsive theme_clean' .split ' '
+    modules:     'accounts menu ui responsive theme_clean' .split ' '
     collections: 'connects items updates boxes colors' .split ' '
     $:
         navbar:
-            list:    ('Home Profile Connect Help' .split ' ').map (a) -> path:a.toLowerCase(), label:a
+            list:    ['home', 'profile', 'connect', 'help'].map (a) -> path:a, label:index[a].label if !Meteor?
             style:   'fixed-top'
             height:  '50px'
             color:   '#777'
@@ -33,4 +37,7 @@ local =
                 color:            'black'
                 background_color: 'white'
 
-module.exports = local unless main?     # Do not remove this line
+    
+#include end                
+
+module.exports = local # Do not remove this line

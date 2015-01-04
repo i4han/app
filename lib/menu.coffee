@@ -1,13 +1,18 @@
-module.exports.navbar =
+module.exports.menu =
 
-    navbar:
+    menu_list:
+        jade: """li: a(href="{{path}}" id="{{id}}") {{label}} ({{name}})"""
+        events:
+            path: -> Router.path this.name
+            label: -> Pages[this.name].label
+    navbar:                                    # seperate menu_list and navbar
         jade: (Config) ->
             _ = require 'underscore'
             _.templateSettings = interpolate: /\[(.+?)\]/g
             menu = ''
             Config.$.navbar.list.forEach (a) -> 
                 menu += ( _.template """            li: a(href="{{pathFor '[path]'}}" id="[id]") [label]\n""" )
-                    path:a.path, label:a.label, id: 'navbar-menu'                
+                    path:a.path, label:a.label, id:'navbar-menu'                
             """
             .navbar.navbar-default.navbar-#{Config.$.navbar.style}: .container
                 .navbar-left 
@@ -18,18 +23,13 @@ module.exports.navbar =
                     +login
             """
         events:
-            'click #menu-toggle': (event) ->
-                event.preventDefault()
-                $("#wrapper").toggleClass "toggled"
+            'click #menu-toggle': (event) -> $("#wrapper").toggleClass "toggled" # event.preventDefault()                
             'click #navbar-menu': (event) ->
-                Session.set 'sidebar.navbar-menu', event.target.innerText.toLowerCase()
-                $('#listen-to-menu-change').trigger('reset')
-                
-                $('ul.sidebar-nav').html('<li><a>Ready</a></li><li><a>Set</a></li><li><a>Go</a></li>') if event.target.innerText == 'Home'
+                menu_selected = event.target.innerText.toLowerCase()
+                $('#listen-to-menu-change').trigger('custom', [menu_selected] )
                 $('ul.sidebar-nav').html('<li><a>Red</a></li><li><a>Green</a></li><li><a>Blue</a></li>') if event.target.innerText == 'Connect'
                 $('ul.sidebar-nav').html('<li><a>Apple</a></li><li><a>Kiwi</a></li><li><a>Mango</a></li><li><a>Orange</a></li>') if event.target.innerText == 'Profile'
                 $('ul.sidebar-nav').html('<li><a>Edmonton</a></li><li><a>Vancouber</a></li><li><a>Toronto</a></li>') if event.target.innerText == 'Help'
-
 
         styl$: (Config) -> """
             #menu-toggle
@@ -192,28 +192,17 @@ module.exports.navbar =
         jade: """
             form#listen-to-menu-change
             #sidebar-wrapper
-                ul.sidebar-nav
-                    +Template.dynamic(template=template)
+                ul.sidebar-nav#sidebar_menu_insert
             """
         events:
-            'reset #listen-to-menu-change': (event) ->
-                navbar_menu = Session.get 'sidebar.navbar-menu'
-                console.log navbar_menu
-        helpers:
-            template: -> 'sidebar_' + ( Session.get 'sidebar.navbar-menu' or 'home' )
+            'custom #listen-to-menu-change': (event, instance, navbar_menu) ->
+                # navbar_menu = Session.get 'sidebar.navbar-menu'
+                # console.log navbar_menu
+                sidebar = Pages[navbar_menu].sidebar
+                __.insertTemplate sidebar, 'sidebar_menu_insert' if sidebar
         
-    page_nav:
-        jade: """
-            ul#page-nav
-                li: a Hello
-                li: a World
-                li: a This
-                li: a Wesite
-                li: a Menu
-            """
-
     __style:
-        stylus: """
+        __styl: """
             .navbar-inner
                 padding 0              
             .navbar-header

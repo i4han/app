@@ -9,6 +9,12 @@ try {
     local_config = 'local.coffee';
 }
 
+var readInclude = function ( path ) {
+    var content = fs.readFileSync( path, 'utf8' );
+    content = content.replace(/[^]*#include\s+begin(\s+[^]*)#include\s+end[^]*/, "$1");
+    return content.split("\n").filter( function(a){ return a.search(/#exclude\s*$/) === -1} ).join("\n")
+}
+
 fs.createReadStream(process.argv[2])
     .pipe(es.split("\n"))
     .pipe(es.mapSync(function(data) {
@@ -17,7 +23,7 @@ fs.createReadStream(process.argv[2])
         };
         if (data.search(/^#include\s+local\s*.*/) != -1) {
             if ( process.env.SITE ) {
-                return fs.readFileSync( path.join( process.env.SITE, local_config), 'utf8');
+                return readInclude( path.join( process.env.SITE, local_config) );
             } else {
                 return '# $SITE has not defined.';
             }

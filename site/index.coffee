@@ -17,16 +17,24 @@ module.exports.index =
             link(href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet" type="text/css")
             """
 
+    home_sidebar:
+        jade: "each menu_items\n    +menu_list"
+        helpers:
+            menu_items: -> [
+                { name: 'home',    id: 'sidebar_menu' },
+                { name: 'help',    id: 'sidebar_menu' },
+                { name: 'connect', id: 'sidebar_menu' } ]
+            
     home:
+        label: 'Home'
         router: path: '/'
-        jade: (Config) -> 
+        sidebar: 'home_sidebar'
+        jade: (Config) ->
             """
             .row
-                .col-md-1
                 .col-md-8
                     h1 #{Config.title}
             .row#items
-                .col-md-1
                 .col-md-8
                     each items
                         .item
@@ -40,8 +48,9 @@ module.exports.index =
             $container = $('#items')
             # $container.masonry itemSelector: '.item', columnWidth: 332
         helpers:
+            hello: -> 'world'
             items: -> db.Items.find {}, sort: created_time: -1
-        stylus: """
+        __stylus: """
             #items > .item 
                 background-color #fff
                 width 320px
@@ -57,6 +66,7 @@ module.exports.index =
         jade: """img(src="{{url}}" height="320" width="320")"""
         
     about:
+        label: 'About'
         router: {}
         jade: """
             .row
@@ -77,48 +87,47 @@ module.exports.index =
                 float left 
                 border 1px solid #999
                 margin 6px
-            """    
+            """
+
+    profile_sidebar:
+        jade: "each menu_items\n    +menu_list"
+        helpers:
+            menu_items: -> [
+                name: 'home',    id: 'sidebar_menu'
+            ,
+                name: 'help',    id: 'sidebar_menu'
+            ,
+                name: 'connect', id: 'sidebar_menu' ]
+
     profile:
+        label: 'Profile'
+        sidebar: 'profile_sidebar'
         router: {}
         jade: """
             .row 
-                .col-sm-2
-                .col-sm-4
+                .col-sm-6
                     +br(height='36px')
-                    each fields
+                    each items
                         +form
                         +br(height='9px')
-            .row &nbsp;
             """
         helpers:
-            fields: -> [
+            items: -> [
                 title: 'Your name',           label: 'Name',   icon: 'user'
             ,   
                 title: 'Mobile Phone Number', label: 'Mobile', icon: 'mobile'
             ,   
                 title: 'Your home Zip code',  label: 'Zip',    icon: 'envelope' ]
         events:
-            'focus input#name': -> $('input#name').attr('data-content',  Template['popover_name'].renderFunction().value).popover('show')
+            'focus input#name':   -> $('input#name')  .attr('data-content',  Template['popover_name'].renderFunction().value).popover('show')
             'focus input#mobile': -> $('input#mobile').attr('data-content',  Template['popover_mobile'].renderFunction().value).popover('show')
-            'focus input#zip': -> $('input#zip').attr('data-content',  Template['popover_zip'].renderFunction().value).popover('show')
-    popover_name:
-        jade: """
-            ul 
-                li Write your name.
-                li No longer then 12 letters.
-            """
-    popover_mobile:
-        jade: """
-            ul 
-                li Write your phone number.
-            """
-    popover_zip:
-        jade: """
-            ul 
-                li Write your zipcode.
-            """
+            'focus input#zip':    -> $('input#zip')   .attr('data-content',  Template['popover_zip'].renderFunction().value).popover('show')
+    popover_name: jade: "ul\n    li Write your name.\n    li No longer then 12 letters."
+    popover_mobile: jade: "ul: li Write your phone number."
+    popover_zip: jade: "ul: li Write your zipcode."
         
     help:
+        label: 'Help'
         router: {}
         jade: """
             .primary-content
@@ -132,9 +141,20 @@ module.exports.index =
                 _.each _.keys( Pages[name] ), ( key ) ->
                     container.append( $("<h3>#{key}</h3><pre>#{Pages[name][key]}</pre>") ) 
 
+    connect_sidebar:
+        jade: "each menu_items\n    +menu_list"
+        helpers:
+            menu_items: -> [
+                name: 'home',    id: 'sidebar_menu'
+            ,
+                name: 'help',    id: 'sidebar_menu'
+            ,
+                name: 'connect', id: 'sidebar_menu' ]
 
     connect:
+        label: 'Connect'
         router: {}
+        sidebar: 'connect_sidebar'
         jade: """
             | Connect
             br.single-line

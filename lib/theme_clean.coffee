@@ -1,8 +1,4 @@
 module.exports.theme_clean =
-    br:
-        jade$: """
-            br(style='line-height:{{height}}')
-            """
 
     __theme:
         styl$: """

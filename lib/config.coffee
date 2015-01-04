@@ -1,4 +1,4 @@
-ß#!/usr/bin/env coffee
+#!/usr/bin/env coffee
 # Source code is config.orgin other files are compiled by the source.
 # config.coffee -> include | coffee -sc --bare -> config.js
 # sat/config.js used by Cakefile, Meteor, dsync, collect
@@ -147,7 +147,14 @@ local = {}
             obj[newName] = obj[oldName]
             delete obj[oldName]
         this
-        
+
+@__.insertTemplate = (template, id) ->
+    $('#' + id).empty()
+    Blaze.renderWithData(
+        Template[template], 
+        Template[template].helpers, 
+        document.getElementById id  ) 
+
 @__.renameKeys = (obj, keyObject) ->
     _.each _.keys keyObject, (key) -> @__.reKey obj, key, keyObject[key]
 
