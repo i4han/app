@@ -41,6 +41,9 @@ local = {}
     indent_string:     '    '
     local_config:      'local.coffee'
     collections:       local.collections
+    _:
+        font_style:    
+            pt_sans:    "https://fonts.googleapis.com/css?family=PT+Sans:400,700"
     $:                 local.$
     instagram:
         callback_path:     '/callback/instagram/'
@@ -148,18 +151,20 @@ local = {}
             delete obj[oldName]
         this
 
-@__.cutup = (str, tab=1, indent='    ') ->
-    ((str.split '|').map (s) ->
-        s = if 0 == s.search /^(<+)/ then s.replace /^(<+)/, Array(tab = Math.max tab - RegExp.$1.length, 1).join indent 
-        else if 0 == s.search /^>/ then s.replace /^>/, Array(++tab).join indent 
-        else s.replace /^/, Array(tab).join indent).join '\n'
+@__.cutup = (str, tab=1, indent='    ') -> ((str.split '|').map (s) ->
+    s = if 0 == s.search /^(<+)/ then s.replace /^(<+)/, Array(tab = Math.max tab - RegExp.$1.length, 1).join indent 
+    else if 0 == s.search /^>/ then s.replace /^>/, Array(++tab).join indent 
+    else s.replace /^/, Array(tab).join indent).join '\n'
 
-@__.insertTemplate = (template, id) ->
+@__.insertTemplate = (page, id) ->
     $('#' + id).empty()
     Blaze.renderWithData(
-        Template[template], 
-        Template[template].helpers, 
-        document.getElementById id  ) 
+        Template[page], 
+        Template[page].helpers, 
+        document.getElementById id  )
+
+@__.render = (page) -> Template[page].renderFunction().value
+
 
 @__.renameKeys = (obj, keyObject) ->
     _.each _.keys keyObject, (key) -> @__.reKey obj, key, keyObject[key]

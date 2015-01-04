@@ -2,23 +2,17 @@ module.exports.index =
 
     layout:
         jade: (C,_) -> _.cutup "+navbar|#wrapper|>+sidebar|#page-content-wrapper|>.container-fluid|>+yield|<.footer|>+footer"
-        head: (Config) -> 
-            """
-            title #{Config.title}
-            link(href="https://fonts.googleapis.com/css?family=PT+Sans:400,700" rel="stylesheet" type="text/css")
-            """
-
+        head: (C,_) -> _.cutup "title #{C.title}|link(href='#{C._.font_style.pt_sans}' rel='stylesheet')"
+ 
     home_sidebar:
         jade: (C,_) -> _.cutup "each items|>+menu_list"
-        helpers:    items: -> [
-            { page: 'home',    id: 'sidebar_menu' },
-            { page: 'help',    id: 'sidebar_menu' },
-            { page: 'connect', id: 'sidebar_menu' } ]
+        helpers:    items: -> id = 'sidebar_menu'; [
+            { page: 'home',    id: id },
+            { page: 'help',    id: id },
+            { page: 'connect', id: id } ]
 
     home:
-        label: 'Home'
-        router: path: '/'
-        sidebar: 'home_sidebar'
+        label: 'Home',     sidebar: 'home_sidebar',     router: path: '/'  
         jade: (C,_) -> _.cutup ".row|>.col-md-8|>h1 #{C.title}|<<.row#items|>.col-md-8|>each items|>.item|>+item"
         created: -> 
             db.Items = new Meteor.Collection 'items' if !db.Items?
@@ -45,8 +39,7 @@ module.exports.index =
         jade: """img(src="{{url}}" height="320" width="320")"""
         
     about:
-        label: 'About'
-        router: {}
+        label: 'About', router: {}
         jade: ".row|>+hello|+br(height='36px')|+dialog"
         rendered: ->
             _.each [1..20], (i) -> $container.append( $("""<div id="tile-#{i}" class="tile box"><h2>Tile #{i}</h2></div>""") ) 
@@ -64,9 +57,7 @@ module.exports.index =
                 { page: 'connect', id: 'sidebar_menu' }]
 
     profile:
-        label: 'Profile'
-        sidebar: 'profile_sidebar'
-        router: {}
+        label: 'Profile',   sidebar: 'profile_sidebar',   router: {}
         jade: (C,_) -> _.cutup ".row|>.col-sm-6|>+br(height='36px')|each items|>+form|+br(height='9px')"
         helpers:
             items: -> [
@@ -74,9 +65,9 @@ module.exports.index =
                 { title: 'Mobile Phone Number', label: 'Mobile', icon: 'mobile'   },
                 { title: 'Your home Zip code',  label: 'Zip',    icon: 'envelope' }]
         events:
-            'focus input#name':   -> $('input#name')  .attr('data-content',  Template['popover_name'].renderFunction().value).popover('show')
-            'focus input#mobile': -> $('input#mobile').attr('data-content',  Template['popover_mobile'].renderFunction().value).popover('show')
-            'focus input#zip':    -> $('input#zip')   .attr('data-content',  Template['popover_zip'].renderFunction().value).popover('show')
+            'focus input#name':   -> $('input#name')  .attr('data-content',  __.render 'popover_name'  ).popover('show')
+            'focus input#mobile': -> $('input#mobile').attr('data-content',  __.render 'popover_mobile').popover('show')
+            'focus input#zip':    -> $('input#zip')   .attr('data-content',  __.render 'popover_zip'   ).popover('show')
     popover_name: jade: (C,_) -> _.cutup "ul|>li Write your name.|li No longer then 12 letters."
     popover_mobile: jade: "ul: li Write your phone number."
     popover_zip: jade: "ul: li Write your zipcode."
