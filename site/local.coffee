@@ -4,7 +4,7 @@
 index_file = 'index'
 if !Meteor?
     require 'coffee-script/register'
-    index = (require index_file + '.coffee')[index_file]    
+    index = (require index_file + '.coffee')[index_file]   # used by collect 
     
 local = 
     title:       'Application'
@@ -40,4 +40,4 @@ local =
     
 #include end                
 
-module.exports = local # Do not remove this line
+module.exports = local

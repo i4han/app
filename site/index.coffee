@@ -18,13 +18,12 @@ module.exports.index =
             """
 
     home_sidebar:
-        jade: "each menu_items\n    +menu_list"
-        helpers:
-            menu_items: -> [
-                { name: 'home',    id: 'sidebar_menu' },
-                { name: 'help',    id: 'sidebar_menu' },
-                { name: 'connect', id: 'sidebar_menu' } ]
-            
+        jade: "each items\n    +menu_list"
+        helpers:    items: -> [
+            { page: 'home',    id: 'sidebar_menu' },
+            { page: 'help',    id: 'sidebar_menu' },
+            { page: 'connect', id: 'sidebar_menu' } ]
+
     home:
         label: 'Home'
         router: path: '/'
@@ -93,11 +92,9 @@ module.exports.index =
         jade: "each menu_items\n    +menu_list"
         helpers:
             menu_items: -> [
-                name: 'home',    id: 'sidebar_menu'
-            ,
-                name: 'help',    id: 'sidebar_menu'
-            ,
-                name: 'connect', id: 'sidebar_menu' ]
+                { page: 'home',    id: 'sidebar_menu' },
+                { page: 'help',    id: 'sidebar_menu' },
+                { page: 'connect', id: 'sidebar_menu' }]
 
     profile:
         label: 'Profile'
@@ -113,11 +110,9 @@ module.exports.index =
             """
         helpers:
             items: -> [
-                title: 'Your name',           label: 'Name',   icon: 'user'
-            ,   
-                title: 'Mobile Phone Number', label: 'Mobile', icon: 'mobile'
-            ,   
-                title: 'Your home Zip code',  label: 'Zip',    icon: 'envelope' ]
+                { title: 'Your name',           label: 'Name',   icon: 'user'     },
+                { title: 'Mobile Phone Number', label: 'Mobile', icon: 'mobile'   },
+                { title: 'Your home Zip code',  label: 'Zip',    icon: 'envelope' }]
         events:
             'focus input#name':   -> $('input#name')  .attr('data-content',  Template['popover_name'].renderFunction().value).popover('show')
             'focus input#mobile': -> $('input#mobile').attr('data-content',  Template['popover_mobile'].renderFunction().value).popover('show')
@@ -125,7 +120,7 @@ module.exports.index =
     popover_name: jade: "ul\n    li Write your name.\n    li No longer then 12 letters."
     popover_mobile: jade: "ul: li Write your phone number."
     popover_zip: jade: "ul: li Write your zipcode."
-        
+
     help:
         label: 'Help'
         router: {}
@@ -139,17 +134,14 @@ module.exports.index =
             _.each _.keys( Pages ), ( name ) ->
                 container.append( $("<h2>#{name}</h2>") )         
                 _.each _.keys( Pages[name] ), ( key ) ->
-                    container.append( $("<h3>#{key}</h3><pre>#{Pages[name][key]}</pre>") ) 
+                    container.append( $("<h3>#{key}</h3><pre>#{Pages[name][key]}</pre>") )
 
     connect_sidebar:
         jade: "each menu_items\n    +menu_list"
         helpers:
             menu_items: -> [
-                name: 'home',    id: 'sidebar_menu'
-            ,
-                name: 'help',    id: 'sidebar_menu'
-            ,
-                name: 'connect', id: 'sidebar_menu' ]
+                { page: 'home',    id: 'sidebar_menu' },
+                { page: 'connect',    id: 'sidebar_menu' }]
 
     connect:
         label: 'Connect'
@@ -170,8 +162,6 @@ module.exports.index =
 
         events:
             'click input': -> console.log Router.current().route.name
-                                                             
-
 
     footer:
         jade: """

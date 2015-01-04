@@ -1,10 +1,11 @@
 module.exports.menu =
 
     menu_list:
-        jade: """li: a(href="{{path}}" id="{{id}}") {{label}} ({{name}})"""
-        events:
-            path: -> Router.path this.name
-            label: -> Pages[this.name].label
+        jade: """li: a(href="{{path}}" id="{{id}}") {{label}}"""
+        helpers: 
+            path: -> Router.path @page 
+            label: -> Pages[@page].label
+
     navbar:                                    # seperate menu_list and navbar
         jade: (Config) ->
             _ = require 'underscore'
@@ -27,9 +28,6 @@ module.exports.menu =
             'click #navbar-menu': (event) ->
                 menu_selected = event.target.innerText.toLowerCase()
                 $('#listen-to-menu-change').trigger('custom', [menu_selected] )
-                $('ul.sidebar-nav').html('<li><a>Red</a></li><li><a>Green</a></li><li><a>Blue</a></li>') if event.target.innerText == 'Connect'
-                $('ul.sidebar-nav').html('<li><a>Apple</a></li><li><a>Kiwi</a></li><li><a>Mango</a></li><li><a>Orange</a></li>') if event.target.innerText == 'Profile'
-                $('ul.sidebar-nav').html('<li><a>Edmonton</a></li><li><a>Vancouber</a></li><li><a>Toronto</a></li>') if event.target.innerText == 'Help'
 
         styl$: (Config) -> """
             #menu-toggle
@@ -196,10 +194,12 @@ module.exports.menu =
             """
         events:
             'custom #listen-to-menu-change': (event, instance, navbar_menu) ->
-                # navbar_menu = Session.get 'sidebar.navbar-menu'
-                # console.log navbar_menu
                 sidebar = Pages[navbar_menu].sidebar
-                __.insertTemplate sidebar, 'sidebar_menu_insert' if sidebar
+                if sidebar
+                    __.insertTemplate sidebar, 'sidebar_menu_insert' if sidebar
+                    $("#wrapper").removeClass "toggled"
+                else
+                    $("#wrapper").addClass "toggled"
         
     __style:
         __styl: """
