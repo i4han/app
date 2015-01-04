@@ -148,6 +148,12 @@ local = {}
             delete obj[oldName]
         this
 
+@__.cutup = (str, tab=1, indent='    ') ->
+    ((str.split '|').map (s) ->
+        s = if 0 == s.search /^(<+)/ then s.replace /^(<+)/, Array(tab = Math.max tab - RegExp.$1.length, 1).join indent 
+        else if 0 == s.search /^>/ then s.replace /^>/, Array(++tab).join indent 
+        else s.replace /^/, Array(tab).join indent).join '\n'
+
 @__.insertTemplate = (template, id) ->
     $('#' + id).empty()
     Blaze.renderWithData(

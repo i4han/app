@@ -82,16 +82,14 @@ Sat.init = function () {
                         Template[name].helpers( Pages[name].helpers );
                     else if (key === 'events')
                         Template[name].events( Pages[name].events );
-                    if (key === 'router') {
+                    else if (key === 'router') {
                         router_map[name] = Pages[name].router;
-                        delete Pages[name].router;
+                    //    delete Pages[name].router;
                     } else if ( ['rendered', 'created', 'destroyed'].indexOf(key) !== -1)
-                        try {
+                        if (Template[name])
                             Template[name][key] = Pages[name][key];
-                        } catch(err) {
-                            console.log( 'name:' + name + ' key:' + key );
-                            console.log( err );
-                        }
+                        else
+                            console.log( 'Template ' + name + ' key:' + key );
             });
         });
         Router.map( function () {

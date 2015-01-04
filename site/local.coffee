@@ -23,17 +23,22 @@ local =
                 width:       '100px'
                 dropdown:
                     width:   '250px'
-                    padding: '25px'
-                    a:
-                        height: '24px'
-                        hover:
-                            background_color: '#eee'
+
+            dropdown:
+                padding: '25px'
+                a:
+                    height: '24px'
+                    hover:
+                        background_color: '#eee'
             text:
                 color:     '#888'
                 font_size: '10px'
                 height:    '20px'
                 width:     '80px'
             hover:
+                color:            'black'
+                background_color: '#eee'
+            focus:
                 color:            'black'
                 background_color: 'white'
 

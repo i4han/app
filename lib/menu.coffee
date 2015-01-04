@@ -54,9 +54,9 @@ module.exports.menu =
                 background-color #{Config.$.navbar.hover.background_color}
             .dropdown-toggle > i.fa-chevron-down
                 padding-left 4px
-            //.navbar-nav > li > a:focus  // it dosen't affect
-            //    color black
-            //    background-color white
+            #navbar-menu:focus
+                color black
+                background-color #{Config.$.navbar.focus.background_color}
             #login-dropdown-list > a
                 width #{Config.$.navbar.login.width}
                 height #{Config.$.navbar.height}
@@ -68,27 +68,23 @@ module.exports.menu =
                 background-color #{Config.$.navbar.hover.background_color}
             """
     sidebar:
-        css: (Config) -> sidebar_width = '180px'; """
-            #wrapper {
+        styl$: (Config) -> sidebar_width = '180px'; """
+            #wrapper 
                 padding-top: 50px;
                 padding-left: 0px;
                 -webkit-transition: all 0.5s ease;
                 -moz-transition: all 0.5s ease;
                 -o-transition: all 0.5s ease;
                 transition: all 0.5s ease;
-            }
-
-            #wrapper.toggled {
+            #wrapper.toggled 
                 padding-left: #{sidebar_width};
-            }
-
-            #sidebar-wrapper {
+            #sidebar-wrapper
                 z-index: 1000;
                 position: fixed;
                 left: 0; /* #{sidebar_width}; */
                 width: 0;
                 height: 100%;
-                padding-top: 65px;
+                padding-top: 50px
                 margin-left: 0; /* -#{sidebar_width}; */
                 overflow-y: auto;
                 background: #555;
@@ -96,100 +92,63 @@ module.exports.menu =
                 -moz-transition: all 0.5s ease;
                 -o-transition: all 0.5s ease;
                 transition: all 0.5s ease;
-            }
-
-            #wrapper.toggled #sidebar-wrapper {
+            #wrapper.toggled #sidebar-wrapper
                 margin-left: -#{sidebar_width}; /* width: #{sidebar_width}; */
-            }
-
-            #page-content-wrapper {
+            #page-content-wrapper
                 width: 100%;
                 padding: 15px;
-            }
-
-            #wrapper.toggled #page-content-wrapper {
+            #wrapper.toggled #page-content-wrapper
                 position: absolute;
                 margin-right: -#{sidebar_width};
-            }
-
-            /* Sidebar Styles */
-
-            .sidebar-nav {
-                position: absolute;
-                top: 0;
-                width: #{sidebar_width};
-                margin: 0;
-                padding: 0;
-                list-style: none;
-            }
-
-            .sidebar-nav li {
-                text-indent: 20px;
-                line-height: 40px;
-            }
-
-            .sidebar-nav li a {
-                display: block;
-                text-decoration: none;
-                color: #bbb;
-            }
-
-            .sidebar-nav li a:hover {
-                text-decoration: none;
-                color: #fff;
-                background: rgba(255,255,255,0.2);
-            }
-
+            .sidebar-nav
+                position absolute
+                top 40px
+                width #{sidebar_width}
+                margin 0
+                padding 0
+                list-style none
+            .sidebar-nav li
+                text-indent 20px
+                line-height 40px
+            .sidebar-nav li a 
+                display block
+                text-decoration none
+                color #bbb
+            .sidebar-nav li a:hover
+                text-decoration: none
+                color #fff
+                background rgba(255,255,255,0.2)
             .sidebar-nav li a:active,
-            .sidebar-nav li a:focus {
-                text-decoration: none;
-            }
-
-            .sidebar-nav > .sidebar-brand {
-                height: 65px;
-                font-size: 18px;
-                line-height: 60px;
-            }
-
-            .sidebar-nav > .sidebar-brand a {
-                color: #999999;
-            }
-
-            .sidebar-nav > .sidebar-brand a:hover {
-                color: #fff;
-                background: none;
-            }
-
-            @media(min-width:768px) {
-                #wrapper {
-                    padding-left: #{sidebar_width};
-                }
-
-                #wrapper.toggled {
-                    padding-left: 0;
-                }
-
-                #sidebar-wrapper {
-                    width: #{sidebar_width};
-                }
-
-                #wrapper.toggled #sidebar-wrapper {
+            .sidebar-nav li a:focus
+                text-decoration none
+            .sidebar-nav > .sidebar-brand
+                height 65px
+                font-size 18px
+                line-height 60px
+            .sidebar-nav > .sidebar-brand a
+                color #999999
+            .sidebar-nav > .sidebar-brand a:hover
+                color #fff
+                background none
+            @media(min-width:768px)
+                #wrapper
+                    padding-left #{sidebar_width}
+                #wrapper.toggled 
+                    padding-left 0
+                #sidebar-wrapper
+                    width #{sidebar_width};
+                #wrapper.toggled #sidebar-wrapper
                     /* width: 0; */
-                }
-
-                #page-content-wrapper {
-                    padding: 20px;
-                }
-
-                #wrapper.toggled #page-content-wrapper {
-                    position: relative;
-                    margin-right: 0;
-                }
-            }
+                #page-content-wrapper
+                    padding 20px
+                #wrapper.toggled #page-content-wrapper
+                    position relative
+                    margin-right 0
             """
         jade: """
             form#listen-to-menu-change
             #sidebar-wrapper
+                #sidebar-top
                 ul.sidebar-nav#sidebar_menu_insert
             """
         events:
@@ -199,6 +158,7 @@ module.exports.menu =
                     __.insertTemplate sidebar, 'sidebar_menu_insert' if sidebar
                     $("#wrapper").removeClass "toggled"
                 else
+                    $('#'+sidebar).empty()
                     $("#wrapper").addClass "toggled"
         
     __style:

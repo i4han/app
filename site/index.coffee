@@ -1,16 +1,7 @@
 module.exports.index =
 
     layout:
-        jade: """
-            +navbar
-            #wrapper
-                +sidebar
-                #page-content-wrapper
-                    .container-fluid
-                        +yield
-                        .footer
-                            +footer
-            """
+        jade: (C,_) -> _.cutup "+navbar|#wrapper|>+sidebar|#page-content-wrapper|>.container-fluid|>+yield|<.footer|>+footer"
         head: (Config) -> 
             """
             title #{Config.title}
@@ -18,7 +9,7 @@ module.exports.index =
             """
 
     home_sidebar:
-        jade: "each items\n    +menu_list"
+        jade: (C,_) -> _.cutup "each items|>+menu_list"
         helpers:    items: -> [
             { page: 'home',    id: 'sidebar_menu' },
             { page: 'help',    id: 'sidebar_menu' },
@@ -28,28 +19,17 @@ module.exports.index =
         label: 'Home'
         router: path: '/'
         sidebar: 'home_sidebar'
-        jade: (Config) ->
-            """
-            .row
-                .col-md-8
-                    h1 #{Config.title}
-            .row#items
-                .col-md-8
-                    each items
-                        .item
-                            +item
-            """
+        jade: (C,_) -> _.cutup ".row|>.col-md-8|>h1 #{C.title}|<<.row#items|>.col-md-8|>each items|>.item|>+item"
         created: -> 
             db.Items = new Meteor.Collection 'items' if !db.Items?
             Meteor.subscribe 'items'
-
         rendered: ->
             $container = $('#items')
             # $container.masonry itemSelector: '.item', columnWidth: 332
         helpers:
             hello: -> 'world'
             items: -> db.Items.find {}, sort: created_time: -1
-        __stylus: """
+        __styl: """
             #items > .item 
                 background-color #fff
                 width 320px
@@ -67,29 +47,16 @@ module.exports.index =
     about:
         label: 'About'
         router: {}
-        jade: """
-            .row
-                +hello
-                +br(height='36px')
-                +dialog
-            .primary-content
-                +color_list
-            """
+        jade: ".row|>+hello|+br(height='36px')|+dialog"
         rendered: ->
             _.each [1..20], (i) -> $container.append( $("""<div id="tile-#{i}" class="tile box"><h2>Tile #{i}</h2></div>""") ) 
             $('.tile').on 'scrollSpy:enter', -> console.log 'enter:', $(this).attr 'id' 
             $('.tile').on 'scrollSpy:exit', -> console.log 'exit:', $(this).attr 'id' 
             $('.tile').scrollSpy()
-        stylus: """
-            .tile
-                width 160px
-                float left 
-                border 1px solid #999
-                margin 6px
-            """
+        __styl: ".tile|>width 160px|float left|border 1px solid #999|margin 6px"
 
     profile_sidebar:
-        jade: "each menu_items\n    +menu_list"
+        jade: (C,_) -> _.cutup "each menu_items|>+menu_list"
         helpers:
             menu_items: -> [
                 { page: 'home',    id: 'sidebar_menu' },
@@ -100,14 +67,7 @@ module.exports.index =
         label: 'Profile'
         sidebar: 'profile_sidebar'
         router: {}
-        jade: """
-            .row 
-                .col-sm-6
-                    +br(height='36px')
-                    each items
-                        +form
-                        +br(height='9px')
-            """
+        jade: (C,_) -> _.cutup ".row|>.col-sm-6|>+br(height='36px')|each items|>+form|+br(height='9px')"
         helpers:
             items: -> [
                 { title: 'Your name',           label: 'Name',   icon: 'user'     },
@@ -117,7 +77,7 @@ module.exports.index =
             'focus input#name':   -> $('input#name')  .attr('data-content',  Template['popover_name'].renderFunction().value).popover('show')
             'focus input#mobile': -> $('input#mobile').attr('data-content',  Template['popover_mobile'].renderFunction().value).popover('show')
             'focus input#zip':    -> $('input#zip')   .attr('data-content',  Template['popover_zip'].renderFunction().value).popover('show')
-    popover_name: jade: "ul\n    li Write your name.\n    li No longer then 12 letters."
+    popover_name: jade: (C,_) -> _.cutup "ul|>li Write your name.|li No longer then 12 letters."
     popover_mobile: jade: "ul: li Write your phone number."
     popover_zip: jade: "ul: li Write your zipcode."
 
@@ -148,7 +108,7 @@ module.exports.index =
         router: {}
         sidebar: 'connect_sidebar'
         jade: """
-            | Connect
+            h2 Connect
             br.single-line
             a(href="{{instagram_connect}}") 
                 | Connect with Instagram

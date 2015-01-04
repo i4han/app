@@ -15,7 +15,7 @@ var stringOrFunctionToString = function (what) {
     } else if (typeof what == 'string') {
         return what;
     } else if (typeof what == 'function') {
-        return what.call(this, Config);
+        return what.call(this, Config, __);
     } else  throw "Error";
 }
 

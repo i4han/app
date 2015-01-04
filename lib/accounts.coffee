@@ -128,7 +128,7 @@ module.exports.accounts =
                 border-bottom-right-radius 5px
             #login-dropdown-list .dropdown-menu
                 width #{Config.$.navbar.login.dropdown.width}
-                padding #{Config.$.navbar.login.dropdown.padding}
+                padding #{Config.$.navbar.dropdown.padding}
             """
         events:
             'click #login-buttons-change-password': ( event ) ->
@@ -148,10 +148,10 @@ module.exports.accounts =
             .dropdown-menu a
                 display block
                 padding 0px 8px
-                height #{Config.$.navbar.login.dropdown.a.height}
+                height #{Config.$.navbar.dropdown.a.height}
             .dropdown-menu a:hover
                 cursor pointer
-                background-color: #{Config.$.navbar.login.dropdown.a.hover.background_color}
+                background-color: #{Config.$.navbar.dropdown.a.hover.background_color}
             """
         jade: "each items\n    +menu"
         helpers:
@@ -177,7 +177,7 @@ module.exports.accounts =
                     +button
             #dropdown-other-options
                 each links
-                    +link
+                    +a
             """
         events:
             'keypress #old-password, keypress #password, keypress #password-again': ( event ) -> changePassword() if event.keyCode == 13
@@ -236,7 +236,7 @@ module.exports.accounts =
                             +button
                     #dropdown-other-options
                         each links
-                            +link
+                            +a
             """
         helpers:
             links: -> [
