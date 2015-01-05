@@ -6,10 +6,7 @@ module.exports.index =
  
     home_sidebar:
         jade: (C,_) -> _.cutup "each items|>+menu_list"
-        helpers:    items: -> id = 'sidebar_menu'; [
-            { page: 'home',    id: id },
-            { page: 'help',    id: id },
-            { page: 'connect', id: id } ]
+        helpers: items: -> ['home', 'help', 'connect'].map (a) -> {page:a, id:'sidebar_menu'}
 
     home:
         label: 'Home',     sidebar: 'home_sidebar',     router: path: '/'  
@@ -34,7 +31,6 @@ module.exports.index =
                 transform rotateY( 45deg )
                 -webkit-transform rotateY( 45deg )
             """
-        
     item:
         jade: """img(src="{{url}}" height="320" width="320")"""
         
@@ -49,12 +45,8 @@ module.exports.index =
         __styl: ".tile|>width 160px|float left|border 1px solid #999|margin 6px"
 
     profile_sidebar:
-        jade: (C,_) -> _.cutup "each menu_items|>+menu_list"
-        helpers:
-            menu_items: -> [
-                { page: 'home',    id: 'sidebar_menu' },
-                { page: 'help',    id: 'sidebar_menu' },
-                { page: 'connect', id: 'sidebar_menu' }]
+        jade: (C,_) -> _.cutup "each items|>+menu_list"
+        helpers: items: -> ['home', 'help', 'connect'].map (a) -> {page:a, id:'sidebar_menu'}
 
     profile:
         label: 'Profile',   sidebar: 'profile_sidebar',   router: {}
@@ -64,13 +56,12 @@ module.exports.index =
                 { title: 'Your name',           label: 'Name',   icon: 'user'     },
                 { title: 'Mobile Phone Number', label: 'Mobile', icon: 'mobile'   },
                 { title: 'Your home Zip code',  label: 'Zip',    icon: 'envelope' }]
-        events:
-            'focus input#name':   -> $('input#name')  .attr('data-content',  __.render 'popover_name'  ).popover('show')
-            'focus input#mobile': -> $('input#mobile').attr('data-content',  __.render 'popover_mobile').popover('show')
-            'focus input#zip':    -> $('input#zip')   .attr('data-content',  __.render 'popover_zip'   ).popover('show')
-    popover_name: jade: (C,_) -> _.cutup "ul|>li Write your name.|li No longer then 12 letters."
-    popover_mobile: jade: "ul: li Write your phone number."
-    popover_zip: jade: "ul: li Write your zipcode."
+        events: ['name', 'mobile', 'zip'].reduce (o,v) -> 
+            ( o['focus input#'+v] = -> $('input#'+v).attr('data-content', __.render 'popover_'+v).popover('show') ) && o
+        ,   {}
+    popover_name:   jade: (C,_) -> _.cutup "ul|>li Write your name.|li No longer then 12 letters."
+    popover_mobile: jade: (C,_) -> _.cutup "ul: li Write your phone number."
+    popover_zip:    jade: (C,_) -> _.cutup "ul: li Write your zipcode."
 
     help:
         label: 'Help'

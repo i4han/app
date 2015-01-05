@@ -188,7 +188,7 @@ module.exports.accounts =
                 $('#login-dropdown-list').removeClass 'open'
         helpers:
             buttons: -> [ label: 'Change password',   id:'login-buttons-change-password', type:'button' ]
-            links: -> [ label: 'Close',   id:'login-buttons-back-to-menu', class:'dropdown-menu-link' ]            
+            links: -> [ label: 'Close',   id:'login-buttons-back-to-menu', class:'dropdown-menu-link', visible: true ]            
             fields: -> [
                 id: 'old-password'
                 label: 'Current Password', icon: 'key',           type: 'password'

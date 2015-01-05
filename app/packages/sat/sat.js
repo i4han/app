@@ -80,9 +80,13 @@ Sat.init = function () {
                 if (key.substring(0, 2) !== '__' && _.indexOf(Config.templates, key) === -1 ) 
                     if (key === 'helpers')
                         Template[name].helpers( Pages[name].helpers );
-                    else if (key === 'events')
-                        Template[name].events( Pages[name].events );
-                    else if (key === 'router') {
+                    else if (key === 'events') {
+                        var obj = Pages[name].events;
+                        if ( typeof(obj) === 'function' )
+                            Template[name].events( obj() );
+                        else                            
+                            Template[name].events( obj );
+                    } else if (key === 'router') {
                         router_map[name] = Pages[name].router;
                     //    delete Pages[name].router;
                     } else if ( ['rendered', 'created', 'destroyed'].indexOf(key) !== -1)
