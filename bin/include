@@ -15,19 +15,15 @@ var readInclude = function ( path ) {
     return content.split("\n").filter( function(a){ return a.search(/#exclude\s*$/) === -1} ).join("\n")
 }
 
-fs.createReadStream(process.argv[2])
+fs.createReadStream( Config.config_source )
     .pipe(es.split("\n"))
     .pipe(es.mapSync(function(data) {
-        if (data.search(/^#include\s+["']([^"']+)["']/) != -1) {
+        if (data.search(/^#include\s+["']([^"']+)["']/) != -1)
             return fs.readFileSync( RegExp.$1 + '.coffee', 'utf8');
-        };
-        if (data.search(/^#include\s+local\s*.*/) != -1) {
-            if ( process.env.SITE ) {
-                return readInclude( path.join( process.env.SITE, local_config) );
-            } else {
-                return '# $SITE has not defined.';
-            }
-        };
+        else if (data.search(/^#include\s+local\s*.*/) != -1)
+            return readInclude( Config.local_source );
+        else if (data.search(/^#include\s+theme\s*.*/) != -1) 
+            return readInclude( Config.theme_source );
         return data;
     }))
     .pipe(es.join("\n"))

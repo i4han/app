@@ -1,14 +1,16 @@
 site = 'site'
   
-fs = require 'fs'
-path = require 'path'
+fs       = require 'fs'
+path     = require 'path'
+es       = require 'event-stream'
 chokidar = require 'chokidar'
+
 try
     {Config} = require './app/packages/sat/config'    
 catch e
     {Config} = require "./lib/config"
     
-cwd = process.cwd()    
+cwd  = process.cwd()    
 home = process.env.HOME
     
 Config = { 
@@ -17,7 +19,8 @@ Config = {
     package_dir:   cwd + '/app/packages'
     config_js_dir: cwd + '/app/packages/sat'
     config_source: cwd + '/lib/config.coffee'
-    local_source:  cwd + '/site/local.coffee'    
+    theme_source:  cwd + '/lib/theme.coffee' 
+    local_source:  cwd + '/site/local.coffee'
     config_js:     cwd + '/app/packages/sat/config.js'
     site_dir:      cwd + '/' + site        
     auto_generated_files: 'auto_'
@@ -39,8 +42,8 @@ profile = ->
         export NODE_PATH="#{home}/node_modules:#{Config.config_js_dir}:$SITE"
         export CDPATH=".:#{home}:$METEOR_APP:$SITE"
         [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
-        alias re='parts start redis'
-        alias sl='rmate -p 8080'
+        alias red='parts start redis'
+        alias sul='rmate -p 8080'
 
         """, flag: 'w+'
 
@@ -67,7 +70,7 @@ deldir = (path) ->
             fs.unlinkSync curPath unless (fs.lstatSync curPath).isDirectory()
                 
 
-configure = (func) ->
+__configure = (func) ->
     redis ->
         exec 'include ' + Config.config_source + ' | coffee -sc --bare > ' + Config.config_js, (err, stdout, stderr) ->
             require './app/packages/sat/config'
@@ -85,15 +88,11 @@ clean_up = ->
         fs.unlinkSync file if fs.existsSync file
 
 start_up = ->
-    conf = chokidar.watch Config.config_source, persistent:true
-    conf.on 'change', (file) -> configure()
-    local = chokidar.watch Config.local_source, persistent:true
-    local.on 'change', (file) -> configure()
-    watcher = chokidar.watch Config.source_dir, persistent:true
-    watcher.on 'add', (file) ->
-        collect() if isType file, 'coffee'
-    watcher.on 'change', (file) ->
-        collect() if isType file, 'coffee'
+    ['config_source', 'local_source', 'theme_source'].map (a) ->
+        (chokidar.watch Config[a], persistent:true).on 'change', (file) -> configure()
+    chokidar.watch Config.source_dir, persistent:true
+        .on 'change', (file) -> collect() if isType file, 'coffee'
+        .on 'add',    (file) -> collect() if isType file, 'coffee'
     meteor()
 
 sync = ->
@@ -117,16 +116,31 @@ sync = ->
             else        
                 fs.symlinkSync( path.join( site_dir, file ), path.join( sync_dir, file ) )
 
-        
+readInclude = (path) ->
+    ((fs.readFileSync path, 'utf8').split "\n").filter( (a) -> -1 == a.search /#exclude\s*$/ ).join "\n"
+
+configure = () ->
+    coffee = require 'coffee-script'
+    fs.createReadStream Config.config_source
+        .pipe es.split "\n"
+        .pipe es.mapSync (data) ->
+            if data.search(/^#include\s+local\s*.*/) != -1 then readInclude Config.local_source
+            else if data.search(/^#include\s+theme\s*.*/) != -1 then readInclude Config.theme_source
+            else data
+        .pipe es.join "\n"
+        .pipe es.wait()
+        .pipe es.mapSync (data) -> coffee.compile '#!/usr/bin/env node' + data, bare:true
+        .pipe fs.createWriteStream Config.config_js
+
 task 'start', 'Start the server', ->
     redis start_up
 
 task 'config', 'Compile config file.', -> configure()
 task 'clean', 'Remove generated files', -> clean_up()
-task 'reset', 'Reset files', -> configure reset     
+task 'reset', 'Reset files', -> configure(); reset()     
 task 'redis', 'Start redis', -> redis()
 task 'profile', 'Make shell profile', -> profile()
-    
+task 'sync', 'Sync source to meteor client files.', -> sync()
 task 'gitpass', 'github.com auto login', ->
     prompt = require 'prompt'
     prompt.message = 'github'
@@ -141,7 +155,6 @@ task 'gitpass', 'github.com auto login', ->
         Config.quit()
         process.exit(1)
 
-task 'sync', 'Sync source to meteor client files.', -> sync()
 
 Config.quit()
 

@@ -85,14 +85,11 @@ module.exports.accounts =
                 float right
                 border 0            
             #login-buttons + li .dropdown-menu
-                float: right;
-                right: 0;
-                left: auto;
+                float right
+                right 0
+                left auto
             """
-        jade: """
-            ul.nav.navbar-nav#login-buttons
-                +Template.dynamic(template=template)
-            """
+        jade: "ul.nav.navbar-nav#login-buttons\n    +Template.dynamic(template=template)"
         events:
             'click #login-buttons-logout': -> Meteor.logout -> closeDropdown() ; Router.go 'home'
             'click #login-buttons-profile': -> $('#login-dropdown-list').removeClass 'open' ; Router.go 'profile'
@@ -105,8 +102,8 @@ module.exports.accounts =
                 Meteor.flush()
         helpers:
             template: -> 
-                'dropdown_' + if !Meteor.user() then 'logged_out' else 
-                    if Meteor.loggingIn() then 'logging_in' else 'logged_in'
+                'dropdown_' + if !Meteor.user() then 'logged_out' 
+                else if Meteor.loggingIn() then 'logging_in' else 'logged_in'
 
     dropdown_logged_in:
         jade: """
@@ -116,11 +113,11 @@ module.exports.accounts =
                 .dropdown-menu(id="{{id}}")
                     +Template.dynamic(template=template)
             """
-        styl$: (Config) -> """
+        styl$: (C,_) -> """
             #logged-in-dropdown-menu
                 right 0
                 left auto
-                width 186px
+                width #{C.$.navbar.login.dropdown.width}
                 padding 5px 0px
             #login-dropdown-list input
                 margin-bottom 0px
@@ -129,8 +126,8 @@ module.exports.accounts =
                 border-bottom-left-radius 0px
                 border-bottom-right-radius 5px
             .dropdown-menu
-                width #{Config.$.navbar.login.dropdown.width}
-                padding #{Config.$.navbar.dropdown.padding}
+                width   #{C.$.navbar.dropdown.width}
+                padding #{C.$.navbar.dropdown.padding}
             """
         events:
             'click #login-buttons-change-password': ( event ) ->

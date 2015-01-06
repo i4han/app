@@ -3,7 +3,7 @@ module.exports.index =
     layout:
         jade: (C,_) -> _.cutup "+navbar|#wrapper|>+sidebar|#page-content-wrapper|>.container-fluid|>+yield|<.footer|>+footer"
         head: (C,_) -> _.cutup "title #{C.title}|link(href='#{C._.font_style.pt_sans}' rel='stylesheet')"
- 
+        styl: (C,_) -> _.cutup "body|>font-family #{C.$.font_family}|font-weight #{C.$.font_weight}"
     home_sidebar:
         jade: (C,_) -> _.cutup "each items|>+menu_list"
         helpers: items: -> ['home', 'help', 'connect'].map (a) -> {page:a, id:'sidebar_menu'}

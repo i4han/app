@@ -31,12 +31,7 @@ main = {
         return this
 }.init()
 
-theme =
-    clean:
-        navbar:
-            color:            '#999'
-            background_color: '#eee'
-
+#include theme
 
 local = {}
     
@@ -79,24 +74,24 @@ local = {}
         HTML:
             target_file: main.target_dir + main.autogen_prefix + '3.html'
             indent: 1
-            format: (name, block) -> """<template name="#{name}">\n#{block}\n</template>"""
+            format: (name, block) -> """<template name="#{name}">\n#{block}\n</template>\n"""
         head:
             target_file: main.target_dir + main.autogen_prefix + '0.jade'
             indent: 1
             header: 'head\n'                  #  'doctype html\n' has not suppored by jade
-            format: (name, block) -> block
+            format: (name, block) -> block + '\n'
         less:
             target_file: main.target_dir + main.autogen_prefix + '7.less'
             indent: 0
-            format: (name, block) -> block
+            format: (name, block) -> block + '\n'
         css:
             target_file: main.target_dir + main.autogen_prefix + '5.css'
             indent: 0
-            format: (name, block) -> block
+            format: (name, block) -> block + '\n'
         styl:
             target_file: main.target_dir + main.autogen_prefix + '4.styl'
             indent: 0
-            format: (name, block) -> block
+            format: (name, block) -> block + '\n\n'
         styl$:
             target_file: main.target_dir + main.autogen_prefix + '6.css'
             indent: 0
@@ -115,6 +110,7 @@ local = {}
             @config_source = @module_dir + '/config.coffee'
             @site_dir      = main.site_dir
             @local_source  = @site_dir +  main.local_config
+            @theme_source  = @module_dir + '/theme.coffee'
             @sync_dir      = @meteor_lib
             @source_dir    = main.source_dir
             @target_dir    = main.target_dir
