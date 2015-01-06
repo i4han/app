@@ -1,9 +1,10 @@
 module.exports.index =
 
     layout:
-        jade: (C,_) -> _.cutup "+navbar|#wrapper|>+sidebar|#page-content-wrapper|>.container-fluid|>+yield|<.footer|>+footer"
+        jade: (C,_) -> _.cutup "+navbar|#wrapper|>+sidebar|#page-content-wrapper|>.container-fluid|>+yield|<<<+footer"
         head: (C,_) -> _.cutup "title #{C.title}|link(href='#{C._.font_style.pt_sans}' rel='stylesheet')"
-        styl: (C,_) -> _.cutup "body|>font-family #{C.$.font_family}|font-weight #{C.$.font_weight}"
+        styl: (C,_) -> _.cutup """body|>font-family #{C.$.font_family}|font-weight #{C.$.font_weight} ~
+            |background-color #f2f2f2"""
     home_sidebar:
         jade: (C,_) -> _.cutup "each items|>+menu_list"
         helpers: items: -> ['home', 'help', 'connect'].map (a) -> {page:a, id:'sidebar_menu'}
@@ -85,5 +86,7 @@ module.exports.index =
 
         events: 'click input': -> console.log Router.current().route.name
 
-    footer: jade: (C,_) -> _.cutup ".content|>.row|>+br(height='54px')|center © Businesses 2014"
+    footer: 
+        jade: (C,_) -> _.cutup ".footer|>.content|>.row|>center © Businesses 2015"
+        styl: (C,_) -> _.cutup ".footer|>background-color #d9d9d9|padding-top 50px|padding-bottom 20px"
                 

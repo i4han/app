@@ -117,7 +117,7 @@ module.exports.menu =
             .sidebar-nav li a:hover
                 text-decoration: none
                 color #000
-                background #eee
+                background #ddd
             .sidebar-nav li a:active,
             .sidebar-nav li a:focus
                 text-decoration none

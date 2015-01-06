@@ -61,9 +61,9 @@ changePassword = ->
            Meteor.setTimeout ->
                resetMessages()
                closeDropdown()
-               $('#login-dropdown-list').removeClass 'open'
+               $('#login-dropdown').removeClass 'open'
            , 
-               3000
+               2400
 forgotPassword = ->
     resetMessages();
     email = __.trimmedValue "forgot-password-email"
@@ -80,126 +80,95 @@ loginFlow = -> ! Session.get('login.inSignupFlow') and ! Session.get('login.inFo
 module.exports.accounts =
 
     login: 
-        styl$: """
-            #login-buttons
-                float right
-                border 0            
-            #login-buttons + li .dropdown-menu
-                float right
-                right 0
-                left auto
-            """
-        jade: "ul.nav.navbar-nav#login-buttons\n    +Template.dynamic(template=template)"
+        styl$: (C,_) -> _.cutup """#login-buttons|>float right|border 0 ~
+            |<#login-buttons + li .dropdown-menu |>float right|right 0|left auto"""
+        jade:  (C,_) -> _.cutup "ul.nav.navbar-nav#login-buttons|>+Template.dynamic(template=template)"
         events:
-            'click #login-buttons-logout': -> Meteor.logout -> closeDropdown() ; Router.go 'home'
-            'click #login-buttons-profile': -> $('#login-dropdown-list').removeClass 'open' ; Router.go 'profile'
-            'click #login-buttons-settings': -> $('#login-dropdown-list').removeClass 'open' ; Router.go 'settings'
-            'click input, click label, click button, click .dropdown-menu, click .alert': ( event ) -> event.stopPropagation()
-            'click .login-close': -> closeDropdown() ; $('#login-dropdown-list').removeClass 'open' ; console.log "login-close"
-            'click #login-name-link, click #login-sign-in-link': ( event ) -> 
+            'click input, click label, click button, click .dropdown-menu, click .alert': (event) -> event.stopPropagation()
+            'click .login-close': -> closeDropdown() ; $('#login-dropdown').removeClass 'open' ; console.log "login-close"
+            'click #login-name-link, click #login-sign-in-link': (event) -> 
                 event.stopPropagation()
                 Session.set 'login.dropdownVisible', true
                 Meteor.flush()
-        helpers:
-            template: -> 
-                'dropdown_' + if !Meteor.user() then 'logged_out' 
-                else if Meteor.loggingIn() then 'logging_in' else 'logged_in'
+        helpers: template: ->
+            'dropdown_' + if !Meteor.user() then 'logged_out' 
+            else if Meteor.loggingIn() then 'logging_in' else 'logged_in'
 
     dropdown_logged_in:
-        jade: """
-            li.dropdown#login-dropdown-list
-                a.dropdown-toggle#login-id(data-toggle="dropdown") {{username}}
-                    i.fa(class="fa-chevron-down")
-                .dropdown-menu(id="{{id}}")
-                    +Template.dynamic(template=template)
-            """
-        styl$: (C,_) -> """
-            #logged-in-dropdown-menu
-                right 0
-                left auto
+        jade: (C,_) -> 
+            _.cutup """li.dropdown#login-dropdown ~
+                |>a.dropdown-toggle#login-id(data-toggle='dropdown') {{username}}|>i.fa(class='fa-chevron-down') ~
+                |<.dropdown-menu(id='{{id}}')|>+Template.dynamic(template=template)"""
+        styl$: (C,_) -> _.cutup """#logged-in-dropdown-menu|>right 0|left auto
                 width #{C.$.navbar.login.dropdown.width}
                 padding 5px 0px
-            #login-dropdown-list input
+            #login-dropdown input
                 margin-bottom 0px
-                border-top-left-radius 0px
-                border-top-right-radius 5px
-                border-bottom-left-radius 0px
-                border-bottom-right-radius 5px
+                border-radius 0px 5px 5px 0px
             .dropdown-menu
                 width   #{C.$.navbar.dropdown.width}
                 padding #{C.$.navbar.dropdown.padding}
             """
-        events:
-            'click #login-buttons-change-password': ( event ) ->
-                event.stopPropagation()
-                resetMessages()
-                Session.set 'login.inChangePasswordFlow', true
-                Meteor.flush()
         helpers:
             template: -> 
-                if Session.get 'login.inMessageOnlyFlow' then 'login_messages' 
+                if      Session.get 'login.inMessageOnlyFlow'    then 'login_messages' 
                 else if Session.get 'login.inChangePasswordFlow' then 'change_password' 
-                else 'dropdown_menu_logged_in'
+                else    'dropdown_menu_logged_in'
             id: -> 
-                if Session.get('login.inMessageOnlyFlow') or Session.get('login.inChangePasswordFlow') 
+                if   Session.get('login.inMessageOnlyFlow') or Session.get('login.inChangePasswordFlow') 
                 then 'logged-in-dropdown' else 'logged-in-dropdown-menu'
             username: -> get_username()
 
     dropdown_menu_logged_in:
-        styl$: (Config) -> """
+        styl$: (C,_) -> """
             .dropdown-menu a
                 display block
                 padding 0px 8px
-                height #{Config.$.navbar.dropdown.a.height}
+                height #{C.$.navbar.dropdown.a.height}
             .dropdown-menu a:hover
                 cursor pointer
-                background-color: #{Config.$.navbar.dropdown.a.hover.background_color}
+                background-color: #{C.$.navbar.dropdown.a.hover.background_color}
+            #logged-in-dropdown-menu > li > a
+                height 30px
+                padding 7px 20px
             """
-        jade: "each items\n    +menu"
-        helpers:
-            items: ->
-                style = 'height: 30px; padding: 7px 20px;' 
-                [
-                    label: 'Profile',         id: 'login-buttons-profile',         style: style, icon: 'list-alt'
-                ,
-                    label: 'Settings',        id: 'login-buttons-help',            style: style, icon: 'cog'
-                ,   label: 'Change Password', id: 'login-buttons-change-password', style: style, icon: 'key'
-                ,
-                    label: '-'
-                ,   label: 'Sign Out',        id: 'login-buttons-logout',          style: style, icon: 'sign-out']
+        jade: (C,_) -> _.cutup "each items|>+menu"
+        helpers: items: -> [
+            { label: 'Profile',         id: 'menu-profile',         icon: 'list-alt' },
+            { label: 'Settings',        id: 'menu-settings',        icon: 'cog'      },
+            { label: 'Change Password', id: 'menu-change-password', icon: 'key'      },
+            { label: '-' },
+            { label: 'Sign Out',        id: 'menu-logout',          icon: 'sign-out' }]
+        events:
+            'click #menu-logout':   -> Meteor.logout -> closeDropdown()        ; Router.go 'home'
+            'click #menu-profile':  -> $('#login-dropdown').removeClass 'open' ; Router.go 'profile'
+            'click #menu-settings': -> $('#login-dropdown').removeClass 'open' ; Router.go 'help'
+            'click #menu-change-password': (event) ->
+                event.stopPropagation()
+                resetMessages()
+                Session.set 'login.inChangePasswordFlow', true
+                Meteor.flush()
 
     change_password:
-        jade: """
-            each fields
-                +form
-            br
-            +login_messages
-            #dropdown-menu-buttons
-                each buttons
-                    +button
-            #dropdown-other-options
-                each links
-                    +a
-            """
+        jade: (C,_) -> _.cutup """each fields|>+form|<br|+login_messages ~
+            |#dropdown-menu-buttons   |>each buttons|>+button ~
+            |<<#dropdown-other-options|>each links  |>+a"""
         events:
-            'keypress #old-password, keypress #password, keypress #password-again': ( event ) -> changePassword() if event.keyCode == 13
-            'click #login-buttons-change-password': ( event ) -> event.stopPropagation(); changePassword()
-            'click #login-buttons-back-to-menu': ( event ) -> 
+            'keypress #old-password, keypress #password, keypress #password-again': (event) -> 
+                changePassword() if event.keyCode == 13
+            'click #login-buttons-change-password': (event) -> 
+                event.stopPropagation(); changePassword()
+            'click #login-buttons-back-to-menu': (event) -> 
                 event.stopPropagation()
                 Session.set 'login.inChangePasswordFlow', false
-                $('#login-dropdown-list').removeClass 'open'
+                $('#login-dropdown').removeClass 'open'
         helpers:
             buttons: -> [ label: 'Change password',   id:'login-buttons-change-password', type:'button' ]
-            links: -> [ label: 'Close',   id:'login-buttons-back-to-menu', class:'dropdown-menu-link', visible: true ]            
-            fields: -> [
-                id: 'old-password'
-                label: 'Current Password', icon: 'key',           type: 'password'
-            ,
-                id: 'password'
-                label: 'New Password',     icon: 'asterisk',      type: 'password'
-            ,
-                id: 'password-again'
-                label: 'New Password (again)',                    type: 'password',           visible: -> false ]
+            links:   -> [ label: 'Close',   id:'login-buttons-back-to-menu', class:'dropdown-menu-link', visible: true ]            
+            fields:  -> [
+                { id: 'old-password',   label: 'Current Password', icon: 'key',      type: 'password' },
+                { id: 'password',       label: 'New Password',     icon: 'asterisk', type: 'password' },
+                { id: 'password-again', label: 'New Password (again)',               type: 'password', visible: false }]
                         
     dropdown_logged_out:
         styl$: """
@@ -219,7 +188,7 @@ module.exports.accounts =
                 line-height 25px
             """
         jade: """
-            li.dropdown#login-dropdown-list
+            li.dropdown#login-dropdown
                 a.dropdown-toggle(data-toggle="dropdown")
                     | Sign In
                     i.fa.fa-chevron-down
@@ -300,17 +269,11 @@ module.exports.accounts =
                 Meteor.flush()
                     
     login_messages:
-        styl$: """
-            #login-dropdown-list .alert
-                padding 6px
-                margin-bottom 14px
-            """
-        jade: """
-            +alert(class="alert-danger"  message=error_message)
-            +alert(class="alert-success" message=info_message)
-            """
+        styl$: (C,_) -> _.cutup "#login-dropdown .alert|>padding 6px|margin-bottom 14px"
+        jade: """+alert(class='alert-danger'  message=error_message)
+                 +alert(class='alert-success' message=info_message )"""
         helpers:
             error_message: -> Session.get 'login.errorMessage'
-            info_message: -> Session.get 'login.infoMessage'
+            info_message:  -> Session.get 'login.infoMessage'
 
 
