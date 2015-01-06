@@ -18,6 +18,7 @@ else
 main = {
     autogen_prefix:   'auto_'
     callback_port:    3003
+    local_config:     'local.coffee'
     init: ->
         if !Meteor? or Meteor.isServer
             @home_dir   = process.env.HOME + '/'
@@ -30,6 +31,13 @@ main = {
         return this
 }.init()
 
+theme =
+    clean:
+        navbar:
+            color:            '#999'
+            background_color: '#eee'
+
+
 local = {}
     
 #include local <- This is where local config files to be located.
@@ -39,7 +47,7 @@ local = {}
     home_url:          local.home_url
     callback_port:     main.callback_port
     indent_string:     '    '
-    local_config:      'local.coffee'
+    local_config:      main.local_config
     collections:       local.collections
     _:
         font_style:    
@@ -106,6 +114,7 @@ local = {}
             @module_dir    = main.module_dir
             @config_source = @module_dir + '/config.coffee'
             @site_dir      = main.site_dir
+            @local_source  = @site_dir +  main.local_config
             @sync_dir      = @meteor_lib
             @source_dir    = main.source_dir
             @target_dir    = main.target_dir

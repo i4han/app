@@ -87,7 +87,7 @@ module.exports.menu =
                 padding-top: 50px
                 margin-left: 0; /* -#{sidebar_width}; */
                 overflow-y: auto;
-                background: #555;
+                background transparent
                 -webkit-transition: all 0.5s ease;
                 -moz-transition: all 0.5s ease;
                 -o-transition: all 0.5s ease;
@@ -113,11 +113,11 @@ module.exports.menu =
             .sidebar-nav li a 
                 display block
                 text-decoration none
-                color #bbb
+                color #666
             .sidebar-nav li a:hover
                 text-decoration: none
-                color #fff
-                background rgba(255,255,255,0.2)
+                color #000
+                background #eee
             .sidebar-nav li a:active,
             .sidebar-nav li a:focus
                 text-decoration none

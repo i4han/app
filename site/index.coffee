@@ -20,23 +20,14 @@ module.exports.index =
         helpers:
             hello: -> 'world'
             items: -> db.Items.find {}, sort: created_time: -1
-        __styl: """
-            #items > .item 
-                background-color #fff
-                width 320px
-                height 320px
-                float left
-                border 1px solid #999
-                margin 6px
-                transform rotateY( 45deg )
-                -webkit-transform rotateY( 45deg )
-            """
-    item:
-        jade: """img(src="{{url}}" height="320" width="320")"""
+        styl: (C,_) -> _.cutup "#items .item|>background-color #eee|width 320px|height 320px|float left" +
+            "|border 1px|solid #999|margin 6px|transform rotateY(45deg)|-webkit-transform rotateY(45deg)"
+
+    item: jade: "img(src='{{url}}' height='320' width='320')"
         
     about:
         label: 'About', router: {}
-        jade: ".row|>+hello|+br(height='36px')|+dialog"
+        jade: (C,_) -> ".row|>+hello|+br(height='36px')|+dialog"
         rendered: ->
             _.each [1..20], (i) -> $container.append( $("""<div id="tile-#{i}" class="tile box"><h2>Tile #{i}</h2></div>""") ) 
             $('.tile').on 'scrollSpy:enter', -> console.log 'enter:', $(this).attr 'id' 
@@ -50,7 +41,7 @@ module.exports.index =
 
     profile:
         label: 'Profile',   sidebar: 'profile_sidebar',   router: {}
-        jade: (C,_) -> _.cutup ".row|>.col-sm-6|>+br(height='36px')|each items|>+form|+br(height='9px')"
+        jade: (C,_) -> _.cutup ".row|>.col-sm-7|>+br(height='30px')|each items|>+form|+br(height='9px')"
         helpers:
             items: -> [
                 { title: 'Your name',           label: 'Name',   icon: 'user'     },
@@ -64,13 +55,8 @@ module.exports.index =
     popover_zip:    jade: (C,_) -> _.cutup "ul: li Write your zipcode."
 
     help:
-        label: 'Help'
-        router: {}
-        jade: """
-            .primary-content
-                .h2 Debug..  
-            .primary-content#debug
-            """
+        label: 'Help',   router: {}
+        jade: (C,_) -> _.cutup ".primary-content|>.h2 Debug|<.primary-content#debug"
         rendered: ->
             container = $('#debug')
             _.each _.keys( Pages ), ( name ) ->
@@ -79,17 +65,12 @@ module.exports.index =
                     container.append( $("<h3>#{key}</h3><pre>#{Pages[name][key]}</pre>") )
 
     connect_sidebar:
-        jade: "each menu_items\n    +menu_list"
-        helpers:
-            menu_items: -> [
-                { page: 'home',    id: 'sidebar_menu' },
-                { page: 'connect',    id: 'sidebar_menu' }]
+        jade: "each items\n    +menu_list"
+        helpers: items: -> ['home', 'connect'].map (a) -> {page:a, id:'sidebar_menu'}
 
     connect:
-        label: 'Connect'
-        router: {}
-        sidebar: 'connect_sidebar'
-        jade: """
+        label: 'Connect',  sidebar: 'connect_sidebar',  router: {}
+        jade: """ 
             h2 Connect
             br.single-line
             a(href="{{instagram_connect}}") 
@@ -102,14 +83,7 @@ module.exports.index =
                 redirect_uri: Config.instagram.redirect_uri Meteor.userId()
                 response_type: Config.instagram.response_type
 
-        events:
-            'click input': -> console.log Router.current().route.name
+        events: 'click input': -> console.log Router.current().route.name
 
-    footer:
-        jade: """
-            .content
-                .row    
-                    +br(height='54px')
-                    center © Businesses 2014
-            """
+    footer: jade: (C,_) -> _.cutup ".content|>.row|>+br(height='54px')|center © Businesses 2014"
                 

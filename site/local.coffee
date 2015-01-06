@@ -5,13 +5,16 @@ index_file = 'index'
 if !Meteor?
     require 'coffee-script/register'
     index = (require index_file + '.coffee')[index_file]   # used by collect 
-    
+
+T = theme.clean
+
 local = 
     title:       'Application'
     home_url:    'bless-diesel.codio.io'
     modules:     'accounts menu ui responsive theme_clean' .split ' '
     collections: 'connects items updates boxes colors' .split ' '
     $:
+        theme:   T
         navbar:
             list:    ['home', 'profile', 'connect', 'help'].map (a) -> path:a, label:index[a].label if !Meteor?
             style:   'fixed-top'
@@ -22,7 +25,7 @@ local =
             login:
                 width:       '100px'
                 dropdown:
-                    width:   '250px'
+                    width:   '230px'
 
             dropdown:
                 padding: '25px'

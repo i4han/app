@@ -6,12 +6,10 @@ closeDropdown = ->
     ('inSignupFlow inForgotPasswordFlow inChangePasswordFlow inMessageOnlyFlow dropdownVisible'.split ' ').forEach (key) ->
         Session.set 'login.' + key , false
     resetMessages()
-    console.log 'close dropdown'
     
 orTest = -> (array) ->
-    array.forEach (key) -> 
-        return true if Session.get key 
-    return false
+    array.forEach (key) -> return true if Session.get key 
+    false
 
 ensureMessageVisible = ->
     if ! orTest 'resetPasswordToken enrollAccountToken justVerifiedEmail'.split ' '
@@ -42,7 +40,6 @@ login = ->
         if err then errorMessage err.reason else closeDropdown()
 
 signup = ->
-    console.log 'signup'
     resetMessages()
     options =
         username: __.trimmedValue 'username'
@@ -120,13 +117,18 @@ module.exports.accounts =
                     +Template.dynamic(template=template)
             """
         styl$: (Config) -> """
+            #logged-in-dropdown-menu
+                right 0
+                left auto
+                width 186px
+                padding 5px 0px
             #login-dropdown-list input
                 margin-bottom 0px
                 border-top-left-radius 0px
                 border-top-right-radius 5px
                 border-bottom-left-radius 0px
                 border-bottom-right-radius 5px
-            #login-dropdown-list .dropdown-menu
+            .dropdown-menu
                 width #{Config.$.navbar.login.dropdown.width}
                 padding #{Config.$.navbar.dropdown.padding}
             """
@@ -137,10 +139,13 @@ module.exports.accounts =
                 Session.set 'login.inChangePasswordFlow', true
                 Meteor.flush()
         helpers:
-            template: -> if Session.get 'login.inMessageOnlyFlow' then 'login_messages' else
-                         if Session.get 'login.inChangePasswordFlow' then 'change_password' else
-                             'dropdown_menu_logged_in'
-            id: ->  if Session.get('login.inMessageOnlyFlow') or Session.get('login.inChangePasswordFlow') then 'no_id' else 'logged-in-dropdown'
+            template: -> 
+                if Session.get 'login.inMessageOnlyFlow' then 'login_messages' 
+                else if Session.get 'login.inChangePasswordFlow' then 'change_password' 
+                else 'dropdown_menu_logged_in'
+            id: -> 
+                if Session.get('login.inMessageOnlyFlow') or Session.get('login.inChangePasswordFlow') 
+                then 'logged-in-dropdown' else 'logged-in-dropdown-menu'
             username: -> get_username()
 
     dropdown_menu_logged_in:
@@ -208,11 +213,6 @@ module.exports.accounts =
                 text-align left
                 line-height 14px
                 border-radius 0px
-                &#logged-in-dropdown
-                    right 0
-                    left auto
-                    width 186px
-                    padding 5px 0px
             .dropdown-menu-icon
                 margin-right 12px
             #dropdown-menu-buttons
@@ -307,12 +307,6 @@ module.exports.accounts =
             #login-dropdown-list .alert
                 padding 6px
                 margin-bottom 14px
-            """
-        jade: """
-            if errorMessage
-                .alert.alert-danger {{errorMessage}}
-            if infoMessage
-                .alert.alert-success.no-margin {{infoMessage}}
             """
         jade: """
             +alert(class="alert-danger"  message=error_message)
