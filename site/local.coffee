@@ -8,6 +8,7 @@ if !Meteor?
 
 local = 
     title:       'Application'
+    index_file:  index_file
     home_url:    'bless-diesel.codio.io'
     modules:     'accounts menu ui responsive' .split ' '
     collections: 'connects items updates boxes colors' .split ' '

@@ -15,6 +15,8 @@ var stringOrFunctionToString = function (what) {
     } else if (typeof what == 'string') {
         return what;
     } else if (typeof what == 'function') {
+        this.C = Config;
+        this._ = __;
         return what.call(this, Config, __);
     } else  throw "Error";
 }
@@ -73,7 +75,7 @@ var collectKey = function (obj, kind, storables_hash) {
     var template = Config.pages[kind];
     
     var checkSum = function () {
-        _.each( _.keys(obj), function ( file ) {
+        _.each( _.keys(obj), function ( file ) { 
             _.each( _.keys( obj[file] ), function ( page ) {
 //                console.log( file + '/' + page + '/' + kind );
 //                console.log( 'SoF: ' + stringOrFunctionToString( obj[file][page][kind] ) );
@@ -84,7 +86,11 @@ var collectKey = function (obj, kind, storables_hash) {
     }
     var updateFile = function () {
         var fileTarget = template.header ? template.header : '';  // change: attach header later
-        _.each( _.keys(obj), function ( file ) { 
+
+        objs = Object.keys(obj).filter( function(a) { return 'index' !== a } );
+        objs.unshift('index');
+        objs.forEach( function ( file ) {
+            console.log(file);
             _.each( _.keys(obj[file]), function ( page ) {
                 var block = stringOrFunctionToString( obj[file][page][kind] );
                 if ( block ) {
@@ -126,7 +132,16 @@ var collectPages = function (pages_in_file) {
 var filesFromDir = function(dir) {
     var results = [];
 
-    fs.readdirSync(dir).forEach(function(file) {
+    var files = fs.readdirSync(dir);
+/*    files.sort( function(a,b) {
+        if ('index.coffee' === a) 
+            return false;
+        else if ('index.coffee' === b)
+            return true;
+        else
+            return a > b;
+    });  */
+    files.forEach(function(file) {
         file = dir + '/' + file;
         var stat = fs.statSync(file);
         if (stat && stat.isDirectory()) {

@@ -3,7 +3,7 @@ module.exports.menu =
     menu_list:
         jade: """li: a(href="{{path}}" id="{{id}}") {{label}}"""
         helpers: 
-            path: -> Router.path @page 
+            path:  -> Router.path @page 
             label: -> Pages[@page].label
 
     navbar:                                    # seperate menu_list and navbar
@@ -57,6 +57,8 @@ module.exports.menu =
             #navbar-menu:focus
                 color black
                 background-color #{Config.$.navbar.focus.background_color}
+            #login-dropdown:hover
+                cursor pointer
             #login-dropdown-list > a
                 width #{Config.$.navbar.login.width}
                 height #{Config.$.navbar.height}
@@ -94,10 +96,10 @@ module.exports.menu =
                 transition: all 0.5s ease;
             #wrapper.toggled #sidebar-wrapper
                 margin-left: -#{sidebar_width}; /* width: #{sidebar_width}; */
-            #page-content-wrapper
+            #content-wrapper
                 width: 100%;
                 padding: 15px;
-            #wrapper.toggled #page-content-wrapper
+            #wrapper.toggled #content-wrapper
                 position: absolute;
                 margin-right: -#{sidebar_width};
             .sidebar-nav
@@ -139,9 +141,9 @@ module.exports.menu =
                     width #{sidebar_width};
                 #wrapper.toggled #sidebar-wrapper
                     /* width: 0; */
-                #page-content-wrapper
+                #content-wrapper
                     padding 20px
-                #wrapper.toggled #page-content-wrapper
+                #wrapper.toggled #content-wrapper
                     position relative
                     margin-right 0
             """
@@ -151,6 +153,8 @@ module.exports.menu =
                 #sidebar-top
                 ul.sidebar-nav#sidebar_menu_insert
             """
+        rendered: ->
+            $('#listen-to-menu-change').trigger('custom', [__.currentRoute()])
         events:
             'custom #listen-to-menu-change': (event, instance, navbar_menu) ->
                 sidebar = Pages[navbar_menu].sidebar

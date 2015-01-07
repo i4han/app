@@ -112,6 +112,7 @@ local = {}
             @local_source  = @site_dir +  main.local_config
             @theme_source  = @module_dir + '/theme.coffee'
             @sync_dir      = @meteor_lib
+            @index_file    = local.index_file
             @source_dir    = main.source_dir
             @target_dir    = main.target_dir
             @storables     = main.meteor_dir + 'private/storables'
@@ -156,7 +157,7 @@ local = {}
             delete obj[oldName]
         this
 
-@__.cutup = (str, tab=1, indent='    ') -> (((str.replace /~\s+/g, '').split '|').map (s) ->
+@__.slice = (str, tab=1, indent='    ') -> (((str.replace /~\s+/g, '').split '|').map (s) ->
     s = if 0 == s.search /^(<+)/ then s.replace /^(<+)/, Array(tab = Math.max tab - RegExp.$1.length, 1).join indent 
     else if 0 == s.search /^>/ then s.replace /^>/, Array(++tab).join indent 
     else s.replace /^/, Array(tab).join indent).join '\n'
@@ -168,8 +169,9 @@ local = {}
         Template[page].helpers, 
         document.getElementById id  )
 
-@__.render = (page) -> Template[page].renderFunction().value
+@__.currentRoute = -> Router.current().route.getName()
 
+@__.render = (page) -> Template[page].renderFunction().value
 
 @__.renameKeys = (obj, keyObject) ->
     _.each _.keys keyObject, (key) -> @__.reKey obj, key, keyObject[key]

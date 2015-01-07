@@ -119,14 +119,16 @@ sync = ->
 readInclude = (path) ->
     ((fs.readFileSync path, 'utf8').split "\n").filter( (a) -> -1 == a.search /#exclude\s*$/ ).join "\n"
 
+include = (data) ->
+    if data.search(/^#include\s+local\s*.*/) != -1 then readInclude Config.local_source
+    else if data.search(/^#include\s+theme\s*.*/) != -1 then readInclude Config.theme_source
+    else data
+
 configure = () ->
     coffee = require 'coffee-script'
     fs.createReadStream Config.config_source
         .pipe es.split "\n"
-        .pipe es.mapSync (data) ->
-            if data.search(/^#include\s+local\s*.*/) != -1 then readInclude Config.local_source
-            else if data.search(/^#include\s+theme\s*.*/) != -1 then readInclude Config.theme_source
-            else data
+        .pipe es.mapSync (data) -> include data
         .pipe es.join "\n"
         .pipe es.wait()
         .pipe es.mapSync (data) -> coffee.compile '#!/usr/bin/env node' + data, bare:true

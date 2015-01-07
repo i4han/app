@@ -80,9 +80,9 @@ loginFlow = -> ! Session.get('login.inSignupFlow') and ! Session.get('login.inFo
 module.exports.accounts =
 
     login: 
-        styl$: (C,_) -> _.cutup """#login-buttons|>float right|border 0 ~
+        styl$: (C,_) -> _.slice """#login-buttons|>float right|border 0 ~
             |<#login-buttons + li .dropdown-menu |>float right|right 0|left auto"""
-        jade:  (C,_) -> _.cutup "ul.nav.navbar-nav#login-buttons|>+Template.dynamic(template=template)"
+        jade:  (C,_) -> _.slice "ul.nav.navbar-nav#login-buttons|>+Template.dynamic(template=template)"
         events:
             'click input, click label, click button, click .dropdown-menu, click .alert': (event) -> event.stopPropagation()
             'click .login-close': -> closeDropdown() ; $('#login-dropdown').removeClass 'open' ; console.log "login-close"
@@ -96,10 +96,10 @@ module.exports.accounts =
 
     dropdown_logged_in:
         jade: (C,_) -> 
-            _.cutup """li.dropdown#login-dropdown ~
+            _.slice """li.dropdown#login-dropdown ~
                 |>a.dropdown-toggle#login-id(data-toggle='dropdown') {{username}}|>i.fa(class='fa-chevron-down') ~
                 |<.dropdown-menu(id='{{id}}')|>+Template.dynamic(template=template)"""
-        styl$: (C,_) -> _.cutup """#logged-in-dropdown-menu|>right 0|left auto
+        styl$: (C,_) -> _.slice """#logged-in-dropdown-menu|>right 0|left auto
                 width #{C.$.navbar.login.dropdown.width}
                 padding 5px 0px
             #login-dropdown input
@@ -132,7 +132,7 @@ module.exports.accounts =
                 height 30px
                 padding 7px 20px
             """
-        jade: (C,_) -> _.cutup "each items|>+menu"
+        jade: (C,_) -> _.slice "each items|>+menu"
         helpers: items: -> [
             { label: 'Profile',         id: 'menu-profile',         icon: 'list-alt' },
             { label: 'Settings',        id: 'menu-settings',        icon: 'cog'      },
@@ -150,7 +150,7 @@ module.exports.accounts =
                 Meteor.flush()
 
     change_password:
-        jade: (C,_) -> _.cutup """each fields|>+form|<br|+login_messages ~
+        jade: (C,_) -> _.slice """each fields|>+form|<br|+login_messages ~
             |#dropdown-menu-buttons   |>each buttons|>+button ~
             |<<#dropdown-other-options|>each links  |>+a"""
         events:
@@ -269,7 +269,7 @@ module.exports.accounts =
                 Meteor.flush()
                     
     login_messages:
-        styl$: (C,_) -> _.cutup "#login-dropdown .alert|>padding 6px|margin-bottom 14px"
+        styl$: (C,_) -> _.slice "#login-dropdown .alert|>padding 6px|margin-bottom 14px"
         jade: """+alert(class='alert-danger'  message=error_message)
                  +alert(class='alert-success' message=info_message )"""
         helpers:
