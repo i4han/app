@@ -1,3 +1,5 @@
+# required by 'save'
+
 index_file = 'index'
 if !Meteor?
     require 'coffee-script/register'
@@ -8,8 +10,9 @@ if !Meteor?
 
 local = 
     title:       'Application'
-    index_file:  index_file
     home_url:    'bless-diesel.codio.io'
+    index_file:  index_file
+    other_files: []
     modules:     'accounts menu ui responsive' .split ' '
     collections: 'connects items updates boxes colors' .split ' '
     $: {

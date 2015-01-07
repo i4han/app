@@ -64,36 +64,36 @@ local = {}
             "http://www.hi16.ca:3003/callback/instagram/?command=oauth&user_id=#{user_id}"        
     pages:
         jade:
-            target_file: main.target_dir + main.autogen_prefix + '1.jade'
+            file: main.target_dir + main.autogen_prefix + '1.jade'
             indent: 1
             format: (name, block) -> """template(name="#{name}")\n#{block}\n\n"""
         jade$:
-            target_file: main.target_dir + main.autogen_prefix + '2.html'
+            file: main.target_dir + main.autogen_prefix + '2.html'
             indent: 1
             format: (name, block) -> jade.compile( """template(name="#{name}")\n#{block}\n\n""", null )()  
         HTML:
-            target_file: main.target_dir + main.autogen_prefix + '3.html'
+            file: main.target_dir + main.autogen_prefix + '3.html'
             indent: 1
             format: (name, block) -> """<template name="#{name}">\n#{block}\n</template>\n"""
         head:
-            target_file: main.target_dir + main.autogen_prefix + '0.jade'
+            file: main.target_dir + main.autogen_prefix + '0.jade'
             indent: 1
             header: 'head\n'                  #  'doctype html\n' has not suppored by jade
             format: (name, block) -> block + '\n'
         less:
-            target_file: main.target_dir + main.autogen_prefix + '7.less'
+            file: main.target_dir + main.autogen_prefix + '7.less'
             indent: 0
             format: (name, block) -> block + '\n'
         css:
-            target_file: main.target_dir + main.autogen_prefix + '5.css'
+            file: main.target_dir + main.autogen_prefix + '5.css'
             indent: 0
             format: (name, block) -> block + '\n'
         styl:
-            target_file: main.target_dir + main.autogen_prefix + '4.styl'
+            file: main.target_dir + main.autogen_prefix + '4.styl'
             indent: 0
             format: (name, block) -> block + '\n\n'
         styl$:
-            target_file: main.target_dir + main.autogen_prefix + '6.css'
+            file: main.target_dir + main.autogen_prefix + '6.css'
             indent: 0
             format: (name, block) -> stylus( block ).render() + '\n'
 
@@ -129,7 +129,8 @@ local = {}
         delete @init
         return this
     quit: ->
-        @redis.quit() if ! _.isEmpty( @redis )    
+        @redis.quit() if ! _.isEmpty( @redis )
+        process.exit 0   
 }.init()
 
 

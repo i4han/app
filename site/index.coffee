@@ -73,10 +73,10 @@ module.exports.index =
         events: 'click input': -> console.log Router.current().route.name
 
     sidebar_home:    sidebarMenu 'home about connect help' .split ' '
-    sidebar_profile: sidebarMenu 'home help' .split ' '
+    sidebar_profile: sidebarMenu 'home about help' .split ' '
     sidebar_connect: sidebarMenu 'home connect help' .split ' '
 
     footer: 
-        jade: -> slice ".footer|>.content|>.row|>center © Businesses 2015"
+        jade: -> slice ".footer|>.content|>.row|>center © Business 2015"
         styl: -> slice ".footer|>background-color #d9d9d9|padding-top 50px|padding-bottom 20px"
                 
