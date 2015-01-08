@@ -1,0 +1,43 @@
+#!/usr/bin/env coffee
+
+fs        =  require 'fs'
+md5       =  require 'MD5'
+ps        =  require 'ps-node'
+{Config, __} =  require 'config'         
+local        =  require  Config.local_module
+
+fs.mkdir Config.target_dir, 0775, (err) -> err.code == 'EEXIST'
+ps.lookup command: 'node', psargs: 'ux', (err, a) -> 
+    a.filter( (f) -> if parseInt(f.pid) == process.pid then false else true ).forEach (p) ->
+        (process.exit 0 if s.match /\/bin\/save$/) for s in p.arguments
+
+func$str = (what) ->
+    @C = Config
+    @_ = __
+    if !what? then undefined
+    else if 'string'   == typeof what then what
+    else if 'function' == typeof what then what.call(@, @C, @_)
+
+indent = (block, indent) -> 
+    if indent then block.replace /^/gm, Array(++indent).join Config.indent_string else block
+
+a = [require Config.index_module].concat(
+    (local.modules)    .map (module) -> require Config.module_dir + module,
+    (local.other_files).map (file)   -> require Config.site_dir   + file )
+(Config.templates).map (kind) ->
+    $$ = Config.pages[kind]
+    data = ($$.header || '') + ((a     .map (obj) -> 
+        (((    Object.keys obj)        .map (module) ->
+            (((Object.keys obj[module]).map (page) ->
+                if block = func$str(obj[module][page][kind])
+                    #console.log "#{module}:#{page}:#{kind}\n[#{block}]\n" 
+                    $$.format.call @, page, indent block, $$.indent 
+            ).filter (o) -> o?).join ''
+        ).filter (o) -> o?).join ''
+    ).filter (o) -> o?).join ''
+    checksum = md5 data
+    fs.readFile $$.file, (err, d) ->
+        fs.writeFileSync $$.file, data, encoding: 'utf8', flag: 'w+' if checksum != md5 d
+
+Config.quit()
+
