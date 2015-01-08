@@ -102,20 +102,23 @@ local = {}
         @redis = {}
         if !Meteor? or Meteor.isServer
             @meteor_dir    = main.meteor_dir
+            @index_file    = local.index_file
+            @module_dir    = main.module_dir
+            @source_dir    = main.source_dir
+            @client_dir    = main.target_dir
+            @target_dir    = main.target_dir   # alias client_dir
+            @site_dir      = if process.env.SITE then process.env.SITE + '/' else main.site_dir
             @meteor_lib    = @meteor_dir + 'lib/'
             @package_dir   = @meteor_dir + 'packages/'
             @config_js_dir = @package_dir   + 'sat/'
+            @sync_dir      = @meteor_lib                      # after meteor_lib
             @config_js     = @config_js_dir + 'config.js'
-            @module_dir    = main.module_dir
             @config_source = @module_dir + '/config.coffee'
-            @site_dir      = main.site_dir
             @local_source  = @site_dir +  main.local_config
             @theme_source  = @module_dir + '/theme.coffee'
-            @sync_dir      = @meteor_lib
-            @index_file    = local.index_file
-            @source_dir    = main.source_dir
-            @target_dir    = main.target_dir
-            @storables     = main.meteor_dir + 'private/storables'
+            @index_module  = @site_dir + @index_file 
+            @local_module  = @site_dir + main.local_config # 'local.coffee'
+            @storables     = main.meteor_dir + 'private/storables' # remove?
             @set_prefix    = ''
             @autogen_prefix = main.autogen_prefix
             if !Meteor?               
@@ -125,12 +128,12 @@ local = {}
                 @redis = (Npm.require 'redis').createClient()
                 @server_config = @meteor_dir + 'server/config'
         @templates  = Object.keys @pages
-        @auto_generated_files = (@pages[i].target_file for i in @templates)
+        @auto_generated_files = (@pages[i].file for i in @templates)
         delete @init
         return this
-    quit: ->
+    quit: (func) ->
         @redis.quit() if ! _.isEmpty( @redis )
-        process.exit 0   
+        func() if func?
 }.init()
 
 

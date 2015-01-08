@@ -10,7 +10,7 @@ if !Meteor?
 
 local = 
     title:       'Application'
-    home_url:    'bless-diesel.codio.io'
+    home_url:    'circus-baboon.codio.io'
     index_file:  index_file
     other_files: []
     modules:     'accounts menu ui responsive' .split ' '

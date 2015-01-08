@@ -8,7 +8,8 @@ popover = (list) ->
 
 module.exports.index =
 
-    layout: jade: -> slice "+navbar|#wrapper|>+sidebar|#content-wrapper|>.container-fluid|>+yield|<<<+footer"
+    layout: jade: -> 
+        slice "+navbar|#wrapper|>+sidebar|#content-wrapper|>.container-fluid|>+yield|<<<+footer"
 
     home:
         label: 'Home',   sidebar: 'sidebar_home',   router: path: '/'  
@@ -21,7 +22,7 @@ module.exports.index =
             |float left |border 1px   |margin 6px ~
             |transform rotateY(45deg) |-webkit-transform rotateY(45deg)'''
 
-    item: jade: "img(src='{{url}}' height='320' width='320')"
+    item: jade: "img(height='320' width='320')"
         
     about:
         label: 'About', router: {}
@@ -46,8 +47,8 @@ module.exports.index =
                 { label: 'Zip',    id: 'zip',    title: 'Your home Zip code',  icon: 'envelope' }]
         events: popover 'name mobile zip' .split ' '
     popover_name:   jade: -> slice "ul|>li Write your name.|li No longer then 12 letters."
-    popover_mobile: jade: -> slice "ul: li Write your phone number."
-    popover_zip:    jade: -> slice "ul: li Write your zipcode."
+    popover_mobile: jade: "ul: li Write your phone number."
+    popover_zip:    jade: "ul: li Write your zipcode."
 
     help:
         label: 'Help',   router: {}

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-#git submodule update --init
-
 for i in redis meteor
 do
     [[ `parts list` =~ $i ]] || parts install $i
@@ -11,7 +9,7 @@ parts start redis
 NODE_MODULES=~/node_modules
 [ -d $NODE_MODULES ] || mkdir $NODE_MODULES
 
-for j in coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar node-serialize request event-stream prompt jade
+for j in coffee-script underscore express stylus fs-extra fibers hiredis redis mongodb chokidar node-serialize request event-stream prompt jade ps-node MD5
 do
     echo "Installing $j."
     npm install --prefix ~ $j
@@ -35,12 +33,6 @@ fi
 cake config 
 cake profile
 . ~/.bashrc
-
-for i in client private
-do
-    [ -d "app/$i" ] || mkdir "app/$i"
-done
-
 cake sync
-collect
+cake build
 
