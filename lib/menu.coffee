@@ -11,7 +11,7 @@ module.exports.menu =
             _ = require 'underscore'
             _.templateSettings = interpolate: /\[(.+?)\]/g
             menu = ''
-            Config.$.navbar.list.forEach (a) -> 
+            Config.menu.forEach (a) -> 
                 menu += ( _.template """            li: a(href="{{pathFor '[path]'}}" id="[id]") [label]\n""" )
                     path:a.path, label:a.label, id:'navbar-menu'                
             """

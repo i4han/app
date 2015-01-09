@@ -30,9 +30,6 @@ else
     exit 0
 fi
 
-cake config 
-cake profile
+cake setup
 . ~/.bashrc
-cake sync
-cake build
-
+cake reset

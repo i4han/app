@@ -4,3 +4,4 @@ app/private/storables
 app/lib/*.coffee
 app/packages/sat/config.js
 npm-debug.log
+site/build

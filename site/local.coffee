@@ -3,7 +3,8 @@
 index_file = 'index'
 if !Meteor?
     require 'coffee-script/register'
-    index = (require index_file + '.coffee')[index_file]   # used by collect 
+    try
+        index = (require index_file)[index_file]   # used by cake build     
     if main?
         T = theme.clean
         T.navbar.height = '50px'
@@ -15,12 +16,13 @@ local =
     other_files: []
     modules:     'accounts menu ui responsive' .split ' '
     collections: 'connects items updates boxes colors' .split ' '
+    menu:        ['home', 'profile', 'connect', 'help'].map (a) -> 
+        path:a, label:index[a].label if index
     $: {
         theme:   T
         font_family: T.font_family
         font_weight: T.font_weight
         navbar:
-            list:    ['home', 'profile', 'connect', 'help'].map (a) -> path:a, label:index[a].label 
             style:   'fixed-top'
             height:  T.navbar.height
             color:   T.navbar.color
@@ -48,6 +50,6 @@ local =
             focus:
                 color:            T.navbar.focus.color
                 background_color: T.navbar.focus.background_color
-        end: undefined } if !Meteor? and main?              
+        end: undefined } if !Meteor? and main?         
 
 module.exports = local  #exclude

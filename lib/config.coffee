@@ -38,12 +38,13 @@ local = {}
 #include local <- This is where local config files to be located.
 
 @Config = {
-    title:             local.title
-    home_url:          local.home_url
-    callback_port:     main.callback_port
-    indent_string:     '    '
-    local_config:      main.local_config
-    collections:       local.collections
+    title:         local.title
+    home_url:      local.home_url
+    callback_port: main.callback_port
+    indent_string: '    '
+    local_config:  main.local_config
+    collections:   local.collections
+    menu:          local.menu
     _:
         font_style:    
             pt_sans:    "https://fonts.googleapis.com/css?family=PT+Sans:400,700"
@@ -108,15 +109,17 @@ local = {}
             @client_dir    = main.target_dir
             @target_dir    = main.target_dir   # alias client_dir
             @site_dir      = if process.env.SITE then process.env.SITE + '/' else main.site_dir
-            @meteor_lib    = @meteor_dir + 'lib/'
-            @package_dir   = @meteor_dir + 'packages/'
-            @config_js_dir = @package_dir   + 'sat/'
+            @build_dir     = @site_dir    + 'build/'
+            @meteor_lib    = @meteor_dir  + 'lib/'
+            @package_dir   = @meteor_dir  + 'packages/'
+            @config_js_dir = @package_dir + 'sat/'
             @sync_dir      = @meteor_lib                      # after meteor_lib
             @config_js     = @config_js_dir + 'config.js'
-            @config_source = @module_dir + '/config.coffee'
-            @local_source  = @site_dir +  main.local_config
-            @theme_source  = @module_dir + '/theme.coffee'
-            @index_module  = @site_dir + @index_file 
+            @config_source = @module_dir    + 'config.coffee'
+            @local_source  = @site_dir      + main.local_config
+            @theme_source  = @module_dir    + 'theme.coffee'
+            @header_source = @module_dir    + 'header.coffee'
+            @index_module  = @build_dir     + local.index_file 
             @local_module  = @site_dir + main.local_config # 'local.coffee'
             @storables     = main.meteor_dir + 'private/storables' # remove?
             @set_prefix    = ''
