@@ -32,4 +32,5 @@ fi
 
 cake setup
 . ~/.bashrc
-cake reset
+cd app
+meteor update
