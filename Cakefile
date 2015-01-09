@@ -13,11 +13,10 @@ catch e
     {Config, __} = require "./lib/config"
 
 try
-    console.log '##' + if Config? and Config.local_module? then Config.local_module 
     local = require if Config? and Config.local_module? then Config.local_module 
     else './'+ site + '/local.coffee'
 catch e
-    console.log "err:#{local}:#{e}"
+    console.log "local:#{local}:#{e}"
 cwd  = process.cwd()    
 home = process.env.HOME
     
@@ -87,8 +86,8 @@ clean_up = ->
         fs.unlinkSync file if fs.existsSync file
 
 start_up = ->
-    sync()  if (fs.readdirSync Config.sync_dir  ).length == 0  
-    build() if (fs.readdirSync Config.client_dir).length == 0  # check better than this.
+    sync()  if ! fs.existsSync Config.sync_dir  
+    build() if ! fs.existsSync Config.client_dir  # check better than this.
     chokidar.watch Config.build_dir, persistent:true
         .on 'change', (file) -> build() if isType file, 'coffee'
         .on 'add',    (file) -> build() if isType file, 'coffee'
@@ -105,7 +104,7 @@ start_up = ->
     meteor()
 
 mkdir = (path) ->
-    if path? then fs.mkdir path, 0o775, (err) -> err and err.code == 'EEXIST'
+    if path? then fs.mkdirSync path
     else console.log "path: not defined." 
 
 sync = ->
@@ -137,7 +136,6 @@ coffee = (data) ->
     cs.compile '#!/usr/bin/env node' + data, bare:true
 
 configure = () ->
-    console.log Config.config_source
     fs.createReadStream Config.config_source
         .pipe es.split "\n"
         .pipe es.mapSync (data) -> include data
@@ -151,9 +149,7 @@ indent = (block, indent) ->
 
 touch = () ->
     mkdir Config.build_dir
-    console.log 'index:' + local.index_file
     ([local.index_file].concat(local.other_files)).filter((f) -> f?).map (file) ->
-        console.log file
         fs.readFile Config.header_source, 'utf8', (err, head) ->
             fs.createReadStream Config.site_dir + file + '.coffee'
                 .pipe es.split "\n"
