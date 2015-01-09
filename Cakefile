@@ -18,7 +18,6 @@ try
     else './'+ site + '/local.coffee'
 catch e
     console.log "err:#{local}:#{e}"
-console.log local
 cwd  = process.cwd()    
 home = process.env.HOME
     
@@ -88,6 +87,8 @@ clean_up = ->
         fs.unlinkSync file if fs.existsSync file
 
 start_up = ->
+    sync()  if (fs.readdirSync Config.sync_dir  ).length == 0  
+    build() if (fs.readdirSync Config.client_dir).length == 0  # check better than this.
     chokidar.watch Config.build_dir, persistent:true
         .on 'change', (file) -> build() if isType file, 'coffee'
         .on 'add',    (file) -> build() if isType file, 'coffee'
@@ -120,14 +121,9 @@ sync = ->
         .concat((local.modules)    .map (l) -> Config.module_dir + l ))
             .map (l) -> l + '.coffee'
         .forEach (path) ->
+#           console.log path + ":" + sync_dir + path.replace /.*?([^\/]*)$/, "$1"
             fs.symlink path, sync_dir + path.replace /.*?([^\/]*)$/, "$1"
-###            modules = (require path.join site_dir, local_config ).modules
-            modules.forEach (module) ->
-                module_path = path.join Config.module_dir, module + '.coffee'
-                sync_path = path.join sync_dir, module + '.coffee'
-                fs.symlinkSync module_path, sync_path if fs.existsSync module_path
-        else
-###
+
 readInclude = (path) ->
     ((fs.readFileSync path, 'utf8').split "\n").filter( (a) -> -1 == a.search /#exclude\s*$/ ).join "\n"
 
