@@ -2,7 +2,7 @@
 slice = (str) -> @_.slice str
 
 # correct - id must unique.
-sidebarMenu = (list, id='sidebar_menu') ->
+sidebar = (list, id='sidebar_menu') ->
     jade: -> @_.slice "each items|>+menu_list"
     helpers: 
     	items: -> list.map (a) -> { page:a, id:id } 
@@ -12,7 +12,7 @@ assignPopover = (o,v) ->
         $('input#'+v)
             .attr('data-content', __.render 'popover_'+v)
             .popover 'show' 
-        o
+    o
 
 popover = (list) -> list.reduce ((o, v) -> assignPopover o, v), {}
 
@@ -22,20 +22,19 @@ module.exports.index =
     
     home:
         label: 'Home',   sidebar: 'sidebar_home',   router: path: '/'  
-        jade: -> slice ".row|>.col-md-8|>h1 #{@C.title} is title|<<.row#items|>.col-md-8|>each items|>.item|>+item"
+        jade: -> slice ".row|>.col-md-8|>h1 #{@C.title} is title|<<.row#items|>.col-md-12|>each items|>+item"
         rendered: ->
             $items = $('#items')
             # $container.masonry itemSelector: '.item', columnWidth: 332
         helpers: items: -> db.Items.find {}, sort: created_time: -1
-        styl: -> slice '''#items .item|>background-color #eee |width 320px |height 320px ~
-            |float left |border 1px   |margin 6px ~
-            |transform rotateY(45deg) |-webkit-transform rotateY(45deg)'''
+        styl: -> slice '''#items .item|>background-color white |width 240px |height 240px ~
+            |float left  |border 1px  |margin 6px'''
     
-    item: jade: "img(height='320' width='320')"
+    item: jade: ".item(style='height:{{height}}px;color:{{color}}')"
         
     about:
         label: 'About', router: {}
-        jade: ".row#items" # ".row|>+hello|+br(height='36px')|+dialog"
+        jade: ".row#items"
         rendered: ->
             $items = $ '#items'
             $('body').scrollspy({ target: '#items' })
@@ -46,6 +45,9 @@ module.exports.index =
             $tile.on 'scrollSpy:exit', -> console.log 'exit:', $(this).attr 'id' 
         styl: -> slice ".tile|>width 160px|height 160px|float left|border 1px|background-color white|margin 1px"
     
+    sidebar_home:     sidebar 'home about connect help' .split ' '
+    sidebar_profile:  sidebar 'home about help' .split ' '
+    sidebar_connect:  sidebar 'home connect help' .split ' '
     
     profile:
         label: 'Profile',   sidebar: 'sidebar_profile',   router: {}
@@ -81,10 +83,6 @@ module.exports.index =
                 redirect_uri: Config.instagram.redirect_uri Meteor.userId()
                 response_type: Config.instagram.response_type
         events: 'click input': -> console.log Router.current().route.name
-    
-    sidebar_home:     sidebarMenu 'home about connect help' .split ' '
-    sidebar_profile:  sidebarMenu 'home about help' .split ' '
-    sidebar_connect:  sidebarMenu 'home connect help' .split ' '
     
     footer: 
         jade: -> slice ".footer|>.content|>.row|>center © Business 2015"

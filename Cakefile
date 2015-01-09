@@ -103,9 +103,7 @@ start_up = ->
 
     meteor()
 
-mkdir = (path) ->
-    if path? then fs.mkdirSync path
-    else console.log "path: not defined." 
+mkdir = (path) -> fs.mkdirSync path if path? and !fs.existsSync path 
 
 sync = ->
     sync_dir = Config.sync_dir

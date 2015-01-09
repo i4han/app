@@ -2,7 +2,7 @@ theme =
     clean:
         font_family:            "'PT Sans', sans-serif"
         font_weight:            200
-        backgound_color:        '#f2f2f2'
+        backgound_color:        '#eee'
         navbar:
             height:             '50px'
             color:              '#999'
