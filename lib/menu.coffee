@@ -23,6 +23,7 @@ module.exports.menu =
                 .navbar-right
                     +login
             """
+        styl: -> @_.slice ".navbar|>background-color #8fc748|<.navbar-fixed-top|>border 0px"
         events:
             'click #menu-toggle': (event) -> $("#wrapper").toggleClass "toggled" # event.preventDefault()                
             'click #navbar-menu': (event) ->
@@ -70,7 +71,7 @@ module.exports.menu =
                 background-color #{Config.$.navbar.hover.background_color}
             """
     sidebar:
-        styl$: (Config) -> sidebar_width = '180px'; """
+        styl$: (Config) -> sidebar_width = '100px'; """
             #wrapper 
                 padding-top: 50px;
                 padding-left: 0px;
@@ -119,16 +120,18 @@ module.exports.menu =
             .sidebar-nav li a:hover
                 text-decoration: none
                 color #000
-                background #ddd
+                background-color #e8e8e8
             .sidebar-nav li a:active,
             .sidebar-nav li a:focus
                 text-decoration none
+                color #000
+                background-color #ddd
             .sidebar-nav > .sidebar-brand
                 height 65px
                 font-size 18px
                 line-height 60px
             .sidebar-nav > .sidebar-brand a
-                color #999999
+                color #999
             .sidebar-nav > .sidebar-brand a:hover
                 color #fff
                 background none

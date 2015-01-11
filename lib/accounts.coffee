@@ -1,6 +1,6 @@
 resetMessages = ->
     Session.set 'login.errorMessage', null
-    Session.set 'login.infoMessage', null
+    Session.set 'login.infoMessage' , null
     
 closeDropdown = ->
     ('inSignupFlow inForgotPasswordFlow inChangePasswordFlow inMessageOnlyFlow dropdownVisible'.split ' ').forEach (key) ->

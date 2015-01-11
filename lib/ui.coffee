@@ -10,9 +10,8 @@ module.exports.ui =
                 db[a] = new Meteor.Collection a if !db[a]?
                 Meteor.subscribe [a]
 
-    body: styl: (C,_) -> _.slice """body|>font-family #{C.$.font_family}|font-weight #{C.$.font_weight} ~
-            |background-color #f2f2f2"""
-
+    body: styl: (C,_) -> _.slice "body|>font-family #{C.$.font_family}|font-weight #{C.$.font_weight}"
+    
     form:
         jade: """
             if visible
@@ -48,7 +47,6 @@ module.exports.ui =
             type: -> @type or "button"
             visible: -> isVisible(@visible)
             id: -> @id or __.dasherize @label.toLowerCase().trim()
-            title: -> @title
             class: -> @class or 'btn-primary'
         styl$: """
             .btn

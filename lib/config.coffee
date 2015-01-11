@@ -123,19 +123,21 @@ local = {}
             @local_module  = @site_dir + main.local_config # 'local.coffee'
             @storables     = main.meteor_dir + 'private/storables' # remove?
             @set_prefix    = ''
-            @autogen_prefix = main.autogen_prefix
+            @autogen_prefix = main.autogen_prefix            
             if !Meteor?               
-                redis = require 'redis'
-                @redis = redis.createClient()
+#                redis = require 'redis'
+#                 @redis = redis.createClient()
+                a = '' # useless                 
             else
-                @redis = (Npm.require 'redis').createClient()
+#                @redis = (Npm.require 'redis').createClient()
                 @server_config = @meteor_dir + 'server/config'
+
         @templates  = Object.keys @pages
         @auto_generated_files = (@pages[i].file for i in @templates)
         delete @init
         return this
     quit: (func) ->
-        @redis.quit() if ! _.isEmpty( @redis )
+#        @redis.quit() if ! _.isEmpty( @redis )
         func() if func?
 }.init()
 
@@ -169,11 +171,11 @@ local = {}
     else if 0 == s.search /^>/ then s.replace /^>/, Array(++tab).join indent 
     else s.replace /^/, Array(tab).join indent).join '\n'
 
-@__.insertTemplate = (page, id) ->
+@__.insertTemplate = (page, id, data={}) ->
     $('#' + id).empty()
     Blaze.renderWithData(
         Template[page], 
-        Template[page].helpers, 
+        if Object.keys(data).length then data else Template[page].helpers 
         document.getElementById id  )
 
 @__.currentRoute = -> Router.current().route.getName()

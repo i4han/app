@@ -1,4 +1,4 @@
-site = 'site'
+site = 'calendar'
   
 fs       = require 'fs'
 path     = require 'path'
@@ -17,6 +17,8 @@ try
     else './'+ site + '/local.coffee'
 catch e
     console.log "local:#{local}:#{e}"
+    # module.export.index = undefined
+
 cwd  = process.cwd()    
 home = process.env.HOME
     
@@ -28,7 +30,7 @@ Config = {
     config_js_dir: cwd + '/app/packages/sat'
     config_source: cwd + '/lib/config.coffee'
     theme_source:  cwd + '/lib/theme.coffee' 
-    local_source:  cwd + '/site/local.coffee'
+    local_source:  cwd + '/' + site + '/local.coffee'
     config_js:     cwd + '/app/packages/sat/config.js'
     site_dir:      cwd + '/' + site        
     auto_generated_files: 'auto_'
@@ -53,14 +55,15 @@ profile = ->
         export METEOR_APP=#{cwd}/app
         export METEOR_LIB=$METEOR_APP/lib
         export PACKAGES=$METEOR_APP/packages
-        export PATH="#{home}/node_modules/.bin:#{cwd}/bin:$PATH"
-        export NODE_PATH="#{home}/node_modules:#{Config.config_js_dir}:$BUILD"
-        export CDPATH=".:#{home}:$METEOR_APP:$SITE"
+        export PATH=#{home}/node_modules/.bin:#{cwd}/bin:$PATH
+        export NODE_PATH=#{home}/node_modules:#{Config.config_js_dir}:$BUILD
+        export CDPATH=.:#{home}:$METEOR_APP
         [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
         export all="Cakefile install.sh lib/* site/*"
         alias red='parts start redis'
         alias sul='rmate -p 8080'
         alias sal='find $all -type f -print0 | xargs -0 -I % rmate -p 8080 % +'
+        alias refresh='. ~/.bashrc'
         """, flag: 'w+'
 
 {spawn, exec} = require 'child_process'
@@ -89,8 +92,8 @@ start_up = ->
     sync()  if ! fs.existsSync Config.sync_dir  
     build() if ! fs.existsSync Config.client_dir  # check better than this.
     chokidar.watch Config.build_dir, persistent:true
-        .on 'change', (file) -> build() if isType file, 'coffee'
-        .on 'add',    (file) -> build() if isType file, 'coffee'
+        .on 'change', (file) -> build()
+        .on 'add',    (file) -> build()
     (local.modules)    .map (file) ->
         chokidar.watch Config.module_dir + file + '.coffee', persistent:true
             .on 'change', (file) -> build()
@@ -106,6 +109,8 @@ start_up = ->
 mkdir = (path) -> fs.mkdirSync path if path? and !fs.existsSync path 
 
 sync = ->
+    console.log Config.index_module
+    console.log local.modules
     sync_dir = Config.sync_dir
     if fs.existsSync sync_dir
         (fs.readdirSync sync_dir).forEach (file) -> 
@@ -118,7 +123,7 @@ sync = ->
         .concat((local.modules)    .map (l) -> Config.module_dir + l ))
             .map (l) -> l + '.coffee'
         .forEach (path) ->
-#           console.log path + ":" + sync_dir + path.replace /.*?([^\/]*)$/, "$1"
+            console.log path + ":" + sync_dir + path.replace /.*?([^\/]*)$/, "$1"
             fs.symlink path, sync_dir + path.replace /.*?([^\/]*)$/, "$1"
 
 readInclude = (path) ->
@@ -134,18 +139,24 @@ coffee = (data) ->
     cs.compile '#!/usr/bin/env node' + data, bare:true
 
 configure = () ->
+    console.log Config.config_source
+    console.log Config.config_js
+    console.log Config.local_source
+    console.log Config.theme_source    
     fs.createReadStream Config.config_source
         .pipe es.split "\n"
         .pipe es.mapSync (data) -> include data
         .pipe es.join "\n"
         .pipe es.wait()
-        .pipe es.mapSync (data) -> coffee data
+        .pipe es.mapSync (data) ->  c = coffee data ; c
         .pipe fs.createWriteStream Config.config_js
 
 indent = (block, indent) -> 
     if indent then block.replace /^/gm, Array(++indent).join Config.indent_string else block
 
 touch = () ->
+    console.log Config.site_dir
+    console.log Config.build_dir
     mkdir Config.build_dir
     ([local.index_file].concat(local.other_files)).filter((f) -> f?).map (file) ->
         fs.readFile Config.header_source, 'utf8', (err, head) ->
@@ -166,6 +177,8 @@ build = () ->
         else if 'string'   == typeof what then what
         else if 'function' == typeof what then what.call(@, @C, @_)
 
+    console.log Config.target_dir
+    console.log Config.index_module
     mkdir Config.target_dir
     a = [require Config.index_module].concat(
         (local.modules)    .map (module) -> require Config.module_dir + module,
@@ -182,6 +195,7 @@ build = () ->
             ).filter (o) -> o?).join ''
         ).filter (o) -> o?).join ''
         fs.readFile $$.file, (err, d) -> if md5(data) != md5 d
+            console.log $$.file
             fs.writeFileSync $$.file, data, encoding: 'utf8', flag: 'w+' 
 
 task 'watch',   'Start the server',           -> start_up()

@@ -1,12 +1,13 @@
-layout: jade: -> 
-    slice "+navbar|#wrapper|>+sidebar|#content-wrapper|>.container-fluid|>+yield|<<<+footer"
+layout: 
+    jade: -> slice "+navbar|#wrapper|>+sidebar|#content-wrapper|>.container-fluid|>+yield|<<<+footer"
+    styl: -> slice "body|>background-color #ccc"
 
 home:
     label: 'Home',   sidebar: 'sidebar_home',   router: path: '/'  
-    jade: -> slice ".row|>.col-md-8|>h1 #{@C.title} is title|<<.row#items|>.col-md-12|>each items|>+item"
+    jade: -> slice ".row|>.col-md-8|>h1 #{@C.title} is title|<<.row#items|>.col-md-12#pack|>each items|>+item"
     rendered: ->
         $items = $('#items')
-        # $container.masonry itemSelector: '.item', columnWidth: 332
+        $('#pack').masonry itemSelector: '.item', columnWidth: 126
     helpers: items: -> db.Items.find {}, sort: created_time: -1
     styl: -> slice '''#items .item|>background-color white |width 240px |height 240px ~
         |float left  |border 1px  |margin 6px'''
@@ -29,7 +30,7 @@ about:
 sidebar_home:     sidebar 'home about connect help' .split ' '
 sidebar_profile:  sidebar 'home about help' .split ' '
 sidebar_connect:  sidebar 'home connect help' .split ' '
-
+    
 profile:
     label: 'Profile',   sidebar: 'sidebar_profile',   router: {}
     jade: -> slice ".row|>.col-sm-7|>h2 Edit your profile|+br(height='32px')|each items|>+form|br"
@@ -56,9 +57,9 @@ help:
 connect:
     label: 'Connect',  sidebar: 'sidebar_connect',  router: {}
     jade: -> slice '''.row|>.col-md-8|h2 Connect|+br(height='48px') ~
-        |a(href='{{instagram_connect}}') Connect with Instagram|+br(height='48px') ~
-        |input.btn.btn-default(type='button' value='Click')'''
+        |a(href='{{instagram_connect}}') Connect with Instagram|with h|>+button'''
     helpers:
+        h: class:'btn-default', label: 'Click'
         instagram_connect: -> Config.instagram.oauth_url + '?' + __.queryString
             client_id: Config.instagram.client_id
             redirect_uri: Config.instagram.redirect_uri Meteor.userId()

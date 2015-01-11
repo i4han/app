@@ -1,3 +1,11 @@
+calendar = (month_year, jquery, class_str) ->
+    ø = HTML
+    jquery.append ø.toHTML ø.H2 moment(month_year, 'YYYYMM').format('MMMM YYYY')
+    [1...parseInt(moment(month_year, 'YYYYMM').startOf('month').format 'd')].forEach (i) ->
+        jquery.append ø.toHTML ø.DIV class:class_str + ' empty'
+    $('.empty').css 'visibility', 'hidden' 
+    [1..parseInt(moment(month_year, 'YYYYMM').endOf('month').format 'D')].forEach (i) ->
+        jquery.append ø.toHTML ø.DIV id:"day-#{month_year}#{i}", class:class_str, ø.P "#{i}" 
 
 slice = (str) -> @_.slice str
 
@@ -17,12 +25,15 @@ assignPopover = (o,v) ->
 popover = (list) -> list.reduce ((o, v) -> assignPopover o, v), {}
 
 module.exports.index =
+    
+    
+    
     layout: 
         jade: -> slice "+navbar|#wrapper|>+sidebar|#content-wrapper|>.container-fluid|>+yield|<<<+footer"
         styl: -> slice "body|>background-color #ccc"
     
     home:
-        label: 'Home',   sidebar: 'sidebar_home',   router: path: '/'  
+        label: 'Home',  router: path: '/'  
         jade: -> slice ".row|>.col-md-8|>h1 #{@C.title} is title|<<.row#items|>.col-md-12#pack|>each items|>+item"
         rendered: ->
             $items = $('#items')
@@ -33,26 +44,20 @@ module.exports.index =
     
     item: jade: ".item(style='height:{{height}}px;color:{{color}}')"
         
-    about:
-        label: 'About', router: {}
-        jade: ".row#items"
-        rendered: ->
-            $items = $ '#items'
-            $('body').scrollspy({ target: '#items' })
-            [1..21].forEach (i) -> 
-                $items.append HTML.toHTML HTML.DIV id:"tile-#{i}", class:'tile box', HTML.P "Tile #{i}" 
-            $tile = $('.tile')
-            $items.on 'activate.bs.scrollspy', -> console.log 'enter:', $(this).attr 'id' 
-            $tile.on 'scrollSpy:exit', -> console.log 'exit:', $(this).attr 'id' 
-        styl: -> slice ".tile|>width 160px|height 160px|float left|border 1px|background-color white|margin 1px"
+    event:
+        label: 'Event',  router: {}
+        jade: -> slice ".row|>#container-calendar|>#top|#items|#bottom"
+        rendered: -> calendar moment().format('YYYYMM'), $('#items'), 'tile'
+        styl: -> slice '''#container-calendar|>max-width 1180px ~
+            |<.tile|>width 160px|height 160px|float left|border 1px|background-color white|margin 2px ~
+            |<h2|>color black'''
     
-    sidebar_home:     sidebar 'home about connect help' .split ' '
-    sidebar_profile:  sidebar 'home about help' .split ' '
-    sidebar_connect:  sidebar 'home connect help' .split ' '
-        
+    #day:
+    #    jade: -> slice ".tile#day-20141203"
+    
     profile:
         label: 'Profile',   sidebar: 'sidebar_profile',   router: {}
-        jade: -> slice ".row|>.col-sm-7|>h2 Edit your profile|+br(height='32px')|each items|>+form|br"
+        jade: -> slice ".row|>.col-sm-7|>h2 Edit your profile|+br(height='28px')|each items|>+form|br"
         helpers: items: -> [
                 { label: 'Name',   id: 'name',   title: 'Your name',           icon: 'user'     },
                 { label: 'Mobile', id: 'mobile', title: 'Mobile Phone Number', icon: 'mobile'   },
@@ -64,29 +69,13 @@ module.exports.index =
     
     help:
         label: 'Help',   router: {}
-        jade: -> slice ".primary-content|>.h2 Debug|<.primary-content#debug"
-        rendered: ->
-            $debug = $ '#debug'
-            (Object.keys Pages).map (name) ->
-                $debug.append HTML.toHTML HTML.H2 name         
-                (Object.keys Pages[name]).map (key) ->
-                    $debug.append HTML.toHTML HTML.H3 key 
-                    $debug.append HTML.toHTML HTML.PRE "#{Pages[name][key]}"
-    
-    connect:
-        label: 'Connect',  sidebar: 'sidebar_connect',  router: {}
-        jade: -> slice '''.row|>.col-md-8|h2 Connect|+br(height='48px') ~
-            |a(href='{{instagram_connect}}') Connect with Instagram|with h|>+button'''
-        helpers:
-            h: class:'btn-default', label: 'Click'
-            instagram_connect: -> Config.instagram.oauth_url + '?' + __.queryString
-                client_id: Config.instagram.client_id
-                redirect_uri: Config.instagram.redirect_uri Meteor.userId()
-                response_type: Config.instagram.response_type
-        events: 'click input': -> console.log Router.current().route.name
+        jade: -> slice ".row|>.h2 Debug|<.row#help"
+        rendered: -> $help = $ '#help'
     
     footer: 
         jade: -> slice ".footer|>.content|>.row|>center © Business 2015"
         styl: -> slice ".footer|>background-color #d9d9d9|padding-top 50px|padding-bottom 20px"
+    
+    
                 
     

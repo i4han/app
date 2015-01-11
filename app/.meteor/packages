@@ -17,3 +17,6 @@ iron:router
 mquandalle:jade
 mizzao:bootstrap-3
 fortawesome:fontawesome
+masonry
+scrollspy
+momentjs:moment
