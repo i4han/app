@@ -10,16 +10,19 @@ module.exports.menu =
         jade: (Config) ->
             _ = require 'underscore'
             _.templateSettings = interpolate: /\[(.+?)\]/g
-            menu = ''
-            Config.menu.forEach (a) -> 
-                menu += ( _.template """            li: a(href="{{pathFor '[path]'}}" id="[id]") [label]\n""" )
-                    path:a.path, label:a.label, id:'navbar-menu'                
+            menu_str = ''
+            console.log @Pages.index.layout.navbar.menu
+            index = @Pages[Config.index_file]
+            menu = index.layout.navbar.menu
+            menu and menu.forEach (a) -> 
+                menu_str += ( _.template """            li: a(href="{{pathFor '[path]'}}" id="[id]") [label]\n""" )
+                    path:a, label:index[a].label, id:'navbar-menu'                
             """
             .navbar.navbar-default.navbar-#{Config.$.navbar.style}: .container
                 .navbar-left 
                     ul.nav.navbar-nav
                         li: a#menu-toggle: i.fa.fa-bars
-            #{menu}
+            #{menu_str}
                 .navbar-right
                     +login
             """

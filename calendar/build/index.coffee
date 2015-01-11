@@ -1,16 +1,16 @@
+#!/usr/bin/env coffee
+
 eventListener = ->
-    $('.tile').on 'change', (obj, claxx, id, content) ->
-        console.log 'Listener', claxx, id, content
-        if 'title' == claxx
+    $('.tile').on 'change', (obj, class_, id, content) ->
+        console.log 'Listener', class_, id, content
+        if 'title' == class_
             console.log 'title', db.Title.find({id:id})
             if db.Title.find({id:id}) then db.Title.update(id:id, $set:{content: content})
             else db.Title.insert(id:id, content:content)
-        else if 'event' == claxx
+        else if 'event' == class_
             console.log 'event', db.Event.find({id:id})
             if db.Event.find({id:id}) then db.Event.update({id:id, $set:{content: content}})
             else db.Event.insert({id:id, content:content})
-
-#        Pages['day'].Event(claxx, id, content)
 
 contentEditable = (id) ->
     $('#'+id)
@@ -22,12 +22,12 @@ contentEditable = (id) ->
         .on 'blur keyup paste input', '[contenteditable]', ->
             id = $(this).parent().attr('id')
             content = $(this).html()
-            claxx = $(this).attr('class')
+            class_ = $(this).attr('class')
             $this = $(this)
             if $this.data('before') isnt $this.html()
                 $this.data 'before', $this.html()
-                console.log 'Editable', $this.parent(), claxx, id, content 
-                $this.parent().trigger('change', [claxx, id, content] )
+                console.log 'Editable', $this.parent(), class_, id, content 
+                $this.parent().trigger('change', [class_, id, content] )
             return $this
 
 calendar = (month_year, jquery, class_str) ->
@@ -46,11 +46,10 @@ calendar = (month_year, jquery, class_str) ->
 
 slice = (str) -> @_.slice str
 
-# correct - id must unique.
 sidebar = (list, id='sidebar_menu') ->
     jade: -> @_.slice "each items|>+menu_list"
     helpers: 
-    	items: -> list.map (a) -> { page:a, id:id } 
+    	items: -> list.map (a) -> { page:a, id:id } # correct - id must unique.
 
 assignPopover = (o,v) -> 
     o['focus input#'+v] = -> 
@@ -60,15 +59,13 @@ assignPopover = (o,v) ->
     o
 
 popover = (list) -> list.reduce ((o, v) -> assignPopover o, v), {}
-
 module.exports.index =
-    
-    
-    
+
     layout: 
         jade: -> slice "+navbar|#wrapper|>#content-wrapper|>.container-fluid|>+yield|<<<+footer"
         styl: -> slice "body|>background-color #ccc"
-    
+        navbar: sidebar: true, login: true, menu: 'home calendar help'.split ' '
+
     home:
         label: 'Home',  router: path: '/'  
         jade: -> slice ".row|>.col-md-8|>h1 Event Calendar|<<.row#items|>.col-md-12#pack|>each items|>+item"
@@ -78,13 +75,14 @@ module.exports.index =
         helpers: items: -> db.Items.find {}, sort: created_time: -1
         styl: -> slice '''#items .item|>background-color white |width 240px |height 240px ~
             |float left  |border 1px  |margin 6px'''
-    
+
     item: jade: ".item(style='height:{{height}}px;color:{{color}}')"
         
     calendar:
         label: 'Calendar',  router: {}
         jade: -> slice ".row|>#container-calendar|>.scrollspy#top top|#items|.scrollspy#bottom bottom"
         rendered: ->
+            console.log 'rendered'
             $scrollspy = $('.scrollspy')
             $scrollspy.scrollSpy()
             $scrollspy.on 'scrollSpy:enter', -> 
@@ -92,11 +90,11 @@ module.exports.index =
                     month_year = moment($('#top').next().children().first().attr('id'),'YYYYMM').subtract(1, 'month').format('YYYYMM')
                     console.log 'top', month_year
                     $('#items').prepend("<div class=month id=#{month_year}></div>")
-                    $('html, body').animate({ scrollTop: 5000 }, 0)
+                    $('html, body').animate({ scrollTop: 500 }, 0)
                     calendar month_year, $('#'+month_year), 'tile'
                     $('.title').attr('contenteditable', 'true')
                     $('.event').attr('contenteditable', 'true')
-    
+
                 else if 'bottom' == $(@).attr 'id'
                     month_year = moment($('#bottom').prev().children().last().attr('id'),'YYYYMM').add(1, 'month').format('YYYYMM')
                     console.log 'bottom', month_year
@@ -113,7 +111,7 @@ module.exports.index =
             |<.tile|>width 160px|height 160px|float left|padding 8px|border 1px|background-color white|margin 2px ~
             |<h2|>color black|margin-top 1000px|display block ~
             |<.month|>display block|<.break|>display block|height 160px|width 1px'''
-    
+
     day:
         jade: -> slice '.date {{date}}|.day {{day}}|.title Title|.event Event'
         helpers:
@@ -125,16 +123,15 @@ module.exports.index =
         styl: -> slice '''.date|>display:inline|font-weight 600|margin-right 10px ~
             |<.day|>display inline|margin-right 10px|<.event|>margin-top 10px|margin-left 5px ~
             |<.title|>display inline|contenteditable true'''
-    
+
     help:
         label: 'Help',   router: {}
         jade: -> slice ".row|>.h2 Debug|<.row#help"
         rendered: -> $help = $ '#help'
-    
+
     footer: 
         jade: -> slice ".footer|>.content|>.row|>center © 2009 - 2014 Startup Edmonton ❘ 301 - 10359 104 Street, Edmonton, Alberta T5J 1B9 ❘ hello@startupedmonton.com"
         styl: -> slice ".footer|>background-color #d9d9d9|padding-top 50px|padding-bottom 20px"
-    
-    
-                
-    
+
+
+            

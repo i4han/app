@@ -1,16 +1,16 @@
+#!/usr/bin/env coffee
+
 eventListener = ->
-    $('.tile').on 'change', (obj, claxx, id, content) ->
-        console.log 'Listener', claxx, id, content
-        if 'title' == claxx
+    $('.tile').on 'change', (obj, class_, id, content) ->
+        console.log 'Listener', class_, id, content
+        if 'title' == class_
             console.log 'title', db.Title.find({id:id})
             if db.Title.find({id:id}) then db.Title.update(id:id, $set:{content: content})
             else db.Title.insert(id:id, content:content)
-        else if 'event' == claxx
+        else if 'event' == class_
             console.log 'event', db.Event.find({id:id})
             if db.Event.find({id:id}) then db.Event.update({id:id, $set:{content: content}})
             else db.Event.insert({id:id, content:content})
-
-#        Pages['day'].Event(claxx, id, content)
 
 contentEditable = (id) ->
     $('#'+id)
@@ -22,12 +22,12 @@ contentEditable = (id) ->
         .on 'blur keyup paste input', '[contenteditable]', ->
             id = $(this).parent().attr('id')
             content = $(this).html()
-            claxx = $(this).attr('class')
+            class_ = $(this).attr('class')
             $this = $(this)
             if $this.data('before') isnt $this.html()
                 $this.data 'before', $this.html()
-                console.log 'Editable', $this.parent(), claxx, id, content 
-                $this.parent().trigger('change', [claxx, id, content] )
+                console.log 'Editable', $this.parent(), class_, id, content 
+                $this.parent().trigger('change', [class_, id, content] )
             return $this
 
 calendar = (month_year, jquery, class_str) ->
@@ -46,11 +46,10 @@ calendar = (month_year, jquery, class_str) ->
 
 slice = (str) -> @_.slice str
 
-# correct - id must unique.
 sidebar = (list, id='sidebar_menu') ->
     jade: -> @_.slice "each items|>+menu_list"
     helpers: 
-    	items: -> list.map (a) -> { page:a, id:id } 
+    	items: -> list.map (a) -> { page:a, id:id } # correct - id must unique.
 
 assignPopover = (o,v) -> 
     o['focus input#'+v] = -> 

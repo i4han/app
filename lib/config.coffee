@@ -48,7 +48,7 @@ local = {}
     _:
         font_style:    
             pt_sans:    "https://fonts.googleapis.com/css?family=PT+Sans:400,700"
-    $:                 local.$
+    $:             theme[local.theme] if theme?[local.theme]?
     instagram:
         callback_path:     '/callback/instagram/'
         response_type:     'code'
@@ -116,11 +116,11 @@ local = {}
             @sync_dir      = @meteor_lib                      # after meteor_lib
             @config_js     = @config_js_dir + 'config.js'
             @config_source = @module_dir    + 'config.coffee'
+            @index_module  = @site_dir      + local.index_file 
             @local_source  = @site_dir      + main.local_config
+            @local_module  = @site_dir      + main.local_config # 'local.coffee'
             @theme_source  = @module_dir    + 'theme.coffee'
             @header_source = @module_dir    + 'header.coffee'
-            @index_module  = @build_dir     + local.index_file 
-            @local_module  = @site_dir + main.local_config # 'local.coffee'
             @storables     = main.meteor_dir + 'private/storables' # remove?
             @set_prefix    = ''
             @autogen_prefix = main.autogen_prefix            

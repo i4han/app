@@ -4,6 +4,7 @@ theme =
         font_weight:            200
         backgound_color:        '#ccc'
         navbar:
+            style:              'fixed-top'
             height:             '50px'
             color:              '#999'
             border:             '1px'
