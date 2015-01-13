@@ -1,5 +1,4 @@
-#!/usr/bin/env coffee
-
+#
 eventListener = ->
     $('.tile').on 'change', (obj, class_, id, content) ->
         console.log 'Listener', class_, id, content
@@ -13,22 +12,17 @@ eventListener = ->
             else db.Event.insert({id:id, content:content})
 
 contentEditable = (id) ->
-    $('#'+id)
-        .on 'focus', '[contenteditable]', ->
-            console.log 'focus'
-            $this = $(this)
-            $this.data 'before', $this.html()
-            return $this
+    $('#' + id)
+        .on 'focus', '[contenteditable]', -> $(@).data 'before', $(@).html() ; $(@)
         .on 'blur keyup paste input', '[contenteditable]', ->
-            id = $(this).parent().attr('id')
-            content = $(this).html()
-            class_ = $(this).attr('class')
-            $this = $(this)
-            if $this.data('before') isnt $this.html()
-                $this.data 'before', $this.html()
+            if $(@).data('before') isnt $(@).html()
+                $(@).data 'before', $(@).html()
                 console.log 'Editable', $this.parent(), class_, id, content 
-                $this.parent().trigger('change', [class_, id, content] )
-            return $this
+                id = $(@).parent().attr('id')
+                content = $(@).html()
+                class_ = $(@).attr('class')
+                $(@).parent().trigger('change', [class_, id, content] )
+            $(@)
 
 calendar = (month_year, jquery, class_str) ->
     ø = HTML
@@ -44,55 +38,26 @@ calendar = (month_year, jquery, class_str) ->
         contentEditable(id)
         eventListener()
 
-repcode = -> ('*ᛡ +ᕀ #ǂ .ˌ ,ˏ -ᐨ :ː'.split ' ').reduce ((o,v) -> o[v[0]]=///#{v[1]}///g;o), {' ': /ॱ/g}
-
-ᛡ = (obj, depth=0) -> ((Object.keys obj).map (key) ->
-    value = obj[key]
-    indent = Array(depth + 2).join '    '
-    key = key.replace v,k for k,v of repcode()
-    if 'object' == typeof value then [key, '\n', indent, ᛡ(value, ++depth)].join ''
-    else if '' is value then key
-    else key + ' ' + value).join '\n'
-
-slice = (str) -> @_.slice str
-
-sidebar = (list, id='sidebar_menu') ->
-    jade: -> @_.slice "each items|>+menu_list"
-    helpers: 
-        items: -> list.map (a) -> { page:a, id:id } # correct - id must unique.
-
-assignPopover = (o,v) -> 
-    o['focus input#'+v] = -> 
-        $('input#'+v)
-            .attr('data-content', __.render 'popover_'+v)
-            .popover 'show' 
-    o
-
-popover = (list) -> list.reduce ((o, v) -> assignPopover o, v), {}
 module.exports.index =
 
     layout: 
-        jade: -> slice "+navbar|#wrapper|>#content-wrapper|>.container-fluid|>+yield|<<<+footer"
-        styl: -> slice "body|>background-color #ccc"
+        jade: ᛡ ᐩnavbar:'', ǂwrapper: {ǂcontentـwrapper: ꓸcontainerـfluid: ᐩyield:''}, ᐩfooter:''
+        styl: ᛡ body: backgroundـcolor: '#ccc'
         navbar: sidebar: true, login: true, menu: 'home calendar help'.split ' '
 
     home:
         label: 'Home',  router: path: '/'  
-        jade: -> slice ".row|>.col-md-8|>h1 Event Calendar|<<.row#items|>.col-md-12#pack|>each items|>+item"
-        rendered: ->
-            $items = $('#items')
-            $('#pack').masonry itemSelector: '.item', columnWidth: 126
+        jade: ᛡ ꓸrow:{ꓸcolـmdـ8:h1:'Event Calendar'},ꓸrowǂitems:ꓸcolـmdـ12ǂpack:eachˌitems:ᐩitem:''
+        styl: ᛡ ǂitemsˌꓸitem:{backgroundـcolor:'white', width:240, height:240, float:'left', border:1, margin:6}
+        rendered: -> $('#pack').masonry itemSelector: '.item', columnWidth: 126
         helpers: items: -> db.Items.find {}, sort: created_time: -1
-        styl: -> slice '''#items .item|>background-color white |width 240px |height 240px ~
-            |float left  |border 1px  |margin 6px'''
 
-    item: jade: ".item(style='height:{{height}}px;color:{{color}}')"
+    item: jade: ᛡ ꓸitemʿstyleᚚˈheightꓽʻʻheightʼʼpxꓼcolorꓽʻʻcolorʼʼˈʾ:''
         
     calendar:
         label: 'Calendar',  router: {}
-        jade: -> slice ".row|>#container-calendar|>.scrollspy#top top|#items|.scrollspy#bottom bottom"
+        jade: ᛡ ꓸrow:ǂcontainerـcalendar:{ꓸscrollspyǂtop:'top', ǂitems:'', ꓸscrollspyǂbottom:'bottom'}
         rendered: ->
-            console.log 'rendered'
             $scrollspy = $('.scrollspy')
             $scrollspy.scrollSpy()
             $scrollspy.on 'scrollSpy:enter', -> 
@@ -117,31 +82,31 @@ module.exports.index =
             calendar month_year, $('#'+month_year), 'tile'
             $('.title').attr('contenteditable', 'true')
             $('.event').attr('contenteditable', 'true')
-        styl: -> slice '''#container-calendar|>width 1180px|max-width 1180px ~
-            |<.tile|>width 160px|height 160px|float left|padding 8px|border 1px|background-color white|margin 2px ~
-            |<h2|>color black|margin-top 1000px|display block ~
-            |<.month|>display block|<.break|>display block|height 160px|width 1px'''
-
+        styl: ᛡ 
+            h2:{color:'black',marginـtop:1000,display:'block'} 
+            ǂcontainerـcalendar:{width: 1180, maxـwidth: 1180}
+            ꓸtile:{width:160,height:160,float:'left',padding:8,border:1,backgroundـcolor:'white',margin:2}            
+            ꓸbreak:{display:'block',height:160,width:1},ꓸmonth:display:'block'
     day:
-        jade: -> slice '.date {{date}}|.day {{day}}|.title Title|.event Event'
+        jade: ᛡlist 'date day title event'
         helpers:
-            events: -> [{}]
             date: -> moment(@date_str, 'YYYYMMDD').format('D')
             day:  -> moment(@date_str, 'YYYYMMDD').format('ddd')
             title: -> db.Title.find({id:@id})
             event: -> db.Event.find({id:@id})
-        styl: -> slice '''.date|>display:inline|font-weight 600|margin-right 10px ~
-            |<.day|>display inline|margin-right 10px|<.event|>margin-top 10px|margin-left 5px ~
-            |<.title|>display inline|contenteditable true'''
+        styl: ᛡ
+            ꓸdate:  {display:'inline', marginـright:10, fontـweight:'600'}
+            ꓸday:   {display:'inline', marginـright:10}
+            ꓸtitle: {display:'inline'}
+            ꓸevent: {marginـtop:10, marginـleft:5}
 
     help:
         label: 'Help',   router: {}
-        jade: -> slice ".row|>.h2 Debug|<.row#help"
+        jade: ᛡ ꓸrow:h1:'Help',ꓸrowǂhelp:''
         rendered: -> $help = $ '#help'
 
     footer: 
-        jade: -> slice ".footer|>.content|>.row|>center © 2009 - 2014 Startup Edmonton ❘ 301 - 10359 104 Street, Edmonton, Alberta T5J 1B9 ❘ hello@startupedmonton.com"
-        styl: -> slice ".footer|>background-color #d9d9d9|padding-top 50px|padding-bottom 20px"
-
+        jade: ᛡ ꓸfooter:ꓸcontent:ꓸrow:center:'© 2009 - 2014 Startup Edmonton ❘ 301 - 10359 104 Street, Edmonton, Alberta T5J 1B9 ❘ hello@startupedmonton.com'
+        styl: ᛡ ꓸfooter:{backgroundـcolor:'#ddd',paddingـtop:50,paddingـbottom:20}
 
             

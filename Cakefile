@@ -195,14 +195,15 @@ build = () ->
         data = ($$.header || '') + (((Object.keys Pages).map (module) ->
             (((Object.keys Pages[module]).map (page) ->
                 if block = func$str(Pages[module][page][kind])
-                    #console.log "#{module}:#{page}:#{kind}\n[#{block}]\n" 
                     $$.format.call @, page, indent block, $$.indent 
+                #console.log "#{module}:#{page}:#{kind}\n[#{block}]\n" 
             ).filter (o) -> o?).join ''
         ).filter (o) -> o?).join ''
-        fs.readFile $$.file, (err, d) -> if md5(data) != md5 d
-            console.log $$.file
-            fs.writeFile $$.file, data, (err) ->
-                if err then console.log err else undefined
+        fs.readFile $$.file, (err, d) -> 
+            if md5(data) != md5 d
+                fs.writeFile $$.file, data, (err) ->
+                    console.log if err then err else $$.file
+
 
 task 'watch',   'Start the server',           -> start_up()
 task 'config',  'Compile config file.',       -> configure()

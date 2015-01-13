@@ -14,13 +14,14 @@ run ./install.sh
 - Server side rendering
 - random ID generator
 - stylesheet 
-- ~watch config file 'cake config'~
-- ~watch lib files 'cake sync'~
+- ~~watch config file 'cake config'~~
+- ~~watch lib files 'cake sync'~~
 - Style, theme clean up.
 - Automated page listing.
 - Form generator.
 - merge files in client
 - dialog
+- subscribe/publish
 - use exteral mongo db
 
     Host codio
