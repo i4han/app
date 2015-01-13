@@ -1,3 +1,14 @@
+getMenu = (Config, Pages) ->
+    _ = require 'underscore'
+    _.templateSettings = interpolate: /\[(.+?)\]/g
+    index = Pages[Config.index_file]
+    menu = index.layout.navbar.menu
+    ((if 'string' == typeof menu then menu.split ' ' 
+    else if Array.isArray(menu) then menu else []).map (a) -> 
+        ( _.template """            li: a(href="{{pathFor '[path]'}}" id='[id]') [label]""" )
+            path:a, label:index[a].label, id:'navbar-menu'
+    ).join '\n'
+
 module.exports.menu =
 
     menu_list:
@@ -8,21 +19,13 @@ module.exports.menu =
 
     navbar:                                    # seperate menu_list and navbar
         jade: (Config) ->
-            _ = require 'underscore'
-            _.templateSettings = interpolate: /\[(.+?)\]/g
-            menu_str = ''
-            console.log @Pages.index.layout.navbar.menu
-            index = @Pages[Config.index_file]
-            menu = index.layout.navbar.menu
-            menu and menu.forEach (a) -> 
-                menu_str += ( _.template """            li: a(href="{{pathFor '[path]'}}" id="[id]") [label]\n""" )
-                    path:a, label:index[a].label, id:'navbar-menu'                
+            menu = getMenu(@C, @Pages)
             """
-            .navbar.navbar-default.navbar-#{Config.$.navbar.style}: .container
+            .navbar.navbar-default.navbar-#{@C.$.navbar.style}: .container
                 .navbar-left 
                     ul.nav.navbar-nav
                         li: a#menu-toggle: i.fa.fa-bars
-            #{menu_str}
+            #{menu}
                 .navbar-right
                     +login
             """

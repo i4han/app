@@ -1,7 +1,7 @@
 #!/usr/bin/env coffee
 
 
-repcode = -> ('ᛡ* ᐩ+ ǂ# ꓸ. , ـ- ᚚ= ꓽ: ꓼ; ˈ\' ˮ" ʿ( ʾ) ʻ{ ʼ}'.split ' ').reduce ((o,v) -> o[v[1..]]=///#{v[0]}///g; o), {' ':/ˌ/g}
+repcode = -> ('ᛡ* ᐩ+ ᐟ/ ǂ# ꓸ. ꓹ, ـ- ᚚ= ꓽ: ꓼ; ˈ\' ˮ" ᐸ< ᐳ> ʿ( ʾ) ʻ{ ʼ}'.split ' ').reduce ((o,v) -> o[v[1..]]=///#{v[0]}///g; o), {' ':/ˌ/g}
 
 parseValue = (value) ->
     if      'number'   == typeof value then value.toString() + 'px'
@@ -28,7 +28,7 @@ slice = (str) -> @_.slice str
 sidebar = (list, id='sidebar_menu') ->
     jade: -> @_.slice "each items|>+menu_list"
     helpers: 
-        items: -> list.map (a) -> { page:a, id:id } # correct - id must unique.
+        items: -> list.map (a) -> { page:a, id:id } # ̵̵̵correct - id must unique.
 
 assignPopover = (o,v) -> 
     o['focus input#'+v] = -> 
