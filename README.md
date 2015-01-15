@@ -11,18 +11,25 @@ run ./install.sh
 - ~~dsync into Cakefile~~
 - ~~accounts.coffee, transfer accounts.js to coffee~~
 - ~~side menu~~
-- Server side rendering
-- random ID generator
-- stylesheet 
 - ~~watch config file 'cake config'~~
 - ~~watch lib files 'cake sync'~~
-- Style, theme clean up.
-- Automated page listing.
-- Form generator.
+- scrollspy, contentEditable to header
+- _id management jquery .data
+- subscribe/publish
+- $db, $cfg, $tmpl and $_.
 - merge files in client
 - dialog
-- subscribe/publish
+- change main menu when you log in
 - use exteral mongo db
+- library in lib
+- structured id generator
+- data model
+- Style, theme, color selector, size selector 
+- Internationalization, language, message files
+- Form generator. jquery muliselect, slide, card form
+- Server side rendering
+- Automated page listing.
+
 
     Host codio
         Hostname ssh2.codio.com
