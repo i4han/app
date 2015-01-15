@@ -1,10 +1,8 @@
-#App
-
-Meteor app
+#Satellite
+A webapp development framework written in CoffeeScript based on Meteor.
 
 ##Install
-Codio
-run ./install.sh
+$ ./install.sh
 
 ##Todo
 - ~~Restructure bin, app, module, etc, home directories~~
@@ -24,8 +22,6 @@ run ./install.sh
 - subscribe/publish
 - use exteral mongo db
 
-    Host codio
-        Hostname ssh2.codio.com
-        Port 6405
-        User codio
-        RemoteForward 8080 127.0.0.1:52698
+##License
+Non-commercial, personal, or open source projects and applications, you may use under the terms of the GPL v3 License. Commercial project and application,
+a commercial license is required. If you are paid to do your project using this software, a commercial license is required.
