@@ -43,7 +43,7 @@ module.exports.index =
     layout: 
         jade: ᛡ ᐩnavbar:'', ǂwrapper: {ǂcontentـwrapper: ꓸcontainerـfluid: ᐩyield:''}, ᐩfooter:''
         styl: ᛡ body: backgroundـcolor: '#ccc'
-        navbar: sidebar: true, login: true, menu: 'home calendar help'.split ' '
+        navbar: sidebar: true, login: true, menu: 'home calendar help'
 
     home:
         label: 'Home',  router: path: '/'  
@@ -52,7 +52,7 @@ module.exports.index =
         rendered: -> $('#pack').masonry itemSelector: '.item', columnWidth: 126
         helpers: items: -> db.Items.find {}, sort: created_time: -1
 
-    item: jade: ᛡ ꓸitemʿstyleᚚˈheightꓽʻʻheightʼʼpxꓼcolorꓽʻʻcolorʼʼˈʾ:''
+    item: jade: ".item(style='height:{{height}}px;color:{{color}}')" # ᛡ ꓸitemʿstyleᚚˈheightꓽʻʻheightʼʼpxꓼcolorꓽʻʻcolorʼʼˈʾ:'' # 
         
     calendar:
         label: 'Calendar',  router: {}
@@ -67,21 +67,17 @@ module.exports.index =
                     $('#items').prepend("<div class=month id=#{month_year}></div>")
                     $('html, body').animate({ scrollTop: 500 }, 0)
                     calendar month_year, $('#'+month_year), 'tile'
-                    $('.title').attr('contenteditable', 'true')
-                    $('.event').attr('contenteditable', 'true')
-
+                    ['title','event'].forEach (s) -> $('.' + s).attr('contenteditable', 'true')
                 else if 'bottom' == $(@).attr 'id'
                     month_year = moment($('#bottom').prev().children().last().attr('id'),'YYYYMM').add(1, 'month').format('YYYYMM')
                     console.log 'bottom', month_year
                     $('#items').append("<div class=month id=#{month_year}></div>")
                     calendar month_year, $('#'+month_year), 'tile'
-                    $('.title').attr('contenteditable', 'true')
-                    $('.event').attr('contenteditable', 'true')
+                    ['title','event'].forEach (s) -> $('.' + s).attr('contenteditable', 'true')
             month_year = moment().format('YYYYMM')
             $('#items').append("<div class=month id=#{month_year}></div>")
             calendar month_year, $('#'+month_year), 'tile'
-            $('.title').attr('contenteditable', 'true')
-            $('.event').attr('contenteditable', 'true')
+            ['title','event'].forEach (s) -> $('.' + s).attr('contenteditable', 'true')
         styl: ᛡ 
             h2:{color:'black',marginـtop:1000,display:'block'} 
             ǂcontainerـcalendar:{width: 1180, maxـwidth: 1180}
@@ -92,8 +88,8 @@ module.exports.index =
         helpers:
             date: -> moment(@date_str, 'YYYYMMDD').format('D')
             day:  -> moment(@date_str, 'YYYYMMDD').format('ddd')
-            title: -> db.Title.find({id:@id})
-            event: -> db.Event.find({id:@id})
+            title: -> db.Title.find({id:@id}) ; 'Title'
+            event: -> db.Event.find({id:@id}) ; 'Event'
         styl: ᛡ
             ꓸdate:  {display:'inline', marginـright:10, fontـweight:'600'}
             ꓸday:   {display:'inline', marginـright:10}
