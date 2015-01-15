@@ -31,4 +31,4 @@ $ ./install.sh
 
 ##License
 Non-commercial, personal, or open source projects and applications, you may use under the terms of the GPL v3 License. Commercial project and application,
-a commercial license is required. If you are paid to do your project using this software, a commercial license is required.
+a commercial license is required.

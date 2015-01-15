@@ -1,5 +1,5 @@
 
-site = process.env.site or 'calendar'
+site = process.env.site or 'star'
   
 fs       = require 'fs'
 path     = require 'path'

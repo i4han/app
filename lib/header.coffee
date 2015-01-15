@@ -23,6 +23,13 @@ parseValue = (value) ->
     else if Array.isArray(what) then what else [])
         .map (a) -> ".#{a} {{#{a}}}").join '\n'
 
+scrollspy = (obj) ->
+    $scrollspy = $ '.scrollspy'
+    $scrollspy.scrollSpy()
+    ['enter', 'exit'].forEach (a) ->
+        $scrollspy.on 'scrollSpy:' + a, -> obj[a][$(@).attr 'id']() if obj[a]?
+
+
 slice = (str) -> @_.slice str
 
 sidebar = (list, id='sidebar_menu') ->
