@@ -96,18 +96,16 @@ clean_up = ->
 start_up = ->
     sync()  if ! fs.existsSync Config.sync_dir  
     build() if ! fs.existsSync Config.client_dir  # check better than this.
-    chokidar.watch Config.build_dir, persistent:true
-        .on 'change', (file) -> build()
-        .on 'add',    (file) -> build()
-    (local.modules)    .map (file) ->
+    
+    [Config.index_module, Config.header_source].concat(local.other_files).map (file) ->
+        chokidar.watch Config.site_dir  + file + '.coffee', persistent:true
+            .on 'change', (file) -> touch()
+    local.modules.map (file) ->
         chokidar.watch Config.module_dir + file + '.coffee', persistent:true
             .on 'change', (file) -> build()
     ['config_source', 'local_source', 'theme_source'].map (a) ->
         chokidar.watch Config[a], persistent:true
             .on 'change', (file) -> configure()
-    [Config.index_module, Config.header_source].concat(local.other_files).map (file) ->
-        chokidar.watch Config.site_dir  + file + '.coffee', persistent:true
-            .on 'change', (file) -> touch()
 
     meteor()
 
@@ -170,8 +168,7 @@ touch = () ->
                     coffee head
                     coffee data
                     fs.writeFile Config.build_dir + file + '.coffee', head + data, (err) ->
-                        console.log err if err
-
+                        if err then console.log err else build()
 
 build = () ->
     func$str = (what) ->

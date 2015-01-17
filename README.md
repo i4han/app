@@ -11,8 +11,9 @@ $ ./install.sh
 - ~~side menu~~
 - ~~watch config file 'cake config'~~
 - ~~watch lib files 'cake sync'~~
-- scrollspy, contentEditable to header
+- ~~scrollspy, contentEditable to header~~
 - _id management jquery .data
+- db id management
 - subscribe/publish
 - $db, $cfg, $tmpl and $_.
 - merge files in client
