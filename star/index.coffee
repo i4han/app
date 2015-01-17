@@ -1,62 +1,46 @@
 #
-eventListener = ->
-    $('.tile').on 'change', (obj, class_, id, content) ->
-        console.log 'Listener', class_, id, content
-        if 'title' == class_
-            console.log 'title', db.Title.find({id:id})
-            if db.Title.find({id:id}) then db.Title.update(id:id, $set:{content: content})
-            else db.Title.insert(id:id, content:content)
-        else if 'event' == class_
-            console.log 'event', db.Event.find({id:id})
-            if db.Event.find({id:id}) then db.Event.update({id:id, $set:{content: content}})
-            else db.Event.insert({id:id, content:content})
-
-contentEditable = (id) ->
-    $('#' + id)
-        .on 'focus', '[contenteditable]', -> $(@).data 'before', $(@).html() ; $(@)
-        .on 'blur keyup paste input', '[contenteditable]', ->
-            if $(@).data('before') isnt $(@).html()
-                $(@).data 'before', $(@).html()
-                console.log 'Editable', $this.parent(), class_, id, content 
-                id = $(@).parent().attr('id')
-                content = $(@).html()
-                class_ = $(@).attr('class')
-                $(@).parent().trigger('change', [class_, id, content] )
-            $(@)
 
 ø = ''
-YM = 'YYYYMM'
+format_YM = 'YYYYMM'
 
 scrollspyEvents =
     enter:
         top: ->
-            month_year = moment($('#top').next().children().first().attr('id'),YM).subtract(1, 'month').format(YM)
-            console.log 'top', month_year
-            $('#items').prepend("<div class=month id=#{month_year}></div>")
+            month_year = moment($('#top').next().children().first().attr('id'),format_YM).subtract(1, 'month').format(format_YM)
+            $('#items').prepend DIV class:'month', id:month_year
             $('html, body').animate({ scrollTop: 500 }, 0)
-            calendar month_year, $('#'+month_year), 'tile'
+            calendar month_year, 'tile'
             ['title','event'].forEach (s) -> $('.' + s).attr('contenteditable', 'true')
         bottom: ->
-            month_year = moment($('#bottom').prev().children().last().attr('id'),YM).add(1, 'month').format(YM)
-            console.log 'bottom', month_year
-            $('#items').append("<div class=month id=#{month_year}></div>")
-            calendar month_year, $('#'+month_year), 'tile'
+            month_year = moment($('#bottom').prev().children().last().attr('id'),format_YM).add(1, 'month').format(format_YM)
+            $('#items').appendDIV class:'month', id:month_year
+            calendar month_year, 'tile'
             ['title','event'].forEach (s) -> $('.' + s).attr('contenteditable', 'true')
 
+edited = (_id) ->
+    id = $(_id).parent().attr('id')
+    content = $(_id).html()
+    class_ = $(_id).attr('class')
+    console.log 'edited', id, content
+    if 'title' == class_
+        console.log 'title', db.Title.find({id:id})
+        if db.Title.find({id:id}) then db.Title.update(id:id, $set:{content: content})
+        else db.Title.insert(id:id, content:content)
+    else if 'event' == class_
+        console.log 'event', db.Event.find({id:id})
+        if db.Event.find({id:id}) then db.Event.update({id:id, $set:{content: content}})
+        else db.Event.insert({id:id, content:content})
 
-calendar = (month_year, jquery, class_str) ->
-
-    jquery.append HTML.toHTML HTML.H2 id:month_year, moment(month_year, YM).format('MMMM YYYY')    
-    [1..parseInt(moment(month_year, YM).startOf('month').format 'd')].forEach (i) ->
-        jquery.append HTML.toHTML HTML.DIV class:class_str + ' empty'
-    $('.empty').css 'visibility', 'hidden' 
-    [1..parseInt(moment(month_year, YM).endOf('month').format 'D')].forEach (i) ->        
+calendar = (month_year, class_str) ->
+    $id = $ '#' + month_year
+    $id.append H2 id:month_year, moment(month_year, format_YM).format('MMMM YYYY')    
+    [1..parseInt(moment(month_year, format_YM).startOf('month').format 'd')].forEach (i) ->
+        $id.append DIV class:class_str + ' empty', style:'visibility:hidden'
+    [1..parseInt(moment(month_year, format_YM).endOf('month').format 'D')].forEach (i) ->        
         id = 'day-' + (day_id = month_year + (DD = ('0' + i.toString()).substr -2, 2))
-        console.log 'id', id
-        jquery.append HTML.toHTML HTML.DIV id:id, class:class_str, ø
+        $id.append DIV id:id, class:class_str, ø
         __.insertTemplate 'day', id, {date_str:day_id}
-        contentEditable(id)
-        eventListener()
+        contentEditable(id, edited)
 
 module.exports.index =
 
@@ -78,10 +62,10 @@ module.exports.index =
         label: 'Calendar',  router: {}
         jade: ᛡ ꓸrow:ǂcontainerـcalendar:{ꓸscrollspyǂtop:'top', ǂitems:ø, ꓸscrollspyǂbottom:'bottom'}
         rendered: -> 
-            scrollspy scrollspyEvents
-            month_year = moment().format(YM)
-            $('#items').append("<div class=month id=#{month_year}></div>")
-            calendar month_year, $('#'+month_year), 'tile'
+            scrollSpy scrollspyEvents
+            month_year = moment().format(format_YM)
+            $('#items').append DIV class:'month', id:month_year
+            calendar month_year, 'tile'
             ['title','event'].forEach (s) -> $('.' + s).attr('contenteditable', 'true')
         styl: ᛡ 
             h2:{color:'black',marginـtop:1000,display:'block'} 

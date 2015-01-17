@@ -23,7 +23,22 @@ parseValue = (value) ->
     else if Array.isArray(what) then what else [])
         .map (a) -> ".#{a} {{#{a}}}").join '\n'
 
-scrollspy = (obj) ->
+contentEditable = (id, func) ->
+    $('#' + id)
+        .on 'focus', '[contenteditable]', -> $(@).data 'before', $(@).html() ; $(@)
+        .on 'blur keyup paste input', '[contenteditable]', ->
+            console.log $(@).data 'before', $(@).html()
+            if $(@).data('before') isnt $(@).html()
+                console.log 'edited'
+                func(@)
+            $(@)
+
+('DIV H2'.split ' ').forEach (a) ->
+    html_scope = {}
+    html_scope = window if window?
+    html_scope[a] = (obj, str) -> HTML.toHTML HTML[a] obj, str
+
+scrollSpy = (obj) ->
     $scrollspy = $ '.scrollspy'
     $scrollspy.scrollSpy()
     ['enter', 'exit'].forEach (a) ->
