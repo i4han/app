@@ -4,7 +4,6 @@
 # but you can also edit it by hand.
 
 standard-app-packages
-insecure
 less
 coffeescript
 stylus
@@ -20,3 +19,4 @@ fortawesome:fontawesome
 masonry
 scrollspy
 momentjs:moment
+insecure

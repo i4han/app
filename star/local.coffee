@@ -6,7 +6,7 @@ local =
     index_file:  'index'
     other_files: []
     modules:     'accounts menu ui responsive' .split ' '
-    collections: 'connects items updates title event' .split ' '
+    collections: 'Connects Items Updates Calendar' .split ' '
     theme:       'clean'
 
 module.exports = local if !main?

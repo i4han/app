@@ -27,7 +27,16 @@ db.init = function () {
     _.each( db.collections, function (collection) {
         var Collection = __.capitalize(collection)
         if ( 'undefined' === typeof db[ Collection ] )
-            db[ Collection ] = new Meteor.Collection(collection);
+            db[Collection] = new Mongo.Collection(collection);
+            db[Collection].allow({
+                update: function (userId, doc, fields, modifier) { return true; }, 
+                remove: function (userId, doc) { return true; } 
+            });
+            db[Collection].deny({
+                update: function (userId, doc, fields, modifier) { return false; }, 
+                remove: function (userId, doc) { return false; } 
+            });
+            console.log(Collection, 'is allowed');
     });
 }
 

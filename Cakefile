@@ -49,6 +49,7 @@ profile = ->
         # .bashrc
         # This is created shell script. Edit Cakefile. 
 
+        export site=#{site}
         export WORKSPACE=#{work}      # no use
         export SITE=#{work}/#{site}   # include
         export BUILD=#{work}/#{site}/build
@@ -59,12 +60,12 @@ profile = ->
         export PATH=#{home}/node_modules/.bin:#{work}/bin:$PATH
         export NODE_PATH=#{home}/node_modules:#{Config.config_js_dir}:$BUILD
         export CDPATH=.:#{home}:$METEOR_APP
-        [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
-        export all="Cakefile install.sh lib/* site/*"
+        export all="#{work}/Cakefile #{work}/lib/header.coffee #{work}/#{site}/*.coffee"
         alias red='parts start redis'
         alias sul='rmate -p 8080'
         alias sal='find $all -type f -print0 | xargs -0 -I % rmate -p 8080 % +'
         alias refresh='. ~/.bashrc'
+        # [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
         """
     fs.writeFile home + '/.bashrc', file, (err) -> 
         if err then console.log err
@@ -97,8 +98,8 @@ start_up = ->
     sync()  if ! fs.existsSync Config.sync_dir  
     build() if ! fs.existsSync Config.client_dir  # check better than this.
     
-    [Config.index_module, Config.header_source].concat(local.other_files).map (file) ->
-        chokidar.watch Config.site_dir  + file + '.coffee', persistent:true
+    [Config.index_module, Config.header_source].map (file) ->
+        chokidar.watch file + '.coffee', persistent:true
             .on 'change', (file) -> touch()
     local.modules.map (file) ->
         chokidar.watch Config.module_dir + file + '.coffee', persistent:true

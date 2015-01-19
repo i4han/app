@@ -2,6 +2,16 @@
 
 String::toDash = -> @.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase()
 
+extend = ($source, $target) ->
+    ('display float resize margin padding'.split ' ')
+    .concat('color backgroundColor border'.split ' ').forEach (a) ->          
+        $target.css(a, $source.css(a)) if $source.css(a)
+
+position = (obj) ->
+    Meteor.setTimeout ->
+        $('#'+obj.parentId+' .'+obj.class).css top:obj.top, left:obj.left, position:'absolute'
+    , 200
+
 repcode = -> ('ᛡ* ᐩ+ ᐟ/ ǂ# ꓸ. ꓹ, ـ- ᚚ= ꓽ: ꓼ; ˈ\' ᐦ" ᐸ< ᐳ> ʿ( ʾ) ʻ{ ʼ}'.split ' ').reduce ((o,v) -> o[v[1..]]=///#{v[0]}///g; o), {' ':/ˌ/g}
 
 parseValue = (value) ->
@@ -52,10 +62,8 @@ contentEditable = (id, func) ->
                     overflow: 'hidden'
                     outline:  'auto 5px -webkit-focus-ring-color'
                 $(@).before $cloned
-                console.log 'cloned'
             else
                 $cloned.html $(@).html()
-                console.log 'copied'
             console.log $cloned.css opacity: 1
             console.log $(@).css overflow:'visible', opacity: 0
             Meteor.setTimeout =>
@@ -65,10 +73,12 @@ contentEditable = (id, func) ->
                 200
 
 
-('DIV H2'.split ' ').forEach (a) ->
+('DIV H2 BR'.split ' ').forEach (a) ->
     html_scope = {}
     html_scope = window if window?
-    html_scope[a] = (obj, str) -> HTML.toHTML HTML[a] obj, str
+    html_scope[a] = (obj, str) -> 
+        if str? then HTML.toHTML HTML[a] obj, str
+        else         HTML.toHTML HTML[a] obj
 
 scrollSpy = (obj) ->
     $scrollspy = $ '.scrollspy'
@@ -95,45 +105,50 @@ popover = (list) -> list.reduce ((o, v) -> assignPopover o, v), {}
 #
 
 ø = ''
-format_YM = 'YYYYMM'
+ß = '&nbsp;'
+fym = 'YYYYMM'
+cal_addr = "https://docs.google.com/a/hi16.ca/presentation/d/1NFwUbKn6GhprK3ctcBA7h54t8SXycOzn8Qpm8rhAZYo/edit#slide=id.g4a9c01842_"
+cal_tag =
+    '201407':'049',  '201408':'033',  '201409':'041',  '201410':'022',  '201411':'02',   '201412':'014'
+    '201501':'057',  '201502':'065',  '201503':'073',  '201504':'081',  '201505':'089',  '201506':'097'
+    '201507':'0105', '201508':'0113', '201509':'0121', '201510':'0129'
 
-scrollspyEvents =
-    enter:
-        top: ->
-            month_year = moment($('#top').next().children().first().attr('id'),format_YM).subtract(1, 'month').format format_YM
-            $('#items').prepend DIV class:'month', id:month_year
-            $('html, body').animate { scrollTop: 500 }, 0
-            calendar month_year, 'tile'
-            ['title','event'].forEach (s) -> $('.' + s).attr 'contenteditable', 'true'
-        bottom: ->
-            month_year = moment($('#bottom').prev().children().last().attr('id'),format_YM).add(1, 'month').format format_YM
-            $('#items').append DIV class:'month', id:month_year
-            calendar month_year, 'tile'
-            ['title','event'].forEach (s) -> $('.' + s).attr 'contenteditable', 'true'
+gCal = {}
 
-edited = (_id) ->
-    id = $(_id).parent().attr('id')
-    content = $(_id).html()
-    switch $(_id).attr('class')
-        when 'title'
-            console.log 'title', db.Title.find({id:id})
-            if db.Title.find({id:id}) then db.Title.update(id:id, $set:{content: content})
-            else db.Title.insert(id:id, content:content)
-        when 'event'
-            console.log 'event', db.Event.find({id:id})
-            if db.Event.find({id:id}) then db.Event.update({id:id, $set:{content: content}})
-            else db.Event.insert({id:id, content:content})
+calendar = (id_ym) ->
+    action = if moment().format(fym) > id_ym then 'prepend' else 'append'
+    $('#items')[action](DIV class:'month', id:id_ym)
+    moment_ym = moment(id_ym, fym)
+    top = $(window).scrollTop()
 
-calendar = (month_year, class_str) ->
-    $id = $ '#' + month_year
-    $id.append H2 id:month_year, moment(month_year, format_YM).format('MMMM YYYY')    
-    [1..parseInt(moment(month_year, format_YM).startOf('month').format 'd')].forEach (i) ->
-        $id.append DIV class:class_str + ' empty', style:'visibility:hidden'
-    [1..parseInt(moment(month_year, format_YM).endOf('month').format 'D')].forEach (i) ->        
-        id = 'day-' + day_id = month_year + ('0' + i.toString()).substr -2, 2
-        $id.append DIV class:class_str, id:id
-        __.insertTemplate 'day', id, date_str:day_id
-        contentEditable id, edited
+    ($id = $ '#' + id_ym).append H2 id:id_ym, moment_ym.format 'MMMM YYYY'    
+    [1..parseInt moment_ym.startOf('month').format 'd'].forEach (i) ->
+        $id.append DIV class:'everyday empty', style:'visibility:hidden'
+    [1..parseInt moment_ym  .endOf('month').format 'D'].forEach (i) ->        
+        $id.append DIV class:'everyday', id:id = id_ym + ('0' + i)[-2..]
+        __.insertTemplate 'day', id, id:id
+        contentEditable id, (_id) ->
+            id = $(_id).parent().attr 'id'
+            content = $(_id).html()
+            switch $(_id).attr 'class'
+                when 'title'
+                    console.log 'title', id, content 
+                    if doc = db.Calendar.findOne({id:id})
+                        db.Calendar.update(_id:doc._id, $set:{title:content, event:doc.event})
+                    else 
+                        db.Calendar.insert id:id, title:content
+                when 'event'
+                    console.log 'event', id, content
+                    if doc = db.Calendar.findOne({id:id})
+                        db.Calendar.update(_id:doc._id, $set:{title:doc.title, event:content})
+                    else 
+                        db.Calendar.insert id:id, event:content
+        ['title','event'].forEach (s) -> $("##{id} > .#{s}").attr 'contenteditable', 'true'
+    if 'prepend' is action
+        Meteor.setTimeout ( -> $(window).scrollTop( top + $id.outerHeight())), 10
+        $('#top'   ).data id:id_ym
+    else
+        $('#bottom').data id:id_ym
 
 module.exports.index =
 
@@ -142,7 +157,7 @@ module.exports.index =
             ᐩnavbar:ø
             ǂwrapper: ǂcontentWrapper: ꓸcontainerFluid: ᐩyield:ø
             ᐩfooter:ø
-        styl: o body: backgroundColor: '#ccc'
+        styl: o body: backgroundColor: '#ddd'
         navbar: sidebar: true, login: true, menu: 'home calendar help'
 
     home:
@@ -150,39 +165,58 @@ module.exports.index =
         jade: o 
             ꓸrow:ꓸcolـmdـ8:h1:'Event Calendar'
             ꓸrowǂitems:ꓸcolـmdـ12ǂpack:eachˌitems:ᐩitem:ø
-        styl: o ǂitemsˌꓸitem:backgroundColor:'white', width:240, height:240, float:'left', border:1, margin:6
+        styl: o ǂitemsˌꓸitem:backgroundColor:'white', width:240, height:240, float:'left', margin:6
         rendered: -> $('#pack').masonry itemSelector: '.item', columnWidth: 126
         helpers: items: -> db.Items.find {}, sort: created_time: -1
 
-    item: jade: ".item(style='height:{{height}}px;color:{{color}}')" # ᛡ ꓸitemʿstyleᚚˈheightꓽʻʻheightʼʼpxꓼcolorꓽʻʻcolorʼʼˈʾ:'' # 
+    item: jade: ".item(style='height:{{height}}px;color:{{color}}')" 
         
     calendar:
         label: 'Calendar',  router: {}
-        jade: o ꓸrow:ǂcontainerCalendar:ꓸscrollspyǂtop:'top', ǂitems:ø, ꓸscrollspyǂbottom:'bottom'
+        jade: o ꓸrow:ǂcontainerCalendar:ꓸscrollspyǂtop:ß, ǂitems:ø, ꓸscrollspyǂbottom:ß
+        created: ->
+            func = (month, tag) ->
+                $.get cal_addr + tag, (data) ->
+                    (data.match /"[0-9]{1,2}[^0-9a-zA-Z."][^"]*"/g).forEach (str) ->
+                        str.replace s, r for r, s of '\n':/\\u000b/, '\n':/\n+/
+                        if (a = str.split '\n').length > 1
+                            console.log a
+                            gCal[month + ('0' + a[0])[-2..]] = (a[1..]).join '\n'
+            # func(month, tag) for month, tag of cal_tag
+
         rendered: -> 
-            scrollSpy scrollspyEvents
-            month_year = moment().format format_YM
-            $('#items').append DIV class:'month', id:month_year
-            calendar month_year, 'tile'
-            ['title','event'].forEach (s) -> $('.' + s).attr 'contenteditable', 'true'
+            calendar this_month = moment().format fym
+            $('#top').data id:this_month
+            scrollSpy enter:
+                top:    -> calendar moment($('#top'   ).data('id'), fym).subtract(1, 'month').format fym
+                bottom: -> calendar moment($('#bottom').data('id'), fym).add(     1, 'month').format fym
         styl: o 
-            h2:color:'black', marginTop:1000, display:'block' 
             ǂcontainerCalendar:width: 1180, maxWidth: 1180
-            ꓸtile:width:160, height:160, float:'left', padding:8, border:1, backgroundColor:'white', margin:2           
-            ꓸbreak:display:'block', height:160, width:1
-            ꓸmonth:display:'block'
+            h2:   color:'black', display:'block' 
+            ꓸeveryday: position: 'relative', width:160, height:160, float:'left', padding:8, backgroundColor:'white', margin:2           
+            ꓸmonth:    display:'block', height:1180
+            ꓸspacer:   lineHeight: 10
     day:
-        jade: o_list 'date day title event'
+        collection: 'calendar'
+        jade: o_list 'init title date day event'
         helpers:
-            date:  -> moment(@date_str, 'YYYYMMDD').format 'D'
-            day:   -> moment(@date_str, 'YYYYMMDD').format 'ddd'
-            title: -> db.Title.find({id:@id}) ; 'Title'
-            event: -> db.Event.find({id:@id}) ; 'Event'
+            date:  -> moment(@id, 'YYYYMMDD').format 'D'
+            day:   -> moment(@id, 'YYYYMMDD').format 'ddd'
+            title: -> db.Calendar.findOne({id:@id})?['title'] or 'Title'
+            event: -> gCal[@id] or ''
+            init:  ->
+                position parentId:@id, class:'title', top:14,
+                position parentId:@id, class:'event', top:45,
+                position parentId:@id, class:'date',  top: 5, left:(160 - 35)
+                position parentId:@id, class:'day',   top:28, left:(160 - 37)
+                ø
         styl: o
-            ꓸdate:  display:'inline', marginRight:10, fontWeight:'600'
-            ꓸday:   display:'inline', marginRight:10
-            ꓸtitle: display:'inline'
-            ꓸevent: marginTop:10, marginLeft:5
+            ꓸinit:  display:'none'
+            ꓸtitle: display:'inline', fontWeight:'100'               
+            ꓸdate:  display:'inline', fontWeight:'600', fontSize:'14pt', width:24, textAlign:'right'
+            ꓸday:   display:'table',  fontWeight:'100', float:'right', width:24, textAlign:'right', color:'#444',  fontSize: '8pt'
+            ꓸevent: resize:'none',    fontWeight:'100'
+            ꓸrowǂday01: marginBottom:0
 
     help:
         label: 'Help',   router: {}

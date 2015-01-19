@@ -2,6 +2,16 @@
 
 String::toDash = -> @.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase()
 
+extend = ($source, $target) ->
+    ('display float resize margin padding'.split ' ')
+    .concat('color backgroundColor border'.split ' ').forEach (a) ->          
+        $target.css(a, $source.css(a)) if $source.css(a)
+
+position = (obj) ->
+    Meteor.setTimeout ->
+        $('#'+obj.parentId+' .'+obj.class).css top:obj.top, left:obj.left, position:'absolute'
+    , 200
+
 repcode = -> ('ᛡ* ᐩ+ ᐟ/ ǂ# ꓸ. ꓹ, ـ- ᚚ= ꓽ: ꓼ; ˈ\' ᐦ" ᐸ< ᐳ> ʿ( ʾ) ʻ{ ʼ}'.split ' ').reduce ((o,v) -> o[v[1..]]=///#{v[0]}///g; o), {' ':/ˌ/g}
 
 parseValue = (value) ->
@@ -52,10 +62,8 @@ contentEditable = (id, func) ->
                     overflow: 'hidden'
                     outline:  'auto 5px -webkit-focus-ring-color'
                 $(@).before $cloned
-                console.log 'cloned'
             else
                 $cloned.html $(@).html()
-                console.log 'copied'
             console.log $cloned.css opacity: 1
             console.log $(@).css overflow:'visible', opacity: 0
             Meteor.setTimeout =>
@@ -65,10 +73,12 @@ contentEditable = (id, func) ->
                 200
 
 
-('DIV H2'.split ' ').forEach (a) ->
+('DIV H2 BR'.split ' ').forEach (a) ->
     html_scope = {}
     html_scope = window if window?
-    html_scope[a] = (obj, str) -> HTML.toHTML HTML[a] obj, str
+    html_scope[a] = (obj, str) -> 
+        if str? then HTML.toHTML HTML[a] obj, str
+        else         HTML.toHTML HTML[a] obj
 
 scrollSpy = (obj) ->
     $scrollspy = $ '.scrollspy'
