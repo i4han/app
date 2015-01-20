@@ -53,6 +53,7 @@ profile = ->
         export WORKSPACE=#{work}      # no use
         export SITE=#{work}/#{site}   # include
         export BUILD=#{work}/#{site}/build
+        export MONGO_URL=mongodb://localhost:7017/meteor
         export MODULE_LIB=#{work}/lib
         export METEOR_APP=#{work}/app
         export METEOR_LIB=$METEOR_APP/lib
@@ -61,10 +62,11 @@ profile = ->
         export NODE_PATH=#{home}/node_modules:#{Config.config_js_dir}:$BUILD
         export CDPATH=.:#{home}:$METEOR_APP
         export all="#{work}/Cakefile #{work}/lib/header.coffee #{work}/#{site}/*.coffee"
-        alias red='parts start redis'
         alias sul='rmate -p 8080'
         alias sal='find $all -type f -print0 | xargs -0 -I % rmate -p 8080 % +'
         alias refresh='. ~/.bashrc'
+        alias mng='mongo --port 7017'
+        #alias red='parts start redis'
         # [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
         """
     fs.writeFile home + '/.bashrc', file, (err) -> 
@@ -72,8 +74,7 @@ profile = ->
         else console.log file
 
 {spawn, exec} = require 'child_process'
-redis = (func) ->
-    exec 'parts start redis', (err, stdout, stderr) -> func() if func
+# redis = (func) -> exec 'parts start redis', (err, stdout, stderr) -> func() if func
 
 meteor = ->
     cd Config.meteor_dir
@@ -208,7 +209,7 @@ task 'config',  'Compile config file.',       -> configure()
 task 'clean',   'Remove generated files',     -> clean_up()
 task 'setup',   'Config and prepare profile', -> configure() ; profile()
 task 'reset',   'Reset files',                -> configure(); clean_up(); sync(); touch(); build()    
-task 'redis',   'Start redis',                -> redis()
+# task 'redis',   'Start redis',                -> redis()
 task 'profile', 'Make shell profile',         -> profile()
 task 'sync',    'Sync source to meteor client files.', -> sync()
 task 'touch',   'Compile site files.',        -> touch()

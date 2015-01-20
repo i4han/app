@@ -100,7 +100,7 @@ local = {}
 
     auto_generated_files: []
     init: ->
-        @redis = {}
+#        @redis = {}
         if !Meteor? or Meteor.isServer
             @meteor_dir    = main.meteor_dir
             @index_file    = local.index_file
@@ -218,10 +218,11 @@ local = {}
     toReturn
 
 @__.log = (arg) ->
-    if this.Config.redis.connected
-        this.Config.redis.rpush( 'log', arg + '' );
-    else
-        console.log( arg + '' );
+     console.log( arg + '' );
+
+#    if this.Config.redis.connected
+#        this.Config.redis.rpush( 'log', arg + '' );
+#    else
 
 if !Meteor?
     module.exports =
