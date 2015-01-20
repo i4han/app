@@ -73,8 +73,7 @@ profile = ->
         # [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
         """
     fs.writeFile home + '/.bashrc', data, (err) -> 
-        if err then log err
-        else log file
+        if err then log err else log file
 
 install = ->
     data = """
@@ -107,8 +106,7 @@ install = ->
         EOF
         """
     fs.writeFile file = work + '/install.sh', data, (err) -> 
-        if err then log err
-        else fs.chmod file, 0o755, (err) ->
+        if err then log err else fs.chmod file, 0o755, (err) ->
             if err then log err else log data
 
 logconf = ->
@@ -234,8 +232,7 @@ indent = (block, indent) ->
     if indent then block.replace /^/gm, Array(++indent).join Config.indent_string else block
 
 touch = () ->
-    log Config.site_dir
-    log Config.build_dir
+    log Config.site_dir, Config.build_dir
     mkdir Config.build_dir
     fs.readFile Config.header_source, 'utf8', (err, head) ->
         if err then log err
@@ -258,8 +255,7 @@ build = () ->
         else if 'string'   == typeof what then what
         else if 'function' == typeof what then what.call(@, @C, @_)
 
-    log Config.index_module
-    log Config.target_dir
+    log Config.index_module, Config.target_dir
     mkdir Config.target_dir
     Pages = ((fs.readdirSync Config.build_dir).map (file) -> 
         require Config.build_dir + file).concat(
@@ -276,9 +272,8 @@ build = () ->
             ).filter (o) -> o?).join ''
         ).filter (o) -> o?).join ''
         fs.readFile $$.file, (err, d) -> 
-            if md5(data) != md5 d
-                fs.writeFile $$.file, data, (err) ->
-                    log if err then err else $$.file
+            (md5(data) != md5 d) and fs.writeFile $$.file, data, (err) ->
+                log if err then err else $$.file
 
 # task 'redis',   'Start redis',                -> redis()
 gitpass = ->
