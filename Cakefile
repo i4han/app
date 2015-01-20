@@ -65,6 +65,7 @@ profile = ->
         alias sul='rmate -p 8080'
         alias sal='find $all -type f -print0 | xargs -0 -I % rmate -p 8080 % +'
         alias refresh='. ~/.bashrc'
+        alias mngd='mongod --port 7017 --dbpath ~/data &'
         alias mng='mongo --port 7017'
         #alias red='parts start redis'
         # [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis

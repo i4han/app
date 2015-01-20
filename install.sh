@@ -21,9 +21,6 @@ do
 done
 
 [ -d ~/data ] || mkdir ~/data
-mongod --port 7017 --dbpath ~/data <<EOF # port should be 27017 but codio opens only 4999~9999
-use meteor
-EOF
 
 $NODE_MODULES/.bin/coffee -c --bare lib/config.coffee > app/packages/sat/config.js
 
@@ -39,3 +36,6 @@ cake setup
 . ~/.bashrc
 cd app
 meteor update
+mongod --port 7017 --dbpath ~/data <<EOF & # port should be 27017 but codio opens only 4999~9999
+use meteor
+EOF
