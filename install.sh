@@ -1,24 +1,20 @@
 #!/usr/bin/env bash
 
 for i in meteor mongodb
-do
-    [[ `parts list` =~ $i ]] || parts install $i
-done
+do [[ `parts list` =~ $i ]] || parts install $i; done
 
 NODE_MODULES=~/node_modules
 [ -d $NODE_MODULES ] || mkdir $NODE_MODULES
 
 # hiredis redis
-for j in coffee-script underscore express stylus fs-extra fibers mongodb chokidar node-serialize request event-stream prompt jade ps-node MD5 googleapis
+for j in coffee-script underscore express stylus fs-extra fibers mongodb chokidar node-serialize request event-stream prompt jade ps-node MD5 googleapis log.io
 do
     echo "Installing $j."
     npm install --prefix ~ $j
 done
 
 for k in rmate
-do
-    gem install $k
-done
+do gem install $k; done
 
 [ -d ~/data ] || mkdir ~/data
 

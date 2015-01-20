@@ -21,7 +21,7 @@ try
     local = require if Config? and Config.local_module? then Config.local_module 
     else work + '/' + site + '/local.coffee'
 catch e
-    console.log "local:#{local}:#{e}"
+    log "local:#{local}:#{e}"
     
 Config = { 
     index_file:    'index'
@@ -38,14 +38,14 @@ Config = {
     quit: -> {} 
 } if !Config? or 0 == Object.keys(Config).length
 
-local ={
+local = {
     index_file:  'index'
     modules:     'accounts menu ui responsive' .split ' '
     other_files: []
 } if !local? or 0 == Object.keys(local).length
 
 profile = ->
-    file = """
+    data = """
         # .bashrc
         # This is created shell script. Edit Cakefile. 
 
@@ -61,22 +61,98 @@ profile = ->
         export PATH=#{home}/node_modules/.bin:#{work}/bin:$PATH
         export NODE_PATH=#{home}/node_modules:#{Config.config_js_dir}:$BUILD
         export CDPATH=.:#{home}:$METEOR_APP
-        export all="#{work}/Cakefile #{work}/lib/header.coffee #{work}/#{site}/*.coffee"
+        export all="#{work}/Cakefile #{work}/install.sh #{work}/lib/header.coffee #{work}/#{site}/*.coffee"
         alias sul='rmate -p 8080'
         alias sal='find $all -type f -print0 | xargs -0 -I % rmate -p 8080 % +'
         alias refresh='. ~/.bashrc'
-        alias mngd='mongod --port 7017 --dbpath ~/data &'
+        alias mngd='mongod --port 7017 --dbpath ~/data --logpath #{home}/.log.io/mongodb &'
+        alias logs='log.io-server &'
+        alias logh='log.io-harvester &'
         alias mng='mongo --port 7017'
         #alias red='parts start redis'
         # [[ "x"`~/.parts/bin/redis-cli ping` == "xPONG" ]] || ~/.parts/autoparts/bin/parts start redis
         """
-    fs.writeFile home + '/.bashrc', file, (err) -> 
-        if err then console.log err
-        else console.log file
+    fs.writeFile home + '/.bashrc', data, (err) -> 
+        if err then log err
+        else log file
+
+install = ->
+    data = """
+        #!/usr/bin/env bash
+        for i in meteor mongodb
+        do [[ `parts list` =~ $i ]] || parts install $i; done
+        NODE_MODULES=~/node_modules
+        [ -d $NODE_MODULES ] || mkdir $NODE_MODULES
+        [ -d ~/data ] || mkdir ~/data
+        for j in coffee-script underscore express stylus fs-extra fibers mongodb chokidar node-serialize request event-stream prompt jade ps-node MD5 googleapis log.io  # hiredis redis
+        do
+            echo "Installing $j."
+            npm install --prefix ~ $j
+        done
+        for k in rmate; do gem install $k; done
+        $NODE_MODULES/.bin/coffee -c --bare lib/config.coffee > app/packages/sat/config.js
+        if [ ! -e ../.bashrc ]; then
+            $NODE_MODULES/.bin/cake profile
+            . ~/.bashrc
+        else
+            echo '.bashrc exists. Can not proceed.'
+            exit 0
+        fi
+        cake setup
+        refresh
+        cd app
+        meteor update
+        mongod --port 7017 --dbpath ~/data --logpath #{home}/.log.io/mongodb <<EOF & 
+        use meteor
+        EOF
+        """
+    fs.writeFile file = work + '/install.sh', data, (err) -> 
+        if err then log err
+        else fs.chmod file, 0o755, (err) ->
+            if err then log err else log data
+
+logconf = ->
+    obj = 
+        '.log.io/harvester.conf':"""
+            exports.config = {
+              nodeName: "app",
+              logStreams: {
+                meteor: ["#{home}/.log.io/meteor"],
+                mongodb:["#{home}/.log.io/mongodb"],
+                cake:   ["#{home}/.log.io/cake"]
+              },
+              server: {
+                host: '0.0.0.0',
+                port: 8777
+              }
+            }
+            """
+        '.log.io/log_server.conf':"""
+            exports.config = {
+              host: '0.0.0.0',
+              port: 8777
+            }
+            """
+        '.log.io/web_server.conf':""" 
+            exports.config = {
+              host: '0.0.0.0',
+              port: 8778,
+            }
+            """
+    ([k,v] for k,v of obj).forEach (a) ->
+        fs.writeFile home + '/' + a[0], a[1], (err) -> 
+            if err then log err else log a[1]
+    ['meteor', 'mongodb', 'cake'].map (a) -> 
+        fs.exists f = home+'/.log.io/'+a, (ex) ->
+            fs.writeFile f unless ex
 
 {spawn, exec} = require 'child_process'
 # redis = (func) -> exec 'parts start redis', (err, stdout, stderr) -> func() if func
 
+log = ->
+    arguments? and ([].slice.call(arguments)).forEach (str) ->
+        fs.appendFile home + '/.log.io/cake', str, (err) ->
+            console.log err if err
 meteor = ->
     cd Config.meteor_dir
     spawn 'meteor', [], stdio: 'inherit'
@@ -115,7 +191,7 @@ start_up = ->
 mkdir = (path) -> fs.mkdirSync path if path? and !fs.existsSync path 
 
 sync = ->
-    console.log Config.index_module, local.modules
+    log Config.index_module, local.modules
     sync_dir = Config.sync_dir
     if fs.existsSync sync_dir
         (fs.readdirSync sync_dir).forEach (file) -> 
@@ -126,7 +202,7 @@ sync = ->
     (local.modules.map (l) -> Config.module_dir + l + '.coffee' )
         .concat((fs.readdirSync  Config.build_dir).map (l) -> Config.build_dir  + l )    
         .forEach (path) ->
-            console.log path + ' : ' + sync_dir + path.replace /.*?([^\/]*)$/, "$1"
+            log path + ' : ' + sync_dir + path.replace /.*?([^\/]*)$/, "$1"
             fs.symlink path, sync_dir + path.replace /.*?([^\/]*)$/, "$1"
 
 readInclude = (path) ->
@@ -142,10 +218,10 @@ coffee = (data) ->
     cs.compile '#!/usr/bin/env node' + data, bare:true
 
 configure = () ->
-    console.log Config.config_source
-    console.log Config.local_source
-    console.log Config.theme_source    
-    console.log Config.config_js
+    log Config.config_source
+    log Config.local_source
+    log Config.theme_source    
+    log Config.config_js
     fs.createReadStream Config.config_source
         .pipe es.split "\n"
         .pipe es.mapSync (data) -> include data
@@ -158,20 +234,20 @@ indent = (block, indent) ->
     if indent then block.replace /^/gm, Array(++indent).join Config.indent_string else block
 
 touch = () ->
-    console.log Config.site_dir
-    console.log Config.build_dir
+    log Config.site_dir
+    log Config.build_dir
     mkdir Config.build_dir
     fs.readFile Config.header_source, 'utf8', (err, head) ->
-        if err then console.log err
+        if err then log err
         else ([local.index_file].concat(local.other_files)).filter((f) -> f?).map (file) ->
             fs.readFile Config.site_dir + file + '.coffee', (err, data) ->
                 if err 
-                    console.log err 
+                    log err 
                 else 
                     coffee head
                     coffee data
                     fs.writeFile Config.build_dir + file + '.coffee', head + data, (err) ->
-                        if err then console.log err else build()
+                        if err then log err else build()
 
 build = () ->
     func$str = (what) ->
@@ -182,8 +258,8 @@ build = () ->
         else if 'string'   == typeof what then what
         else if 'function' == typeof what then what.call(@, @C, @_)
 
-    console.log Config.index_module
-    console.log Config.target_dir
+    log Config.index_module
+    log Config.target_dir
     mkdir Config.target_dir
     Pages = ((fs.readdirSync Config.build_dir).map (file) -> 
         require Config.build_dir + file).concat(
@@ -196,26 +272,16 @@ build = () ->
             (((Object.keys Pages[module]).map (page) ->
                 if block = func$str(Pages[module][page][kind])
                     $$.format.call @, page, indent block, $$.indent 
-                #console.log "#{module}:#{page}:#{kind}\n[#{block}]\n" 
+                #log "#{module}:#{page}:#{kind}\n[#{block}]\n" 
             ).filter (o) -> o?).join ''
         ).filter (o) -> o?).join ''
         fs.readFile $$.file, (err, d) -> 
             if md5(data) != md5 d
                 fs.writeFile $$.file, data, (err) ->
-                    console.log if err then err else $$.file
+                    log if err then err else $$.file
 
-
-task 'watch',   'Start the server',           -> start_up()
-task 'config',  'Compile config file.',       -> configure()
-task 'clean',   'Remove generated files',     -> clean_up()
-task 'setup',   'Config and prepare profile', -> configure() ; profile()
-task 'reset',   'Reset files',                -> configure(); clean_up(); sync(); touch(); build()    
 # task 'redis',   'Start redis',                -> redis()
-task 'profile', 'Make shell profile',         -> profile()
-task 'sync',    'Sync source to meteor client files.', -> sync()
-task 'touch',   'Compile site files.',        -> touch()
-task 'build',   'Build meteor client files.', -> build()
-task 'gitpass', 'github.com auto login',  ->
+gitpass = ->
     prompt = require 'prompt'
     prompt.message = 'github'
     prompt.start()
@@ -226,6 +292,19 @@ task 'gitpass', 'github.com auto login',  ->
                 password #{result.password}
             """, flag: 'w+'
         Config.quit(process.exit 1)
+
+task 'watch',   'Start the server',           -> start_up()
+task 'config',  'Compile config file.',       -> configure()
+task 'clean',   'Remove generated files',     -> clean_up()
+task 'setup',   'Config and prepare profile', -> configure() ; profile() ; logconf()
+task 'reset',   'Reset files',                -> configure(); clean_up(); sync(); touch(); build()    
+task 'logconf', 'Create log config file',     -> logconf()
+task 'profile', 'Make shell profile',         -> profile()
+task 'sync',    'Sync source to meteor client files.', -> sync()
+task 'touch',   'Compile site files.',        -> touch()
+task 'build',   'Build meteor client files.', -> build()
+task 'install', 'Create install.sh',          -> install()
+task 'gitpass', 'github.com auto login',      -> gitpass()
 
 Config.quit()
 
