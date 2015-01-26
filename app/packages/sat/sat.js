@@ -2,7 +2,20 @@ db = {}, Pages = {};
 Sat = { isServer: false, isClient: false };
 __ = this.__
 Config = this.Config
-module = { exports:{} } // why?
+module = { exports:{} } // why
+
+if (Meteor.isServer)
+    fs = Npm.require('fs') 
+
+log = function () {
+    return (arguments != null) && ([].slice.call(arguments)).concat(['\n']).map(function(str) {
+        if (Meteor.isServer) {
+            return fs.appendFileSync( Config.log_file, str + ' ' );
+        } else {
+            console.log(str);
+        }
+    });
+}
 
 __.deepExtend = function (target, source) {
     for (var prop in source)
@@ -12,7 +25,6 @@ __.deepExtend = function (target, source) {
             target[prop] = source[prop];
     return target;
 }
-
 
 __.capitalize = function (string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -36,7 +48,7 @@ db.init = function () {
                 update: function (userId, doc, fields, modifier) { return false; }, 
                 remove: function (userId, doc) { return false; } 
             });
-            console.log(Collection, 'is allowed');
+            log(Collection, 'is allowed');
     });
 }
 
@@ -102,7 +114,7 @@ Sat.init = function () {
                         if (Template[name])
                             Template[name][key] = Pages[name][key];
                         else
-                            console.log( 'Template ' + name + ' key:' + key );
+                            log( 'Template ' + name + ' key:' + key );
             });
         });
         Router.map( function () {

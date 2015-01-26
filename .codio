@@ -3,7 +3,7 @@
 
 // Run button configuration
   "commands": {
-      	"Edit": "rsub {{path}}/{{filename}}",
+      	"Edit": "rmate -p 8080 ~/workspace/{{path}}/{{filename}}",
         "Node version": "node --version"
   },
 
