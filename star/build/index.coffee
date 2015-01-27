@@ -147,18 +147,18 @@ module.exports.index =
 
     layout: 
         jade: o 
-            ᐩnavbar:ø
-            ǂwrapper: ǂcontentWrapper: ꓸcontainerFluid: ᐩyield:ø
-            ᐩfooter:ø
+            '+navbar' :ø
+            '#wrapper': '#contentWrapper': '.containerFluid': '+yield':ø
+            '+footer' :ø
         styl: o body: backgroundColor: '#ddd'
         navbar: sidebar: true, login: true, menu: 'home calendar help'
 
     home:
         label: 'Home',  router: path: '/'  
         jade: o 
-            ꓸrow:ꓸcolـmdـ8:h1:'Event Calendar'
-            ꓸrowǂitems:ꓸcolـmdـ12ǂpack:eachˌitems:ᐩitem:ø
-        styl: o ǂitemsˌꓸitem:backgroundColor:'white', width:240, height:240, float:'left', margin:6
+            '.row':'.col-md-8':h1:'Event Calendar'
+            '.row#items':'.col-md-12#pack':'each items':'+item':ø
+        styl: o '#items .item':backgroundColor:'white', width:240, height:240, float:'left', margin:6
         rendered: -> $('#pack').masonry itemSelector: '.item', columnWidth: 126
         helpers: items: -> db.Items.find {}, sort: created_time: -1
 
@@ -206,7 +206,7 @@ module.exports.index =
         jade: o ꓸrow:h1:'Help',ꓸrowǂhelp:ø
 
     footer: 
-        jade: o ꓸfooter:ꓸcontent:ꓸrow:center:'© 2009 - [[2014+1]]ng Startup Edmonton ❘ 301 - 10359 104 Street, Edmonton, Alberta T5J 1B9 ❘ hello@startupedmonton.com'
+        jade: o ꓸfooter:ꓸcontent:ꓸrow:center:'© 2009 - 2015 Startup Edmonton ❘ 301 - 10359 104 Street, Edmonton, Alberta T5J 1B9 ❘ hello@startupedmonton.com'
         styl: o ꓸfooter:backgroundColor:'#ddd', paddingTop:50, paddingBottom:20
 
             

@@ -47,7 +47,7 @@ local = {
 logio_port = 8777
 rmate_port = 8080
 mongo_port = 7017
-mongod_option = "-f ~/.mongoconf"
+mongod_option = "-f #{home}/.mongoconf"
 
 mongoconf = ->
     data = """
@@ -167,7 +167,6 @@ logconf = ->
     logs.map (a) -> fs.exists f = home+'/.log.io/'+a, (ex) -> ex or fs.writeFile f
 
 {spawn, exec} = require 'child_process'
-# redis = (func) -> exec 'parts start redis', (err, stdout, stderr) -> func() if func
 
 log = ->
     arguments? and ([].slice.call(arguments)).forEach (str) ->
@@ -192,15 +191,16 @@ clean_up = ->
         fs.unlinkSync file if fs.existsSync file
 
 demon = ->
+    ps.lookup command: 'node',   psargs: 'ux', (err, a) -> 
+        node_ps = a.map (p) -> (p.arguments?[0].match /\/(log\.io-[a-z]+)$/)?[1]
+        'log.io-server'    in node_ps or spawn 'log.io-server',    [], stdio:'inherit'
+        'log.io-harvester' in node_ps or setTimeout( ( -> spawn 'log.io-harvester', [], stdio:'inherit' ), 100 )
     ps.lookup command: 'mongod', psargs: 'ux', (err, a) -> 
-        console.log if a.length then a else 'start mongod'
-    ps.lookup command: 'node', psargs: 'ux', (err, a) -> a.map (p) ->
-        console.log (p.arguments?[0].match /\/(log\.io-[a-z]+)$/)?[1]
-        
+        a.length or spawn 'mongod', (mongod_option.split ' '), stdio:'inherit'
+
 start_up = ->
     sync()  if ! fs.existsSync Config.sync_dir  
     build() if ! fs.existsSync Config.client_dir  # check better than this.
-
     
     [Config.index_module, Config.header_source].map (file) ->
         chokidar.watch file + '.coffee', persistent:true
@@ -228,11 +228,11 @@ sync = ->
     (local.modules.map (l) -> Config.module_dir + l + '.coffee' )
         .concat((fs.readdirSync  Config.build_dir).map (l) -> Config.build_dir  + l )    
         .forEach (path) ->
-            log path + ' : ' + sync_dir + path.replace /.*?([^\/]*)$/, "$1"
-            fs.symlink path, sync_dir + path.replace /.*?([^\/]*)$/, "$1"
+            fs.symlink path, sync = sync_dir + path.replace /.*?([^\/]*)$/, "$1"
+            log path, sync
 
 readInclude = (path) ->
-    ((fs.readFileSync path, 'utf8').split "\n").filter( (a) -> -1 == a.search /#exclude\s*$/ ).join "\n"
+    ((fs.readFileSync path, 'utf8').split "\n").filter((a)-> -1 == a.search /#exclude\s*$/).join "\n"
 
 include = (data) ->
     if data.search(/^#include\s+local\s*.*/) != -1 then readInclude Config.local_source
@@ -264,13 +264,12 @@ touch = () ->
     mkdir Config.build_dir
     fs.readFile Config.header_source, 'utf8', (err, head) ->
         if err then log err
-        else ([local.index_file].concat(local.other_files)).filter((f) -> f?).map (file) ->
+        else ([local.index_file].concat(local.other_files)).filter((f)->f?).map (file) ->
             fs.readFile Config.site_dir + file + '.coffee', (err, data) ->
                 if err 
                     log err 
                 else 
-                    coffee head
-                    coffee data
+                    [head, data].map (a) -> coffee a
                     fs.writeFile Config.build_dir + file + '.coffee', head + data, (err) ->
                         if err then log err else build()
 
@@ -316,11 +315,11 @@ gitpass = ->
             """, flag: 'w+'
         Config.quit(process.exit 1)
 
-task 'watch',     'Start the server',           -> start_up()
+task 'watch',     'Start the server',           -> demon() ; start_up()
 task 'config',    'Compile config file.',       -> configure()
 task 'clean',     'Remove generated files',     -> clean_up()
-task 'setup',     'Config and prepare profile', -> configure() ; profile() ; logconf()
-task 'reset',     'Reset files',                -> configure(); clean_up(); sync(); touch(); build()    
+task 'setup',     'Config and prepare profile', -> configure() ; profile()  ; logconf()
+task 'reset',     'Reset files',                -> configure() ; clean_up() ; sync() ; touch() ; build()    
 task 'logconf',   'Create log config file',     -> logconf()
 task 'mongoconf', 'Create mongo config file',   -> mongoconf()
 task 'profile',   'Make shell profile',         -> profile()
@@ -329,8 +328,7 @@ task 'touch',     'Compile site files.',        -> touch()
 task 'build',     'Build meteor client files.', -> build()
 task 'install',   'Create install.sh',          -> install()
 task 'gitpass',   'github.com auto login',      -> gitpass()
-
-task 'demon',   'github.com auto login',      -> demon()
+task 'demon',     'start demons',               -> demon()
 
 Config.quit()
 
