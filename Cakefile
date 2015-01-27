@@ -190,7 +190,7 @@ clean_up = ->
     for file in Config.auto_generated_files
         fs.unlinkSync file if fs.existsSync file
 
-demon = ->
+daemon = ->
     ps.lookup command: 'node',   psargs: 'ux', (err, a) -> 
         node_ps = a.map (p) -> (p.arguments?[0].match /\/(log\.io-[a-z]+)$/)?[1]
         'log.io-server'    in node_ps or spawn 'log.io-server',    [], stdio:'inherit'
@@ -315,7 +315,7 @@ gitpass = ->
             """, flag: 'w+'
         Config.quit(process.exit 1)
 
-task 'watch',     'Start the server',           -> demon() ; start_up()
+task 'watch',     'Start the server',           -> daemon() ; start_up()
 task 'config',    'Compile config file.',       -> configure()
 task 'clean',     'Remove generated files',     -> clean_up()
 task 'setup',     'Config and prepare profile', -> configure() ; profile()  ; logconf()
@@ -328,7 +328,7 @@ task 'touch',     'Compile site files.',        -> touch()
 task 'build',     'Build meteor client files.', -> build()
 task 'install',   'Create install.sh',          -> install()
 task 'gitpass',   'github.com auto login',      -> gitpass()
-task 'demon',     'start demons',               -> demon()
+task 'daemon',     'start daemons',              -> daemon()
 
 Config.quit()
 
