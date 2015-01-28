@@ -63,6 +63,8 @@ mongoconf = ->
         """
     fs.writeFile file = home + '/.mongoconf', data + '\n', (err) -> log err or data
 
+mongo_str = "mongodb://localhost:#{mongo_port}/meteor"
+mongo_str = "mongodb://isaac:1234@ds053858.mongolab.com:53858/meteor"
 
 profile = ->
     data = """
@@ -73,7 +75,7 @@ profile = ->
         export WORKSPACE=#{work}      # no use
         export SITE=#{work}/#{site}   # include
         export BUILD=#{work}/#{site}/build
-        export MONGO_URL=mongodb://localhost:#{mongo_port}/meteor
+        export MONGO_URL=#{mongo_str}
         export MODULE_LIB=#{work}/lib
         export METEOR_APP=#{work}/app
         export METEOR_LIB=$METEOR_APP/lib
