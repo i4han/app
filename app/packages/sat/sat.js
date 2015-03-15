@@ -81,20 +81,19 @@ Sat.init = function () {
         _.each(_.keys(pages_in_file), function(file) {
             if ( __.isLowerCase(file, 0) )
                 _.extend( Pages, pages_in_file[file] );
+
+            // __events__.startup
             if (pages_in_file[file].__events__ && pages_in_file[file].__events__.startup) {
                 startup.push(pages_in_file[file].__events__.startup);
                 delete pages_in_file[file].__events__.startup
             }
+            // delete Pages if page name startwith __
             _.each( _.filter( _.keys( pages_in_file[file] ), function (key) { 
                     return ! ( (__.isLowerCase(key, 0) || key.charAt(0) === '_') && __.isLowerCase(key, 1) );  // remove pages those name is not 'smallcase' or '_smallcase'
                 }), function (name) {
                     delete Pages[name];
             });
         });
-        if (startup)  // Set startup fuctions.
-            Meteor.startup(function() {
-                _.each(startup, function(func) { func() });
-            });
         var router_map = {};
         _.each(_.keys(Pages), function(name) {           // Pages name: key:  name should be unique.
             _.each(_.keys(Pages[name]), function(key) {  // __key will be ignored including __events__. Defined keys = [helpers, events, router]
@@ -109,6 +108,8 @@ Sat.init = function () {
                             Template[name].events( obj );
                     } else if (key === 'router') {
                         router_map[name] = Pages[name].router;
+                    } else if (key === 'startup') {
+                        startup.push( Pages[name].startup );
                     //    delete Pages[name].router;
                     } else if ( ['rendered', 'created', 'destroyed'].indexOf(key) !== -1)
                         if (Template[name])
@@ -121,6 +122,11 @@ Sat.init = function () {
             for (var key in router_map)
                 this.route( key, router_map[key] );
         });
+        if (startup)  // Set startup fuctions.
+            Meteor.startup(function() {
+                _.each(startup, function(func) { func() });
+            });
+
     }
 }
 

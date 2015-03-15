@@ -72,24 +72,20 @@ contentEditable = (id, func) ->
             ,
                 200
 
-
-('DIV H2 BR'.split ' ').forEach (a) ->
-    html_scope = {}
-    html_scope = window if window?
-    html_scope[a] = (obj, str) -> 
-        if str? then HTML.toHTML HTML[a] obj, str
-        else         HTML.toHTML HTML[a] obj
+window? and ('DIV H2 BR'.split ' ').map (a) -> window[a] = (obj, str) -> 
+    if str? then HTML.toHTML HTML[a] obj, str else HTML.toHTML HTML[a] obj
 
 scrollSpy = (obj) ->
-    $scrollspy = $ '.scrollspy'
-    $scrollspy.scrollSpy()
+    $$ = $ '.scrollspy'
+    $$.scrollSpy()
     ['enter', 'exit'].forEach (a) ->
-        $scrollspy.on 'scrollSpy:' + a, -> obj[a][$(@).attr 'id']() if obj[a]?
+        $$.on 'scrollSpy:' + a, -> obj[a][$(@).attr 'id']() if obj[a]?
 
 
 slice = (str) -> @_.slice str
 
 sidebar = (list, id='sidebar_menu') ->
+    list: list
     jade: -> @_.slice "each items|>+menu_list"
     helpers: 
         items: -> list.map (a) -> { page:a, id:id } # ̵̵̵correct - id must unique.

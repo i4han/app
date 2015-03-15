@@ -1,16 +1,38 @@
+repcode = -> ('ᛡ* ᐩ+ ᐟ/ ǂ# ꓸ. ꓹ, ـ- ᚚ= ꓽ: ꓼ; ˈ\' ᐦ" ᐸ< ᐳ> ʿ( ʾ) ʻ{ ʼ}'.split ' ').reduce ((o,v) -> o[v[1..]]=///#{v[0]}///g; o), {' ':/ˌ/g}
+
+parseValue = (value) ->
+    if      'number'   == typeof value then value.toString() + 'px'
+    else if 'string'   == typeof value then (value = value.replace v,k for k,v of repcode()).pop()
+    else if 'function' == typeof value then value() else value
+
+o = (obj, depth=1) -> 
+    ((Object.keys obj).map (key) ->
+        value = obj[key]
+        key = key.replace v,k for k,v of repcode()
+        key = key.toDash()
+        (Array(depth).join '    ') + 
+        if  'object' == typeof value then [key, o(value, depth + 1)].join '\n'
+        else if '' is value          then key
+        else key + ' ' + parseValue value
+    ).join '\n'
+
 isVisible = (v) -> if 'function' == typeof v then v() else if false is v then false else true
 
 module.exports.ui =
     html:
-        HTML: '' 
-        head: (C,_) -> _.slice "title #{C.title}|link(href='#{C._.font_style.pt_sans}' rel='stylesheet')"
-        created: ->
-            console.log Config.collections
+        jade: ' '
+        head: -> o 
+            'title': @C.title
+            "link(rel='stylesheet'": "href='#{@C._.font_style.pt_sans}')"
+            "script(type='text/javascript'": "src='https://maps.googleapis.com/maps/api/js?key=AIzaSyB2RuPxiq1JbG18Lq793FdEzWM-7-MYX8Q')"
+        startup: ->
+            console.log 'collection:', Config.collections
             Config.collections.forEach (a) ->
                 db[a] = new Meteor.Collection a if !db[a]?
                 Meteor.subscribe [a]
-
-    body: styl: (C,_) -> _.slice "body|>font-family #{C.$.font_family}|font-weight #{C.$.font_weight}"
+        styl: -> o
+            body: fontFamily: @C.$.font_family, fontWeight: @C.$.font_weight
+            'html, body, #map-canvas': height: '100%', margin: 0, padding: 0
     
     form:
         jade: """

@@ -77,7 +77,7 @@ module.exports.menu =
                 background-color #{Config.$.navbar.hover.background_color}
             """
     sidebar:
-        styl$: (Config) -> sidebar_width = '100px'; """
+        styl$: (Config) -> sidebar_width = '160px'; """
             #wrapper 
                 padding-top: 50px;
                 padding-left: 0px;
@@ -91,12 +91,12 @@ module.exports.menu =
                 z-index: 1000;
                 position: fixed;
                 left: 0; /* #{sidebar_width}; */
-                width: 0;
+                width: 100;
                 height: 100%;
                 padding-top: 50px
                 margin-left: 0; /* -#{sidebar_width}; */
                 overflow-y: auto;
-                background transparent
+                background: #aaa;
                 -webkit-transition: all 0.5s ease;
                 -moz-transition: all 0.5s ease;
                 -o-transition: all 0.5s ease;
@@ -144,6 +144,7 @@ module.exports.menu =
             @media(min-width:768px)
                 #wrapper
                     padding-left #{sidebar_width}
+                    height 100%
                 #wrapper.toggled 
                     padding-left 0
                 #sidebar-wrapper
@@ -151,7 +152,7 @@ module.exports.menu =
                 #wrapper.toggled #sidebar-wrapper
                     /* width: 0; */
                 #content-wrapper
-                    padding 20px
+                    padding 0
                 #wrapper.toggled #content-wrapper
                     position relative
                     margin-right 0
@@ -168,7 +169,7 @@ module.exports.menu =
             'custom #listen-to-menu-change': (event, instance, navbar_menu) ->
                 sidebar = Pages[navbar_menu].sidebar
                 if sidebar
-                    __.insertTemplate sidebar, 'sidebar_menu_insert' if sidebar
+                    __.insertTemplate sidebar, 'sidebar_menu_insert'
                     $("#wrapper").removeClass "toggled"
                 else
                     $('#'+sidebar).empty()
