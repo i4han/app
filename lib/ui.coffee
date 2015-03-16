@@ -26,13 +26,17 @@ module.exports.ui =
             "link(rel='stylesheet'": "href='#{@C._.font_style.pt_sans}')"
             "script(type='text/javascript'": "src='https://maps.googleapis.com/maps/api/js?key=AIzaSyB2RuPxiq1JbG18Lq793FdEzWM-7-MYX8Q')"
         startup: ->
-            console.log 'collection:', Config.collections
-            Config.collections.forEach (a) ->
-                db[a] = new Meteor.Collection a if !db[a]?
-                Meteor.subscribe [a]
+            # console.log 'collection:', Config.collections
+            Config.collections #.forEach (a) ->
+            #    db[a] = new Meteor.Collection a if !db[a]?
+            #    Meteor.subscribe [a]
+            #    console.log a
         styl: -> o
-            body: fontFamily: @C.$.font_family, fontWeight: @C.$.font_weight
-            'html, body, #map-canvas': height: '100%', margin: 0, padding: 0
+            html: height: '100%'
+            body: 
+                height: '100%'
+                fontFamily: @C.$.font_family
+                fontWeight: @C.$.font_weight
     
     form:
         jade: """

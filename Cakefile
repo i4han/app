@@ -1,5 +1,5 @@
 
-site = process.env.site or 'star'
+site = process.env.site or 'insta'
   
 fs       = require 'fs'
 path     = require 'path'

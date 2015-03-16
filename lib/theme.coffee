@@ -21,7 +21,7 @@ theme =
                     height:     '24px'
                     hover:      '#eee'
             text:
-                color:          '#888'
+                color:          '#fff'
                 font_size:      '10px'
                 height:         '20px'
                 width:          '80px'
@@ -31,6 +31,11 @@ theme =
             focus:
                 color:              'black'
                 background_color:   'white'
+        sidebar:
+            a:
+                color:          'white'
+
+# todo: change _ to camelCase
 
 theme_clean =
     __theme:

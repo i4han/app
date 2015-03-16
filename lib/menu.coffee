@@ -16,12 +16,13 @@ module.exports.menu =
         helpers: 
             path:  -> Router.path @page 
             label: -> Pages[@page].label
-
+            
     navbar:                                    # seperate menu_list and navbar
         jade: (Config) ->
             menu = getMenu(@C, @Pages)
             """
-            .navbar.navbar-default.navbar-#{@C.$.navbar.style}: .container
+            .navbar.navbar-default.navbar-#{@C.$.navbar.style}
+                +logo
                 .navbar-left 
                     ul.nav.navbar-nav
                         li: a#menu-toggle: i.fa.fa-bars
@@ -29,7 +30,7 @@ module.exports.menu =
                 .navbar-right
                     +login
             """
-        styl: -> @_.slice ".navbar|>background-color #8fc748|<.navbar-fixed-top|>border 0px"
+        styl: -> @_.slice ".navbar|>background-color rgba(255, 127, 38, 0.91)|<.navbar-fixed-top|>border 0px"
         events:
             'click #menu-toggle': (event) -> $("#wrapper").toggleClass "toggled" # event.preventDefault()                
             'click #navbar-menu': (event) ->
@@ -67,9 +68,9 @@ module.exports.menu =
             #login-dropdown:hover
                 cursor pointer
             #login-dropdown-list > a
-                width #{Config.$.navbar.login.width}
+                width  #{Config.$.navbar.login.width}
                 height #{Config.$.navbar.height}
-                color #{Config.$.navbar.text.color}
+                color  #{Config.$.navbar.text.color}
                 text-decoration none
                 cursor pointer
                 padding ( ( #{Config.$.navbar.height} - #{Config.$.navbar.text.height} ) / 2 )
@@ -84,7 +85,7 @@ module.exports.menu =
                 -webkit-transition: all 0.5s ease;
                 -moz-transition: all 0.5s ease;
                 -o-transition: all 0.5s ease;
-                transition: all 0.5s ease;
+                transition: all 0.5s ease; /* (-webkit-|-moz-|-o-|)transition */
             #wrapper.toggled 
                 padding-left: #{sidebar_width};
             #sidebar-wrapper
@@ -122,7 +123,7 @@ module.exports.menu =
             .sidebar-nav li a 
                 display block
                 text-decoration none
-                color #666
+                color #{Config.$.sidebar.a.color}
             .sidebar-nav li a:hover
                 text-decoration: none
                 color #000
@@ -151,8 +152,6 @@ module.exports.menu =
                     width #{sidebar_width};
                 #wrapper.toggled #sidebar-wrapper
                     /* width: 0; */
-                #content-wrapper
-                    padding 0
                 #wrapper.toggled #content-wrapper
                     position relative
                     margin-right 0

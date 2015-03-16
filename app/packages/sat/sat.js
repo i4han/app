@@ -34,21 +34,26 @@ __.isLowerCase = function (char, index) {
     return char.charAt(index) >= 'a' && char.charAt(index) <= 'z' ? true : false
 }
 
-db.init = function () {
-    db.collections = Config.collections;
-    _.each( db.collections, function (collection) {
-        var Collection = __.capitalize(collection)
-        if ( 'undefined' === typeof db[ Collection ] )
-            db[Collection] = new Mongo.Collection(collection);
-            db[Collection].allow({
-                update: function (userId, doc, fields, modifier) { return true; }, 
-                remove: function (userId, doc) { return true; } 
-            });
-            db[Collection].deny({
-                update: function (userId, doc, fields, modifier) { return false; }, 
-                remove: function (userId, doc) { return false; } 
-            });
-            log(Collection, 'is allowed');
+
+db_init = function () {
+    _.each( Config.collections, function (c) {
+        if ( 'undefined' === typeof db[c] ) {
+            db[c] = new Meteor.Collection(c);
+            if ( Meteor.isServer ) {
+                db[c].allow({
+                    insert: function (doc) { return true; },
+                    update: function (userId, doc, fields, modifier) { return true; }, 
+                    remove: function (userId, doc) { return true; } 
+                });
+                db[c].deny({
+                    update: function (userId, doc, fields, modifier) { return false; }, 
+                    remove: function (userId, doc) { return false; } 
+                });
+
+                Meteor.publish( c, function () { return db[c].find({}); });
+            } else if ( Meteor.isClient )
+                Meteor.subscribe( c );
+        }
     });
 }
 
@@ -67,7 +72,7 @@ if ( Meteor.isClient ) {
 
 
 Sat.init = function () {
-    db.init();
+    db_init();
     var pages_in_file = module.exports;
     if ( Meteor.isServer ) {
         Sat.isServer = true;
