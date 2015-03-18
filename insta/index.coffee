@@ -51,19 +51,35 @@ module.exports.index =
     layout: 
         jade: o '+navbar' :'', '#wrapper':'+sidebar':'', '+yield':''
         styl: o body: backgroundColor: '#ddd'
-        navbar: sidebar: true, login: true, menu: 'home map calendar request log help'
+        navbar: sidebar: true, login: true, menu: 'home map calendar vehicle request log help'
 
     home:
         label: 'Home', sidebar: 'sidebar_home',  router: path: '/'  
         jade: o '#contentWrapper': 
-                h1:'InstaMek'
+                h1:'Home'
                 '.row#items':'.col-md-12#pack':'each items':'+item':ø
         styl: o '#items .item':backgroundColor:'white', width:240, height:240, float:'left', margin:6
-        rendered: -> Meteor.setTimeout (-> $('#pack').masonry itemSelector: '.item', columnWidth: 126), 20
+        rendered: -> Meteor.setTimeout (-> $('#pack').masonry itemSelector: '.item', columnWidth: 126), 40
         helpers: items: -> db.Items.find {}, sort: created_time: -1
     sidebar_home: sidebar ['home', 'calendar', 'help']
 
     item: jade: ".item(style='height:{{height}}px;color:{{color}}')" 
+
+    vehicle:
+        label: 'Vehicle', sidebar: 'sidebar_vehicle', router: path: 'vehicle'
+        jade: o '#contentWrapper': 
+                h1: 'You vehicle information', br: ''
+                '.col-sm-7': 'each items': '+form': '', br:''
+        helpers: items: -> [
+                { label: 'Maker',   id: 'maker',  title: 'Car manufacturer',         icon: 'mobile'     },
+                { label: 'Model',   id: 'model',  title:  'Year of the model',       icon: 'mobile'  },
+                { label: 'Color', id: 'color',     title: 'Color of your vehicle',   icon: 'mobile' }]
+        events: popover 'maker model color' .split ' '
+    popover_maker:    jade: o ul:li: 'manufacturer in 20 characters'
+    popover_model:   jade: o ul:li: 'For digit'
+    popover_color: jade: o ul:li: 'White or black only'
+    sidebar_map: sidebar 'home map calendar request vehicle log help'.split ' '             
+
 
     map:
         label: 'Map', sidebar: 'sidebar_map', router: path: 'map'
@@ -75,7 +91,7 @@ module.exports.index =
         map_init: -> 
             new google.maps.Map document.getElementById('map-canvas'), 
                 disableDefaultUI: true, zoom: 11, center: lat: 53.52, lng: -113.5
-    sidebar_map: sidebar 'home map calendar request log help'.split ' '             
+    sidebar_map: sidebar 'home map calendar request vehicle log help'.split ' '             
                 
     calendar:
         label: 'Calendar',  router: {}
