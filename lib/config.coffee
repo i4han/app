@@ -4,9 +4,9 @@
 # sat/config.js used by Cakefile, Meteor, dsync, collect
 
 if !Meteor?
-    _ = require 'underscore'
-    fs = require 'fs'
-    jade = require 'jade'
+    _      = require 'underscore'
+    fs     = require 'fs'
+    jade   = require 'jade'
     stylus = require 'stylus'
 else
     return {Config:@Config, __:@__} unless Package.underscore._.isEmpty(@Config) or Package.underscore._.isEmpty(@__)
@@ -17,17 +17,18 @@ else
 
 main = {
     autogen_prefix:   'auto_'
-    callback_port:    3003
+    callback_port:    3300
     local_config:     'local.coffee'
     init: ->
         if !Meteor? or Meteor.isServer
             @home_dir   = process.env.HOME + '/'
             @workspace  = @home_dir   + 'workspace/'
-            @site_dir   = @workspace  + 'site/'
+            @site_dir   = if process.env.site then @workspace + process.env.site + '/' 
+            else process.env.SITE + '/'
             @module_dir = @workspace  + 'lib/'            
-            @meteor_dir = @workspace  + 'app/'
+            @meteor_dir = @site_dir   + 'app/'
             @source_dir = @meteor_dir + 'lib/'
-            @target_dir = @meteor_dir + 'client/'
+            @target_dir = @meteor_dir   + 'client/'
         return this
 }.init()
 
@@ -108,12 +109,12 @@ local = {}
             @source_dir    = main.source_dir
             @client_dir    = main.target_dir
             @target_dir    = main.target_dir   # alias client_dir
-            @site_dir      = if process.env.SITE then process.env.SITE + '/' else main.site_dir
+            @site_dir      = main.site_dir
             @build_dir     = @site_dir    + 'build/'
             @meteor_lib    = @meteor_dir  + 'lib/'
             @package_dir   = @meteor_dir  + 'packages/'
             @config_js_dir = @package_dir + 'sat/'
-            @sync_dir      = @meteor_lib                      # after meteor_lib
+            @sync_dir      = @site_dir + 'app/lib/' #@meteor_lib  # after meteor_lib
             @config_js     = @config_js_dir  + 'config.js'
             @config_source = @module_dir     + 'config.coffee'
             @index_module  = @site_dir       + local.index_file 

@@ -1,0 +1,211 @@
+template(name="logo")
+    #logo instaMek
+
+template(name="layout")
+    +navbar
+    #wrapper
+        +sidebar
+        +yield
+
+template(name="home")
+    #content-wrapper
+        h1 Insta
+        .row#items
+            .col-md-12#pack
+                each items
+                    +item
+
+template(name="sidebar_home")
+    each items
+        +menu_list
+
+template(name="item")
+    .item(style='height:{{height}}px;color:{{color}}')
+
+template(name="vehicle")
+    #content-wrapper
+        h1 You vehicle information
+        br
+        .col-sm-7
+            each items
+                +form
+                br
+
+template(name="popover_maker")
+    ul
+        li manufacturer in 20 characters
+
+template(name="popover_model")
+    ul
+        li For digit
+
+template(name="popover_color")
+    ul
+        li White or black only
+
+template(name="sidebar_map")
+    each items
+        +menu_list
+
+template(name="map")
+    #map-canvas
+
+template(name="calendar")
+    #content-wrapper
+        #container-calendar
+            .scrollspy#top &nbsp;
+            #items
+            .scrollspy#bottom &nbsp;
+
+template(name="log")
+    #log-canvas
+
+template(name="day")
+    .init {{init}}
+    .title {{title}}
+    .date {{date}}
+    .day {{day}}
+    .event {{event}}
+
+template(name="request")
+    #content-wrapper
+        h1 Request a Mek
+        br
+        .col-sm-7
+            each items
+                +form
+                br
+
+template(name="popover_name")
+    ul
+        li Write your name.
+        li  No longer then 12 letters.
+
+template(name="popover_phone")
+    ul
+        li Write your phone number.
+
+template(name="popover_address")
+    ul
+        li Write your zipcode.
+
+template(name="help")
+    #content-wrapper
+        h1 Help
+
+template(name="login")
+    ul.nav.navbar-nav#login-buttons
+        +Template.dynamic(template=template)
+
+template(name="dropdown_logged_in")
+    li.dropdown#login-dropdown 
+        a.dropdown-toggle#login-id(data-toggle='dropdown') {{username}}
+            i.fa(class='fa-chevron-down') 
+        .dropdown-menu(id='{{id}}')
+            +Template.dynamic(template=template)
+
+template(name="dropdown_menu_logged_in")
+    each items
+        +menu
+
+template(name="change_password")
+    each fields
+        +form
+    br
+    +login_messages 
+    #dropdown-menu-buttons   
+        each buttons
+            +button 
+    #dropdown-other-options
+        each links  
+            +a
+
+template(name="dropdown_logged_out")
+    li.dropdown#login-dropdown
+        a.dropdown-toggle(data-toggle="dropdown")
+            | Sign In
+            i.fa.fa-chevron-down
+        .dropdown-menu
+            each fields
+                +form
+            br
+            +login_messages
+            #dropdown-menu-buttons
+                each buttons
+                    +button
+            #dropdown-other-options
+                each links
+                    +a
+
+template(name="login_messages")
+    +alert(class='alert-danger'  message=error_message)
+    +alert(class='alert-success' message=info_message )
+
+template(name="menu_list")
+    li: a(href="{{path}}" id="{{id}}") {{label}}
+
+template(name="navbar")
+    .navbar.navbar-default.navbar-fixed-top
+        +logo
+        .navbar-left 
+            ul.nav.navbar-nav
+                li: a#menu-toggle: i.fa.fa-bars
+                li: a(href="{{pathFor 'home'}}" id='navbar-menu') Home
+                li: a(href="{{pathFor 'map'}}" id='navbar-menu') Map
+                li: a(href="{{pathFor 'calendar'}}" id='navbar-menu') Calendar
+                li: a(href="{{pathFor 'vehicle'}}" id='navbar-menu') Vehicle
+                li: a(href="{{pathFor 'request'}}" id='navbar-menu') Request
+                li: a(href="{{pathFor 'log'}}" id='navbar-menu') Log
+                li: a(href="{{pathFor 'help'}}" id='navbar-menu') Help
+        .navbar-right
+            +login
+
+template(name="sidebar")
+    form#listen-to-menu-change
+    #sidebar-wrapper
+        #sidebar-top
+        ul.sidebar-nav#sidebar_menu_insert
+
+template(name="html")
+     
+
+template(name="form")
+    if visible
+        .input-group.margin-bottom-sm
+           span.input-group-addon: i.fa.fa-fw(class="fa-{{icon}}")
+           input.form-control(id="{{id}}" type="{{type}}" placeholder="{{label}}" title="{{title}}" data-toggle="popover" data-trigger="hover" data-placement="right" data-html="true")
+
+template(name="button")
+    if visible
+        button.btn(class="{{class}}" id="{{id}}" type="{{type}}") {{label}}
+
+template(name="dialog")
+    button.btn(href="#myModal" role="button" data-toggle="modal") Modal
+    .modal.fade#myModal(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true")
+        .modal-dialog: .modal-content
+            .modal-header
+                button.close(type="button" data-dismiss="modal" aria-hidden="true") ×
+                h3#myModalLabel {{modalHeader}}
+            .modal-body
+                p {{modalBody}}
+            .modal-footer
+                button.btn(data-dismiss="modal" aria-hidden="true") {{modalCloseButton}}
+                button.btn.btn-primary {{modalActionButton}}
+
+template(name="a")
+    if visible
+        a(class="{{class}}" id="{{id}}") {{label}}
+
+template(name="menu")
+    if visible
+        if divider
+            li.divider
+        else
+            li: a(id="{{id}}" class="{{class}}" style="{{style}}")
+                i.fa(class="fa-{{icon}}" class="{{icon_class}}")
+                | {{label}}
+
+template(name="alert")
+    if visible
+        .alert(class="{{class}}") {{message}}
+

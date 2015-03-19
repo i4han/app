@@ -1,5 +1,5 @@
 
-site = process.env.site or 'insta'
+site = process.env.site or 'apps/insta'
   
 fs       = require 'fs'
 path     = require 'path'
@@ -7,13 +7,18 @@ md5      = require 'MD5'
 ps       = require 'ps-node'
 es       = require 'event-stream'
 chokidar = require 'chokidar'
+rmdir    = require 'rimraf'
+{ncp}    = require 'ncp'
+
 
 cwd  = process.cwd()    
 home = process.env.HOME
+site = process.env.site
 work = home + '/workspace'
+site_path = work + '/' + site + '/'
 
 try
-    {Config, __} = require work + '/app/packages/sat/config'    
+    {Config, __} = require site_path + '/app/packages/sat/config'    
 catch e
     {Config, __} = require work + '/lib/config'
 
@@ -25,11 +30,11 @@ catch e
     
 Config = { 
     index_file:    'index'
-    meteor_dir:     work + '/app'
-    sync_dir:       work + '/app/lib'
-    package_dir:    work + '/app/packages'
-    config_js_dir:  work + '/app/packages/sat'
-    config_js:      work + '/app/packages/sat/config.js'
+    meteor_dir:     site_path + '/app'
+    sync_dir:       work + '/lib'
+    package_dir:    site_path + '/app/packages'
+    config_js_dir:  site_path + '/app/packages/sat'
+    config_js:      site_path + '/app/packages/sat/config.js'
     config_source:  work + '/lib/config.coffee'
     theme_source:   work + '/lib/theme.coffee' 
     site_dir:       work + '/' + site        
@@ -233,6 +238,13 @@ sync = ->
             fs.symlink path, sync = sync_dir + path.replace /.*?([^\/]*)$/, "$1"
             log path, sync
 
+packages = ->
+    target = Config.package_dir
+    log 'resetting:', target
+    if target.indexOf('packages') > -1
+        rmdir target, (err) -> log err if err
+    ncp work + '/packages', target, (err) -> log err if err
+
 readInclude = (path) ->
     ((fs.readFileSync path, 'utf8').split "\n").filter((a)-> -1 == a.search /#exclude\s*$/).join "\n"
 
@@ -324,6 +336,7 @@ task 'setup',     'Config and prepare profile', -> configure() ; profile()  ; lo
 task 'reset',     'Reset files',                -> configure() ; clean_up() ; sync() ; touch() ; build()    
 task 'logconf',   'Create log config file',     -> logconf()
 task 'mongoconf', 'Create mongo config file',   -> mongoconf()
+task 'packages',  'Update packages',            -> packages()
 task 'profile',   'Make shell profile',         -> profile()
 task 'sync',      'Sync source to meteor client files.', -> sync()
 task 'touch',     'Compile site files.',        -> touch()

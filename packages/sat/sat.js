@@ -1,3 +1,4 @@
+
 db = {}, Pages = {};
 Sat = { isServer: false, isClient: false };
 __ = this.__
