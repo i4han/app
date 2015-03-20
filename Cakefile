@@ -15,7 +15,7 @@ cwd  = process.cwd()
 home = process.env.HOME
 site = process.env.site
 work = home + '/workspace'
-site_path = work + '/' + site + '/'
+site_path = work + '/' + site
 
 try
     {Config, __} = require site_path + '/app/packages/sat/config'    
@@ -31,10 +31,11 @@ catch e
 Config = { 
     index_file:    'index'
     meteor_dir:     site_path + '/app'
-    sync_dir:       work + '/lib'
-    package_dir:    site_path + '/app/packages'
+    sync_dir:       site_path + '/app/lib'
+    site_packages:  site_path + '/app/packages'
     config_js_dir:  site_path + '/app/packages/sat'
     config_js:      site_path + '/app/packages/sat/config.js'
+    packages:       work + '/packages'
     config_source:  work + '/lib/config.coffee'
     theme_source:   work + '/lib/theme.coffee' 
     site_dir:       work + '/' + site        
@@ -239,11 +240,11 @@ sync = ->
             log path, sync
 
 packages = ->
-    target = Config.package_dir
-    log 'resetting:', target
-    if target.indexOf('packages') > -1
+    target = Config.site_packages
+    console.log 'resetting:', target, Config.packages
+    if target.indexOf(site) > -1
         rmdir target, (err) -> log err if err
-    ncp work + '/packages', target, (err) -> log err if err
+    ncp Config.packages, target, (err) -> console.log err if err
 
 readInclude = (path) ->
     ((fs.readFileSync path, 'utf8').split "\n").filter((a)-> -1 == a.search /#exclude\s*$/).join "\n"
@@ -339,11 +340,11 @@ task 'mongoconf', 'Create mongo config file',   -> mongoconf()
 task 'packages',  'Update packages',            -> packages()
 task 'profile',   'Make shell profile',         -> profile()
 task 'sync',      'Sync source to meteor client files.', -> sync()
-task 'touch',     'Compile site files.',        -> touch()
+task 'touch',     'Compile site files.',        -> touch() ; build()
 task 'build',     'Build meteor client files.', -> build()
 task 'install',   'Create install.sh',          -> install()
 task 'gitpass',   'github.com auto login',      -> gitpass()
-task 'daemon',     'start daemons',              -> daemon()
+task 'daemon',     'start daemons',             -> daemon()
 
 Config.quit()
 

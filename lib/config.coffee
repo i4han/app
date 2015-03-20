@@ -28,7 +28,7 @@ main = {
             @module_dir = @workspace  + 'lib/'            
             @meteor_dir = @site_dir   + 'app/'
             @source_dir = @meteor_dir + 'lib/'
-            @target_dir = @meteor_dir   + 'client/'
+            @target_dir = @meteor_dir + 'client/'
         return this
 }.init()
 
@@ -112,9 +112,10 @@ local = {}
             @site_dir      = main.site_dir
             @build_dir     = @site_dir    + 'build/'
             @meteor_lib    = @meteor_dir  + 'lib/'
-            @package_dir   = @meteor_dir  + 'packages/'
-            @config_js_dir = @package_dir + 'sat/'
-            @sync_dir      = @site_dir + 'app/lib/' #@meteor_lib  # after meteor_lib
+            @packages      = main.workspace  + 'packages/'
+            @site_packages = @site_dir    + 'app/packages/'
+            @config_js_dir = @site_dir    + 'app/packages/sat/'
+            @sync_dir      = @site_dir    + 'app/lib/' #@meteor_lib  # after meteor_lib
             @config_js     = @config_js_dir  + 'config.js'
             @config_source = @module_dir     + 'config.coffee'
             @index_module  = @site_dir       + local.index_file 
@@ -122,7 +123,7 @@ local = {}
             @local_module  = @site_dir       + main.local_config # 'local.coffee'
             @theme_source  = @module_dir     + 'theme.coffee'
             @header_source = @module_dir     + 'header.coffee'
-            @storables     = main.meteor_dir + 'private/storables' # remove?
+#            @storables     = main.meteor_dir + 'private/storables' # remove?
             @log_file      = main.home_dir   + '.log.io/satellite'
             @set_prefix    = ''
             @autogen_prefix = main.autogen_prefix            

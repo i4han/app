@@ -8,7 +8,7 @@ Package.on_use( function (api) {
     api.use('moment');
     api.add_files( 'config.js', ['client', 'server'] );
     api.add_files( 'sat.js',    ['client', 'server'] );
-    api.add_files( 'callback.js',     'server' );
+//    api.add_files( 'callback.js',     'server' );
 
     api.export( '__',      ['client', 'server'] );    
     api.export( 'db',      ['client', 'server'] );

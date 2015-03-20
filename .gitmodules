@@ -1,3 +1,6 @@
 [submodule "packages/home"]
 	path = packages/home
 	url = https://github.com/i4han/home.git
+[submodule "apps/insta/app"]
+	path = apps/insta/app
+	url = https://github.com/i4han/insta.git

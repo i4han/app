@@ -158,4 +158,4 @@ module.exports.index =
         label: 'Help',   router: {}
         jade: o '#contentWrapper':h1:'Help'
 
-            
+Package.sat.Pages.index = module.exports.index           

@@ -1,1 +1,0 @@
-/Users/isaac/workspace/lib/menu.coffee
