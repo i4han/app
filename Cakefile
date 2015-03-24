@@ -1,5 +1,5 @@
 
-site = process.env.site or 'apps/insta'
+site = process.env.site or 'apps/getber'
   
 fs       = require 'fs'
 path     = require 'path'
@@ -103,8 +103,9 @@ profile = ->
     fs.writeFile home + '/.bashrc', data, (err) -> log err or data
 
 install = ->
-    npm_modules = 'coffee-script underscore express stylus fs-extra fibers mongodb chokidar ' + # hiredis redis
-              'node-serialize request event-stream prompt jade ps-node MD5 googleapis log.io node-curl '
+    npm_modules = 'coffee-script underscore express stylus fs-extra fibers mongodb chokidar '  + # hiredis redis
+              'node-serialize request event-stream prompt jade ps-node MD5 googleapis log.io ' +
+              'node-curl node-uber rimraf node-uber browserify '
     data = """
         #!/usr/bin/env bash
         curl -fsSL https://raw.github.com/action-io/autoparts/master/setup.rb | ruby
@@ -114,7 +115,7 @@ install = ->
         NODE_MODULES=~/node_modules
         [ -d $NODE_MODULES ] || mkdir $NODE_MODULES
         [ -d ~/data ] || mkdir ~/data
-        for j in #{npm_modules} #coffee-script underscore express stylus fs-extra fibers mongodb chokidar node-serialize request event-stream prompt jade ps-node MD5 googleapis log.io node-curl 
+        for j in #{npm_modules}
         do
             echo "Installing $j."
             npm install --prefix ~ $j
@@ -224,20 +225,25 @@ start_up = ->
 
 mkdir = (path) -> fs.mkdirSync path if path? and !fs.existsSync path 
 
+cp = (source, destination) ->
+    fs.createReadStream source
+        .pipe fs.createWriteStream destination
+
 sync = ->
     log Config.index_module, local.modules
     sync_dir = Config.sync_dir
     if fs.existsSync sync_dir
-        (fs.readdirSync sync_dir).forEach (file) -> 
-            fs.unlink sync_dir + file
+        (fs.readdirSync sync_dir).forEach (file) -> fs.unlink sync_dir + file
     else
         mkdir sync_dir
 
     (local.modules.map (l) -> Config.module_dir + l + '.coffee' )
         .concat((fs.readdirSync  Config.build_dir).map (l) -> Config.build_dir  + l )    
         .forEach (path) ->
-            fs.symlink path, sync = sync_dir + path.replace /.*?([^\/]*)$/, "$1"
-            log path, sync
+            filename = path.replace /.*?([^\/]*)$/, "$1"
+            fs.createReadStream path
+                .pipe es.mapSync (data) ->  c = coffee data ; c
+                .pipe fs.createWriteStream sync_dir + filename + '.js'
 
 packages = ->
     target = Config.site_packages
@@ -340,7 +346,7 @@ task 'mongoconf', 'Create mongo config file',   -> mongoconf()
 task 'packages',  'Update packages',            -> packages()
 task 'profile',   'Make shell profile',         -> profile()
 task 'sync',      'Sync source to meteor client files.', -> sync()
-task 'touch',     'Compile site files.',        -> touch() ; build()
+task 'touch',     'Compile site files.',        -> touch() ; build() ; sync()
 task 'build',     'Build meteor client files.', -> build()
 task 'install',   'Create install.sh',          -> install()
 task 'gitpass',   'github.com auto login',      -> gitpass()

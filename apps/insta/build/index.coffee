@@ -12,6 +12,8 @@ position = (obj) ->
         $('#'+obj.parentId+' .'+obj.class).css top:obj.top, left:obj.left, position:'absolute'
     , 200
 
+query = -> Iron.Location.get().queryObject
+
 repcode = -> ('ᛡ* ᐩ+ ᐟ/ ǂ# ꓸ. ꓹ, ـ- ᚚ= ꓽ: ꓼ; ˈ\' ᐦ" ᐸ< ᐳ> ʿ( ʾ) ʻ{ ʼ}'.split ' ').reduce ((o,v) -> o[v[1..]]=///#{v[0]}///g; o), {' ':/ˌ/g}
 
 parseValue = (value) ->
@@ -156,11 +158,18 @@ module.exports.index =
     home:
         label: 'Home', sidebar: 'sidebar_home',  router: path: '/'  
         jade: o '#contentWrapper': 
-                h1:'Insta'
+                h2:'Sign up with UBER'
+                '.col-md-5': 'with uber': '+button': ''
+                '.col-md-5': 'a(class="btn-info", href="https://uber.getber.com")': 'Connect with Uber'
                 '.row#items':'.col-md-12#pack':'each items':'+item':ø
         styl: o '#items .item':backgroundColor:'white', width:240, height:240, float:'left', margin:6
         rendered: -> Meteor.setTimeout (-> $('#pack').masonry itemSelector: '.item', columnWidth: 126), 40
-        helpers: items: -> db.Items.find {}, sort: created_time: -1
+        helpers: 
+            items: -> db.Items.find {}, sort: created_time: -1
+            uber: class:'btn-success', id:'uber-botton', label: 'Connect with Uber'
+        events:
+            'click #uber-botton': (event) -> console.log 'uber'
+
     sidebar_home: sidebar ['home', 'calendar', 'help']
 
     item: jade: ".item(style='height:{{height}}px;color:{{color}}')" 
@@ -211,11 +220,25 @@ module.exports.index =
             '.spacer':   lineHeight: 10
     log:
         label: 'Log', router: path: 'log'
-        jade: '#log-canvas'
+        jade:  '#log-canvas'
         rendered: -> $('#log-canvas').html '<object id="full-screen" data="http://localhost:8778/"/>'
         styl: o 
             '#log-canvas':  height: '100%', width: '100%'
             '#full-screen': height: '100%', width: '100%'
+    submit:
+        label: 'Submit', router: path: 'submit'
+        jade:  o h2:'Connected', p:'code is: {{code}}'
+        helpers:
+            code: -> Iron.Location.get().queryObject.code
+    policy:
+        label: 'Policy', router: path: 'policy'
+        jade: o h2:'Privacy Policy'
+    uber:
+        label: 'uber',   router: path: 'uber'
+        jade: o h2:'Uber'
+    redirect:
+        label: 'redirect', router: path: 'redirect'
+        jade: o h2:'redirect'
 
     day:
         collection: 'calendar'
@@ -232,12 +255,12 @@ module.exports.index =
                 position parentId:@id, class:'day',   top:28, left:(date_box_size - 37)
                 ø
         styl: o
-            ꓸinit:  display:'none'
-            ꓸtitle: display:'inline', fontWeight:'100'               
-            ꓸdate:  display:'inline', fontWeight:'600', fontSize:'14pt', width:24, textAlign:'right'
-            ꓸday:   display:'table',  fontWeight:'100', float:'right',   width:24, textAlign:'right', color:'#444',  fontSize: '8pt'
-            ꓸevent: resize:'none',    fontWeight:'100'
-            ꓸrowǂday01: marginBottom:0
+            '.init':  display:'none'
+            '.title': display:'inline', fontWeight:'100'               
+            '.date':  display:'inline', fontWeight:'600', fontSize:'14pt', width:24, textAlign:'right'
+            '.day':   display:'table',  fontWeight:'100', float:'right',   width:24, textAlign:'right', color:'#444',  fontSize: '8pt'
+            '.event': resize:'none',    fontWeight:'100'
+            '.row#day01': marginBottom:0
     request:
         label: 'Request', router: path: 'request'
         jade: o '#contentWrapper': 
@@ -258,4 +281,3 @@ module.exports.index =
         label: 'Help',   router: {}
         jade: o '#contentWrapper':h1:'Help'
 
-            

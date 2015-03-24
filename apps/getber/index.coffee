@@ -45,7 +45,7 @@ calendar_size = date_box_size * 7 + 14
 module.exports.index =
 
     logo:
-        jade: o '#logo': 'Getber'
+        jade: o '#logo': 'Getbur'
         styl: o '#logo': width: 110, float: 'left', padding: 15, fontWeight: '200', fontSize: 15, color: 'white', textAlign: 'right'
 
     layout: 
@@ -58,7 +58,7 @@ module.exports.index =
         jade: o '#contentWrapper': 
                 h2:'Sign up with UBER'
                 '.col-md-5': 'with uber': '+button': ''
-                '.col-md-5': 'a(class="btn-info", href="https://login.uber.com/oauth/authorize?redirect_uri=https%3A%2F%2Fwww.getber.com%2Fsubmit&amp;client_id=xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q&amp;response_type=code&amp;scopes=profile%2Chistory_lite")': 'Connect with Uber'
+                '.col-md-5': 'a(class="btn-info", href="https://login.uber.com/oauth/authorize?scopes=profile%2Chistory_lite&amp;client_id=xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q&amp;redirect_uri=https%3A%2F%2Fwww.getber.com%2Fsubmit&amp;response_type=code")': 'Connect with Uber'
                 '.row#items':'.col-md-12#pack':'each items':'+item':ø
         styl: o '#items .item':backgroundColor:'white', width:240, height:240, float:'left', margin:6
         rendered: -> Meteor.setTimeout (-> $('#pack').masonry itemSelector: '.item', columnWidth: 126), 40

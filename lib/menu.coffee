@@ -1,3 +1,4 @@
+#
 getMenu = (Config, Pages) ->
     _ = require 'underscore'
     _.templateSettings = interpolate: /\[(.+?)\]/g
@@ -30,7 +31,7 @@ module.exports.menu =
                 .navbar-right
                     +login
             """
-        styl: -> @_.slice ".navbar|>background-color rgba(255, 127, 38, 0.91)|<.navbar-fixed-top|>border 0px"
+        styl: -> @_.slice ".navbar|>background-color rgba(20, 23, 240, 0.7)|<.navbar-fixed-top|>border 0px"
         events:
             'click #menu-toggle': (event) -> $("#wrapper").toggleClass "toggled" # event.preventDefault()                
             'click #navbar-menu': (event) ->

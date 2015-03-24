@@ -6,7 +6,7 @@ NODE_MODULES=~/node_modules
 [ -d $NODE_MODULES ] || mkdir $NODE_MODULES
 # [ -d ~/data ] || mkdir ~/data   # mongo data
 
-for j in coffee-script underscore express stylus fs-extra fibers mongodb chokidar node-serialize request event-stream prompt jade ps-node MD5 googleapis log.io ncp rimraf # hiredis redis
+for j in coffee-script underscore express stylus fs-extra fibers mongodb chokidar node-serialize request event-stream prompt jade ps-node MD5 googleapis log.io rimraf # hiredis redis
 do
     echo "Installing $j."
     npm install --prefix ~ $j

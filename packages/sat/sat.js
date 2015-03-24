@@ -76,11 +76,11 @@ if ( Meteor.isClient ) {
 Sat.init = function () {
     db_init();
     var pages_in_file = {};
-    if ( Object.keys(module.exports).length > 0 )
-        pages_in_file = module.exports;
-    else if (Object.keys(Package.sat.Pages).length > 0)
-        pages_in_file = module.exports;
-    
+#    if ( Object.keys(module.exports).length > 0 )
+    pages_in_file = module.exports;
+#    else if (Object.keys(Package.sat.Pages).length > 0)
+#        pages_in_file = module.exports;
+
     if ( Meteor.isServer ) {
         Sat.isServer = true;
         // __.deepExtend( Config, module.exports.ServerConfig );

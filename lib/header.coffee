@@ -12,6 +12,8 @@ position = (obj) ->
         $('#'+obj.parentId+' .'+obj.class).css top:obj.top, left:obj.left, position:'absolute'
     , 200
 
+query = -> Iron.Location.get().queryObject
+
 repcode = -> ('ᛡ* ᐩ+ ᐟ/ ǂ# ꓸ. ꓹ, ـ- ᚚ= ꓽ: ꓼ; ˈ\' ᐦ" ᐸ< ᐳ> ʿ( ʾ) ʻ{ ʼ}'.split ' ').reduce ((o,v) -> o[v[1..]]=///#{v[0]}///g; o), {' ':/ˌ/g}
 
 parseValue = (value) ->
