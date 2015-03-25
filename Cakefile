@@ -7,7 +7,7 @@ md5      = require 'MD5'
 ps       = require 'ps-node'
 es       = require 'event-stream'
 chokidar = require 'chokidar'
-rmdir    = require 'rimraf'
+rm_rf    = require 'rimraf'
 {ncp}    = require 'ncp'
 
 
@@ -36,6 +36,7 @@ Config = {
     config_js_dir:  site_path + '/app/packages/sat'
     config_js:      site_path + '/app/packages/sat/config.js'
     packages:       work + '/packages'
+    module_dir:     work + '/lib/'
     config_source:  work + '/lib/config.coffee'
     theme_source:   work + '/lib/theme.coffee' 
     site_dir:       work + '/' + site        
@@ -223,7 +224,9 @@ start_up = ->
 
     meteor()
 
-mkdir = (path) -> fs.mkdirSync path if path? and !fs.existsSync path 
+mkdir = (path) -> 
+    if path? and !fs.existsSync path 
+        fs.mkdirSync path
 
 cp = (source, destination) ->
     fs.createReadStream source
@@ -247,10 +250,21 @@ sync = ->
 
 packages = ->
     target = Config.site_packages
-    console.log 'resetting:', target, Config.packages
+    console.log 'resetting:', target, site, Config.packages
     if target.indexOf(site) > -1
-        rmdir target, (err) -> log err if err
-    ncp Config.packages, target, (err) -> console.log err if err
+        rm_rf target, (err) -> 
+            log err if err
+            ncp Config.packages, target, (err) -> 
+                log err if err
+                configure()
+                x = Config.module_dir + 'x.coffee'
+                console.log x
+                if fs.existsSync x
+                    fs.createReadStream x
+                        .pipe es.mapSync (data) ->  c = coffee data ; c
+                        .pipe fs.createWriteStream Config.site_packages + 'x/x.coffee.js'
+
+
 
 readInclude = (path) ->
     ((fs.readFileSync path, 'utf8').split "\n").filter((a)-> -1 == a.search /#exclude\s*$/).join "\n"

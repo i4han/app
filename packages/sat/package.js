@@ -6,6 +6,7 @@ Package.on_use( function (api) {
     api.use('jquery');
     api.use('masonry');
     api.use('moment');
+    api.use('x');
     api.add_files( 'config.js', ['client', 'server'] );
     api.add_files( 'sat.js',    ['client', 'server'] );
 //    api.add_files( 'callback.js',     'server' );

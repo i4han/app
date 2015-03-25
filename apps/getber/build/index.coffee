@@ -24,8 +24,8 @@ parseValue = (value) ->
 o = (obj, depth=1) -> 
     ((Object.keys obj).map (key) ->
         value = obj[key]
-        key = key.replace v,k for k,v of repcode()
-        key = key.toDash()
+        # key = key.replace v,k for k,v of repcode()
+        key = key.toDash() if (-1 == key.indexOf '"') and (-1==key.indexOf "'")
         (Array(depth).join '    ') + 
         if  'object' == typeof value then [key, o(value, depth + 1)].join '\n'
         else if '' is value          then key
@@ -117,7 +117,7 @@ calendar = (id_ym) ->
         $id.append DIV class:'everyday empty', style:'visibility:hidden'
     [1..parseInt moment_ym  .endOf('month').format 'D'].forEach (i) ->        
         $id.append DIV class:'everyday', id:id = id_ym + ('0' + i)[-2..]
-        __.insertTemplate 'day', id, id:id
+        x.insertTemplate 'day', id, id:id
         contentEditable id, (_id) ->
             id = $(_id).parent().attr 'id'
             content = $(_id).html()
@@ -159,8 +159,8 @@ module.exports.index =
         label: 'Home', sidebar: 'sidebar_home',  router: path: '/'  
         jade: o '#contentWrapper': 
                 h2:'Sign up with UBER'
-                '.col-md-5': 'with uber': '+button': ''
-                '.col-md-5': 'a(class="btn-info", href="https://login.uber.com/oauth/authorize?scopes=profile%2Chistory_lite&amp;client_id=xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q&amp;redirect_uri=https%3A%2F%2Fwww.getber.com%2Fsubmit&amp;response_type=code")': 'Connect with Uber'
+                '.col-md-5': 'with uber': '+button': '' # V '"' will block camelCase below.
+                '.col-md-5': 'a(class="btn-info", href="https://login.uber.com/oauth/authorize?scope=request%20profile%20history_lite&amp;client_id=xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q&amp;redirect_uri=https%3A%2F%2Fwww.getber.com%2Fsubmit&amp;response_type=token")': 'Connect with Uber'
                 '.row#items':'.col-md-12#pack':'each items':'+item':ø
         styl: o '#items .item':backgroundColor:'white', width:240, height:240, float:'left', margin:6
         rendered: -> Meteor.setTimeout (-> $('#pack').masonry itemSelector: '.item', columnWidth: 126), 40
@@ -185,8 +185,8 @@ module.exports.index =
                 { label: 'Color', id: 'color',     title: 'Color of your vehicle',   icon: 'mobile' }]
         events: popover 'maker model color' .split ' '
     popover_maker:    jade: o ul:li: 'manufacturer in 20 characters'
-    popover_model:   jade: o ul:li: 'For digit'
-    popover_color: jade: o ul:li: 'White or black only'
+    popover_model:    jade: o ul:li: 'For digit'
+    popover_color:    jade: o ul:li: 'White or black only'
     sidebar_map: sidebar 'home map calendar request vehicle log help'.split ' '             
 
 
@@ -227,9 +227,13 @@ module.exports.index =
             '#full-screen': height: '100%', width: '100%'
     submit:
         label: 'Submit', router: path: 'submit'
-        jade:  o h2:'Connected', p:'code is: {{code}}'
+        jade:  o 
+            h2:'Connected'
+            p:'access_token is {{token}} {{a}}'
         helpers:
-            code: -> Iron.Location.get().queryObject.code
+            token: -> x.getQuery.access_token
+            a: -> HTTP.call 'GET', 'https://api.uber.com/v1/me', headers:Authorization:"Bearer 0rKZlilj0qcm4e5HxZlyFyXiDuJxPz", (err, result) ->
+                console.table result
     policy:
         label: 'Policy', router: path: 'policy'
         jade: o h2:'Privacy Policy'
@@ -268,7 +272,7 @@ module.exports.index =
                 '.col-sm-7': 'each items': '+form': '', br:''
         helpers: items: -> [
                 { label: 'Name',    id: 'name',   title: 'Your name',           icon: 'user'     },
-                { label: 'Phone',   id: 'phone',  title:  'Phone Number',       icon: 'mobile'  },
+                { label: 'Phone',   id: 'phone',  title: 'Phone Number',        icon: 'mobile'   },
                 { label: 'Address', id: 'address',title: 'Your home Zip code',  icon: 'envelope' }]
         events: popover 'name phone address' .split ' '
     popover_name:    jade: o ul:li: 'Write your name.', 'li ': 'No longer then 12 letters.'

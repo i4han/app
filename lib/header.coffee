@@ -24,8 +24,8 @@ parseValue = (value) ->
 o = (obj, depth=1) -> 
     ((Object.keys obj).map (key) ->
         value = obj[key]
-        key = key.replace v,k for k,v of repcode()
-        key = key.toDash()
+        # key = key.replace v,k for k,v of repcode()
+        key = key.toDash() if (-1 == key.indexOf '"') and (-1==key.indexOf "'")
         (Array(depth).join '    ') + 
         if  'object' == typeof value then [key, o(value, depth + 1)].join '\n'
         else if '' is value          then key

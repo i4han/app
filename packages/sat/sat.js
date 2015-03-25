@@ -1,12 +1,16 @@
 
 db = {}, Pages = {};
 Sat = { isServer: false, isClient: false };
-__ = this.__
 Config = this.Config
 module = { exports:{} } // why
 
+// __ = this.__
+
+/*
 if (Meteor.isServer)
     fs = Npm.require('fs') 
+
+
 
 log = function () {
     return (arguments != null) && ([].slice.call(arguments)).concat(['\n']).map(function(str) {
@@ -18,7 +22,7 @@ log = function () {
     });
 }
 
-/*
+
 __.deepExtend = function (target, source) {
     for (var prop in source)
         if (prop in target)
@@ -27,7 +31,7 @@ __.deepExtend = function (target, source) {
             target[prop] = source[prop];
     return target;
 }
-*/
+
 __.capitalize = function (string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -36,6 +40,7 @@ __.isLowerCase = function (char, index) {
     return char.charAt(index) >= 'a' && char.charAt(index) <= 'z' ? true : false
 }
 
+*/
 
 db_init = function () {
     _.each( Config.collections, function (c) {
@@ -76,10 +81,10 @@ if ( Meteor.isClient ) {
 Sat.init = function () {
     db_init();
     var pages_in_file = {};
-#    if ( Object.keys(module.exports).length > 0 )
+//    if ( Object.keys(module.exports).length > 0 )
     pages_in_file = module.exports;
-#    else if (Object.keys(Package.sat.Pages).length > 0)
-#        pages_in_file = module.exports;
+//    else if (Object.keys(Package.sat.Pages).length > 0)
+//        pages_in_file = module.exports;
 
     if ( Meteor.isServer ) {
         Sat.isServer = true;
@@ -91,7 +96,7 @@ Sat.init = function () {
         
         var startup = [];
         _.each(_.keys(pages_in_file), function(file) {
-            if ( __.isLowerCase(file, 0) )
+            if ( x.isLowerCase(file, 0) )
                 _.extend( Pages, pages_in_file[file] );
 
             // __events__.startup
@@ -101,7 +106,7 @@ Sat.init = function () {
             }
             // delete Pages if page name startwith __
             _.each( _.filter( _.keys( pages_in_file[file] ), function (key) { 
-                    return ! ( (__.isLowerCase(key, 0) || key.charAt(0) === '_') && __.isLowerCase(key, 1) );  // remove pages those name is not 'smallcase' or '_smallcase'
+                    return ! ( (x.isLowerCase(key, 0) || key.charAt(0) === '_') && x.isLowerCase(key, 1) );  // remove pages those name is not 'smallcase' or '_smallcase'
                 }), function (name) {
                     delete Pages[name];
             });
@@ -127,7 +132,7 @@ Sat.init = function () {
                         if (Template[name])
                             Template[name][key] = Pages[name][key];
                         else
-                            log( 'Template ' + name + ' key:' + key );
+                            x.log( 'Template ' + name + ' key:' + key );
             });
         });
         Router.map( function () {

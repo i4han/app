@@ -48,7 +48,7 @@ module.exports.ui =
         helpers:
             type: -> @type or "text"
             visible: -> isVisible(@visible)
-            id: -> @id or __.dasherize @label.toLowerCase().trim()
+            id: -> @id or x.dasherize @label.toLowerCase().trim()
             title: -> @title
         styl$: """
             .popover
@@ -72,7 +72,7 @@ module.exports.ui =
         helpers:
             type: -> @type or "button"
             visible: -> isVisible(@visible)
-            id: -> @id or __.dasherize @label.toLowerCase().trim()
+            id: -> @id or x.dasherize @label.toLowerCase().trim()
             class: -> @class or 'btn-primary'
         styl$: """
             .btn
@@ -126,7 +126,7 @@ module.exports.ui =
             """
         helpers:
             visible: -> isVisible(@visible)     # change password must put visible: true why?
-            id: -> @id or __.dasherize @label.toLowerCase().trim()
+            id: -> @id or x.dasherize @label.toLowerCase().trim()
             class: -> @class
     menu:
         jade: """

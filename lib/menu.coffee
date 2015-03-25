@@ -164,12 +164,12 @@ module.exports.menu =
                 ul.sidebar-nav#sidebar_menu_insert
             """
         rendered: ->
-            $('#listen-to-menu-change').trigger('custom', [__.currentRoute()])
+            $('#listen-to-menu-change').trigger('custom', [x.currentRoute()])
         events:
             'custom #listen-to-menu-change': (event, instance, navbar_menu) ->
                 sidebar = Pages[navbar_menu].sidebar
                 if sidebar
-                    __.insertTemplate sidebar, 'sidebar_menu_insert'
+                    x.insertTemplate sidebar, 'sidebar_menu_insert'
                     $("#wrapper").removeClass "toggled"
                 else
                     $('#'+sidebar).empty()
