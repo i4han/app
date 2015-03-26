@@ -1,27 +1,10 @@
-repcode = -> ('ᛡ* ᐩ+ ᐟ/ ǂ# ꓸ. ꓹ, ـ- ᚚ= ꓽ: ꓼ; ˈ\' ᐦ" ᐸ< ᐳ> ʿ( ʾ) ʻ{ ʼ}'.split ' ').reduce ((o,v) -> o[v[1..]]=///#{v[0]}///g; o), {' ':/ˌ/g}
-
-parseValue = (value) ->
-    if      'number'   == typeof value then value.toString() + 'px'
-    else if 'string'   == typeof value then (value = value.replace v,k for k,v of repcode()).pop()
-    else if 'function' == typeof value then value() else value
-
-o = (obj, depth=1) -> 
-    ((Object.keys obj).map (key) ->
-        value = obj[key]
-        key = key.replace v,k for k,v of repcode()
-        key = key.toDash()
-        (Array(depth).join '    ') + 
-        if  'object' == typeof value then [key, o(value, depth + 1)].join '\n'
-        else if '' is value          then key
-        else key + ' ' + parseValue value
-    ).join '\n'
 
 isVisible = (v) -> if 'function' == typeof v then v() else if false is v then false else true
 
 module.exports.ui =
     html:
         jade: ' '
-        head: -> o 
+        head: -> x.o 
             'title': @C.title
             "link(rel='stylesheet'": "href='#{@C._.font_style.pt_sans}')"
             "script(type='text/javascript'": "src='https://maps.googleapis.com/maps/api/js?key=AIzaSyB2RuPxiq1JbG18Lq793FdEzWM-7-MYX8Q')"
@@ -31,7 +14,7 @@ module.exports.ui =
             #    db[a] = new Meteor.Collection a if !db[a]?
             #    Meteor.subscribe [a]
             #    console.log a
-        styl: -> o
+        styl: -> x.o 
             html: height: '100%'
             body: 
                 height: '100%'

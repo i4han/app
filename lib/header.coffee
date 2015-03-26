@@ -2,6 +2,7 @@
 
 String::toDash = -> @.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase()
 
+
 extend = ($source, $target) ->
     ('display float resize margin padding'.split ' ')
     .concat('color backgroundColor border'.split ' ').forEach (a) ->          

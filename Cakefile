@@ -17,6 +17,8 @@ site = process.env.site
 work = home + '/workspace'
 site_path = work + '/' + site
 
+{x} = require work + '/meteor/packages/isaac:x/x.coffee'
+
 try
     {Config, __} = require site_path + '/app/packages/sat/config'    
 catch e
@@ -35,7 +37,7 @@ Config = {
     site_packages:  site_path + '/app/packages'
     config_js_dir:  site_path + '/app/packages/sat'
     config_js:      site_path + '/app/packages/sat/config.js'
-    packages:       work + '/packages'
+    packages:       work + 'meteor/packages'
     module_dir:     work + '/lib/'
     config_source:  work + '/lib/config.coffee'
     theme_source:   work + '/lib/theme.coffee' 
@@ -241,12 +243,21 @@ sync = ->
         mkdir sync_dir
 
     (local.modules.map (l) -> Config.module_dir + l + '.coffee' )
-        .concat((fs.readdirSync  Config.build_dir).map (l) -> Config.build_dir  + l )    
+        .concat([Config.site_dir + 'index.coffee'])    
+#        .concat((fs.readdirSync  Config.build_dir).map (l) -> Config.build_dir  + l )    
         .forEach (path) ->
             filename = path.replace /.*?([^\/]*)$/, "$1"
+            console.log path, filename
             fs.createReadStream path
-                .pipe es.mapSync (data) ->  c = coffee data ; c
+                .pipe es.mapSync (data) -> c = coffee data ; c
                 .pipe fs.createWriteStream sync_dir + filename + '.js'
+
+coffee2js = (x) ->
+    console.log x
+    if fs.existsSync x
+        fs.createReadStream x
+            .pipe es.mapSync (data) ->  c = coffee data ; c
+            .pipe fs.createWriteStream x + '.js'
 
 packages = ->
     target = Config.site_packages
@@ -254,17 +265,19 @@ packages = ->
     if target.indexOf(site) > -1
         rm_rf target, (err) -> 
             log err if err
-            ncp Config.packages, target, (err) -> 
-                log err if err
-                configure()
-                x = Config.module_dir + 'x.coffee'
-                console.log x
-                if fs.existsSync x
-                    fs.createReadStream x
-                        .pipe es.mapSync (data) ->  c = coffee data ; c
-                        .pipe fs.createWriteStream Config.site_packages + 'x/x.coffee.js'
-
-
+            mkdir target
+            (fs.readdirSync Config.packages).map (d) ->
+                pack_dir = Config.packages + d
+                if fs.lstatSync(pack_dir).isDirectory()
+                    (fs.readdirSync pack_dir).map (e) ->
+                        file = pack_dir + '/' + e
+                        if e.indexOf('.coffee') == e.length - 7 > -1
+                            console.log 'coffee:', file
+                            coffee2js file
+                    if d.indexOf(':') == -1
+                        ncp pack_dir, target + d, (err) -> 
+                            log err if err
+                            configure() if 'sat' == d
 
 readInclude = (path) ->
     ((fs.readFileSync path, 'utf8').split "\n").filter((a)-> -1 == a.search /#exclude\s*$/).join "\n"
@@ -315,12 +328,14 @@ build = () ->
         @Pages = Pages
         if !what? then undefined
         else if 'string'   == typeof what then what
+        else if 'object'   == typeof what then x.o(what)
         else if 'function' == typeof what then what.call(@, @C, @_)
 
     log Config.index_module, Config.target_dir
     mkdir Config.target_dir
-    Pages = ((fs.readdirSync Config.build_dir).map (file) -> 
-        require Config.build_dir + file).concat(
+#    Pages = ((fs.readdirSync Config.build_dir).map (file) -> 
+#        require Config.build_dir + file).concat(
+    Pages = ([require Config.site_dir + '/index.coffee']).concat(
         (local.modules)    .map (module) -> require Config.module_dir + module,
         (local.other_files).map (file)   -> require Config.site_dir   + file )
         .reduce(((o,v) -> key = Object.keys(v)[0] ; o[key] = v[key] ; o), {})
@@ -330,7 +345,6 @@ build = () ->
             (((Object.keys Pages[module]).map (page) ->
                 if block = func$str(Pages[module][page][kind])
                     $$.format.call @, page, indent block, $$.indent 
-                #log "#{module}:#{page}:#{kind}\n[#{block}]\n" 
             ).filter (o) -> o?).join ''
         ).filter (o) -> o?).join ''
         fs.readFile $$.file, (err, d) -> 

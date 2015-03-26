@@ -168,6 +168,7 @@ module.exports.menu =
         events:
             'custom #listen-to-menu-change': (event, instance, navbar_menu) ->
                 sidebar = Pages[navbar_menu].sidebar
+                console.log 'SB:', sidebar, ':'
                 if sidebar
                     x.insertTemplate sidebar, 'sidebar_menu_insert'
                     $("#wrapper").removeClass "toggled"
