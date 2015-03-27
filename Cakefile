@@ -19,6 +19,9 @@ site_path = work + '/' + site
 
 {x} = require work + '/meteor/packages/isaac:x/x.coffee'
 
+console.log site_path + '/app/packages/sat/config'
+console.log work + '/lib/config'
+
 try
     {Config, __} = require site_path + '/app/packages/sat/config'    
 catch e
@@ -328,8 +331,8 @@ build = () ->
         @Pages = Pages
         if !what? then undefined
         else if 'string'   == typeof what then what
-        else if 'object'   == typeof what then x.o(what)
-        else if 'function' == typeof what then what.call(@, @C, @_)
+        else if 'object'   == typeof what then x.o what
+        else if 'function' == typeof what then func$str what.call @, @C, @_
 
     log Config.index_module, Config.target_dir
     mkdir Config.target_dir
@@ -339,6 +342,7 @@ build = () ->
         (local.modules)    .map (module) -> require Config.module_dir + module,
         (local.other_files).map (file)   -> require Config.site_dir   + file )
         .reduce(((o,v) -> key = Object.keys(v)[0] ; o[key] = v[key] ; o), {})
+    console.log Pages, Config
     (Config.templates).map (kind) ->
         $$ = Config.pages[kind]
         data = ($$.header || '') + (((Object.keys Pages).map (module) ->

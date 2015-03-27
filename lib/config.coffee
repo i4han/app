@@ -14,7 +14,6 @@ else
     @module = exports:{}
     fs = Npm.require 'fs' if Meteor.isServer
 
-
 main = {
     autogen_prefix:   'auto_'
     callback_port:    3300
@@ -110,12 +109,12 @@ local = {}
             @client_dir    = main.target_dir
             @target_dir    = main.target_dir   # alias client_dir
             @site_dir      = main.site_dir
-            @build_dir     = @site_dir    + 'build/'
-            @meteor_lib    = @meteor_dir  + 'lib/'
+            @build_dir     = @site_dir       + 'build/'
+            @meteor_lib    = @meteor_dir     + 'lib/'
             @packages      = main.workspace  + 'meteor/packages/'
-            @site_packages = @site_dir    + 'app/packages/'
-            @config_js_dir = @site_dir    + 'app/packages/sat/'
-            @sync_dir      = @site_dir    + 'app/lib/' #@meteor_lib  # after meteor_lib
+            @site_packages = @site_dir       + 'app/packages/'
+            @config_js_dir = @site_dir       + 'app/packages/sat/'
+            @sync_dir      = @site_dir       + 'app/lib/' #@meteor_lib  # after meteor_lib
             @config_js     = @config_js_dir  + 'config.js'
             @config_source = @module_dir     + 'config.coffee'
             @index_module  = @site_dir       + local.index_file 
@@ -123,7 +122,7 @@ local = {}
             @local_module  = @site_dir       + main.local_config # 'local.coffee'
             @theme_source  = @module_dir     + 'theme.coffee'
             @header_source = @module_dir     + 'header.coffee'
-#            @storables     = main.meteor_dir + 'private/storables' # remove?
+#           @storables     = main.meteor_dir + 'private/storables' # remove?
             @log_file      = main.home_dir   + '.log.io/satellite'
             @set_prefix    = ''
             @autogen_prefix = main.autogen_prefix            
@@ -144,6 +143,14 @@ local = {}
         func() if func?
 }.init()
 
+!Meteor? and module.exports = __: @__, Config: @Config
+
+###
+
+@__.slice = (str, tab=1, indent='    ') -> (((str.replace /~\s+/g, '').split '|').map (s) ->
+    s = if 0 == s.search /^(<+)/ then s.replace /^(<+)/, Array(tab = Math.max tab - RegExp.$1.length, 1).join indent 
+    else if 0 == s.search /^>/ then s.replace /^>/, Array(++tab).join indent 
+    else s.replace /^/, Array(tab).join indent).join '\n'
 
 
 @__ =
@@ -169,10 +176,6 @@ local = {}
             delete obj[oldName]
         this
 
-@__.slice = (str, tab=1, indent='    ') -> (((str.replace /~\s+/g, '').split '|').map (s) ->
-    s = if 0 == s.search /^(<+)/ then s.replace /^(<+)/, Array(tab = Math.max tab - RegExp.$1.length, 1).join indent 
-    else if 0 == s.search /^>/ then s.replace /^>/, Array(++tab).join indent 
-    else s.replace /^/, Array(tab).join indent).join '\n'
 
 @__.insertTemplate = (page, id, data={}) ->
     $('#' + id).empty()
@@ -222,12 +225,7 @@ local = {}
 
 @__.log = (arg) ->
      console.log( arg + '' );
-
+###
 #    if this.Config.redis.connected
 #        this.Config.redis.rpush( 'log', arg + '' );
 #    else
-
-if !Meteor?
-    module.exports =
-        __: @__
-        Config: @Config

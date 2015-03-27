@@ -1,4 +1,5 @@
-#
+
+
 getMenu = (Config, Pages) ->
     _ = require 'underscore'
     _.templateSettings = interpolate: /\[(.+?)\]/g
@@ -10,10 +11,12 @@ getMenu = (Config, Pages) ->
             path:a, label:index[a].label, id:'navbar-menu'
     ).join '\n'
 
+#        jade: """li: a(href="{{path}}" id="{{id}}") {{label}}"""
+
 module.exports.menu =
 
     menu_list:
-        jade: """li: a(href="{{path}}" id="{{id}}") {{label}}"""
+        jade: li:'a(href="{{path}}" id="{{id}}")': '{{label}}'
         helpers: 
             path:  -> Router.path @page 
             label: -> Pages[@page].label
@@ -31,12 +34,15 @@ module.exports.menu =
                 .navbar-right
                     +login
             """
-        styl: -> @_.slice ".navbar|>background-color rgba(20, 23, 240, 0.7)|<.navbar-fixed-top|>border 0px"
+#        styl: -> @_.slice ".navbar|>background-color rgba(20, 23, 240, 0.7)|<.navbar-fixed-top|>border 0px"
+        styl: 
+            '.navbar':backgroundColor:'rgba(20, 23, 240, 0.7)'
+            '.navbar-fixed-top':border:0
         events:
             'click #menu-toggle': (event) -> $("#wrapper").toggleClass "toggled" # event.preventDefault()                
             'click #navbar-menu': (event) ->
                 menu_selected = event.target.innerText.toLowerCase()
-                $('#listen-to-menu-change').trigger('custom', [menu_selected] )
+                $('#listen-to-menu-change').trigger 'custom', [menu_selected]
 
         styl$: (Config) -> """
             #menu-toggle
@@ -169,7 +175,7 @@ module.exports.menu =
             'custom #listen-to-menu-change': (event, instance, navbar_menu) ->
                 sidebar = Pages[navbar_menu].sidebar
                 console.log 'SB:', sidebar, ':'
-                if sidebar
+                if sidebar? and 'string' == typeof sidebar and sidebar.length > 0 # x.isString sidebar
                     x.insertTemplate sidebar, 'sidebar_menu_insert'
                     $("#wrapper").removeClass "toggled"
                 else

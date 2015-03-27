@@ -4,23 +4,22 @@ isVisible = (v) -> if 'function' == typeof v then v() else if false is v then fa
 module.exports.ui =
     html:
         jade: ' '
-        head: -> x.o 
-            'title': @C.title
-            "link(rel='stylesheet'": "href='#{@C._.font_style.pt_sans}')"
-            "script(type='text/javascript'": "src='https://maps.googleapis.com/maps/api/js?key=AIzaSyB2RuPxiq1JbG18Lq793FdEzWM-7-MYX8Q')"
+        head: ->
+            title: @C.title
+            1: "link(rel='stylesheet' href='#{@C._.font_style.pt_sans}')"
+            2: "script(type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyB2RuPxiq1JbG18Lq793FdEzWM-7-MYX8Q')"
         startup: ->
             # console.log 'collection:', Config.collections
             Config.collections #.forEach (a) ->
             #    db[a] = new Meteor.Collection a if !db[a]?
             #    Meteor.subscribe [a]
             #    console.log a
-        styl: -> x.o 
+        styl: -> 
             html: height: '100%'
             body: 
                 height: '100%'
                 fontFamily: @C.$.font_family
-                fontWeight: @C.$.font_weight
-    
+                fontWeight: @C.$.font_weight   
     form:
         jade: """
             if visible
