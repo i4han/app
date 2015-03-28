@@ -9,6 +9,7 @@ local =
     modules:     'accounts menu ui responsive' .split ' '
     collections: 'Connects Items Updates Calendar User' .split ' '
     theme:       'clean'
+    uber_oauth_url:   'https://login.uber.com/oauth/authorize'
     uber_oauth:
         scope:        'request profile history_lite'
         client_id:    'xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q'

@@ -21,15 +21,15 @@ module.exports.index =
         label: 'Home', sidebar: 'sidebar_home',  router: path: '/'  
         jade: '#contentWrapper': 
                 'h2#title':'Sign up with UBER'
-                '.col-md-6':
+                '.col-md-6#e1':
                     'p#name':'Isaac Han'
                     'p#address':'2353 Hagen Link NW, Edmonton, AB T6R 0B2'
                     br:''
                     'with uber': '+button': ''
-                '.col-md-5': '': 'a(class="btn-info", href="<%= @oauth %>") Connect with Uber'
-                '.col-md-4': '{{obj}}'
+                '.col-md-6#e2': '': 'a(class="btn-info", href="<%= @oauth %>") Connect with Uber'
+                '.col-md-6#e3': '{{obj}}'
                 '#items': '.col-md-11#pack':'each items':'+item': ''
-        eco: -> oauth: -> "https://login.uber.com/oauth/authorize?" + x.queryString @C.local.uber_oauth
+        eco: -> oauth: -> @C.local.uber_oauth_url + "?" + x.queryString @C.local.uber_oauth
         helpers: 
             items: -> db.Items.find {}, sort: created_time: -1
             uber: -> class:'btn-success', id:'uber-botton', label: 'Connect with Uber'
@@ -53,7 +53,7 @@ module.exports.index =
                         2:'{{phone}}'
         helpers:
             user: -> name: 'Isaac Han', phone: 'xxx-xxxx'
-            access_token: ->
+            access_token: -> 1
 
     item: jade: ".item(style='height:{{height}}px;color:{{color}}')" 
     submit:
@@ -63,8 +63,11 @@ module.exports.index =
             p:'access_token is {{token}} {{a}}'
         helpers:
             token: -> x.hash().access_token
-            a: -> HTTP.call 'GET', 'https://api.uber.com/v1/me', headers:Authorization:"Bearer 0rKZlilj0qcm4e5HxZlyFyXiDuJxPz", (err, result) ->
-                console.table result
+            a: -> HTTP.call 'GET', 'https://api.uber.com/v1/me', headers: 
+                    Authorization:'Bearer ' + x.hash().access_token
+#                    'Access-Control-Allow-Origin': 'http://www.getber.com'
+            , 
+                (err, result) -> console.log result.data
 
     vehicle:
         label: 'Vehicle', sidebar: 'sidebar_vehicle', router: path: 'vehicle'
