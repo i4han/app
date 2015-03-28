@@ -26,9 +26,10 @@ module.exports.index =
                     'p#address':'2353 Hagen Link NW, Edmonton, AB T6R 0B2'
                     br:''
                     'with uber': '+button': ''
-                '.col-md-5': '': 'a(class="btn-info", href="https://login.uber.com/oauth/authorize?scope=request%20profile%20history_lite&amp;client_id=xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q&amp;redirect_uri=https%3A%2F%2Fwww.getber.com%2Fsubmit&amp;response_type=token") Connect with Uber'
+                '.col-md-5': '': 'a(class="btn-info", href="<%= @oauth %>") Connect with Uber'
                 '.col-md-4': '{{obj}}'
                 '#items': '.col-md-11#pack':'each items':'+item': ''
+        eco: -> oauth: -> "https://login.uber.com/oauth/authorize?" + x.queryString @C.local.uber_oauth
         helpers: 
             items: -> db.Items.find {}, sort: created_time: -1
             uber: -> class:'btn-success', id:'uber-botton', label: 'Connect with Uber'

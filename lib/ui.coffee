@@ -7,7 +7,10 @@ module.exports.ui =
         head: ->
             title: @C.title
             1: "link(rel='stylesheet' href='#{@C._.font_style.pt_sans}')"
-            2: "script(type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyB2RuPxiq1JbG18Lq793FdEzWM-7-MYX8Q')"
+            #2: "script(type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyB2RuPxiq1JbG18Lq793FdEzWM-7-MYX8Q')"
+            3: "script(type='text/javascript' src='https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places')"
+            4: "meta(name='viewport', content='initial-scale=1.0, user-scalable=no')"
+            5: "meta(charset='utf-8')"
         startup: ->
             # console.log 'collection:', Config.collections
             Config.collections #.forEach (a) ->
@@ -46,6 +49,55 @@ module.exports.ui =
             .popover-inner
                 width 100%
             """
+    map:
+        css: """
+          html, body, #map-canvas {
+            height: 100%;
+            margin: 0px;
+            padding: 0px
+          }
+          .controls {
+            margin-top: 16px;
+            border: 1px solid transparent;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            height: 32px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          }
+
+          #pac-input {
+            background-color: #fff;
+            font-family: Roboto;
+            font-size: 15px;
+            font-weight: 300;
+            margin-left: 12px;
+            padding: 0 11px 0 13px;
+            text-overflow: ellipsis;
+            width: 400px;
+          }
+
+          #pac-input:focus {
+            border-color: #4d90fe;
+          }
+
+          .pac-container {
+            font-family: Roboto;
+          }
+
+          #type-selector {
+            color: #fff;
+            background-color: #4d90fe;
+            padding: 5px 11px 0px 11px;
+          }
+
+          #type-selector label {
+            font-family: Roboto;
+            font-size: 13px;
+            font-weight: 300;
+          }"""
+
     button:
         jade: """
             if visible

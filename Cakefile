@@ -6,6 +6,7 @@ path     = require 'path'
 md5      = require 'MD5'
 ps       = require 'ps-node'
 es       = require 'event-stream'
+eco      = require 'eco'
 chokidar = require 'chokidar'
 rm_rf    = require 'rimraf'
 {ncp}    = require 'ncp'
@@ -18,6 +19,7 @@ work = home + '/workspace'
 site_path = work + '/' + site
 
 {x} = require work + '/meteor/packages/isaac:x/x.coffee'
+x.extend x, (require work + '/meteor/packages/isaac:x/x').x
 
 console.log site_path + '/app/packages/sat/config'
 console.log work + '/lib/config'
@@ -111,7 +113,7 @@ profile = ->
 install = ->
     npm_modules = 'coffee-script underscore express stylus fs-extra fibers mongodb chokidar '  + # hiredis redis
               'node-serialize request event-stream prompt jade ps-node MD5 googleapis log.io ' +
-              'node-curl node-uber rimraf node-uber browserify '
+              'node-curl node-uber rimraf eco ' #node-uber
     data = """
         #!/usr/bin/env bash
         curl -fsSL https://raw.github.com/action-io/autoparts/master/setup.rb | ruby
@@ -322,22 +324,27 @@ touch = () ->
                 else 
                     [head, data].map (a) -> coffee a
                     fs.writeFile Config.build_dir + file + '.coffee', head + data, (err) ->
+
                         if err then log err else build()
 
-build = () ->
-    func$str = (what) ->
-        @C = Config
-        @_ = __
-        @Pages = Pages
-        if !what? then undefined
-        else if 'string'   == typeof what then what
-        else if 'object'   == typeof what then x.o what
-        else if 'function' == typeof what then func$str what.call @, @C, @_
+vfunc$str = (obj, pages) ->
+    for key, value of obj
+        obj[key] = func$str value, undefined, pages
+    obj
 
+func$str = (what, obj, pages) ->
+    @C = Config
+    @_ = __
+    @Pages = pages
+    obj = if 'function' == typeof obj then vfunc$str obj(), pages else vfunc$str obj, pages
+    if !what? then undefined
+    else if 'string'   == typeof what then (if x.isEmpty obj then what else eco.render what, obj)
+    else if 'object'   == typeof what then (if x.isEmpty obj then x.o what else eco.render (x.o what), obj)
+    else if 'function' == typeof what then func$str (what.call @, @C, @_), obj, pages
+
+build = () ->
     log Config.index_module, Config.target_dir
     mkdir Config.target_dir
-#    Pages = ((fs.readdirSync Config.build_dir).map (file) -> 
-#        require Config.build_dir + file).concat(
     Pages = ([require Config.site_dir + '/index.coffee']).concat(
         (local.modules)    .map (module) -> require Config.module_dir + module,
         (local.other_files).map (file)   -> require Config.site_dir   + file )
@@ -347,7 +354,7 @@ build = () ->
         $$ = Config.pages[kind]
         data = ($$.header || '') + (((Object.keys Pages).map (module) ->
             (((Object.keys Pages[module]).map (page) ->
-                if block = func$str(Pages[module][page][kind])
+                if block = func$str Pages[module][page][kind], Pages[module][page]['eco'], Pages
                     $$.format.call @, page, indent block, $$.indent 
             ).filter (o) -> o?).join ''
         ).filter (o) -> o?).join ''

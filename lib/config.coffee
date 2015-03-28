@@ -45,6 +45,7 @@ local = {}
     local_config:  main.local_config
     collections:   local.collections
     menu:          local.menu
+    local:         local
     _:
         font_style:    
             pt_sans:    "https://fonts.googleapis.com/css?family=PT+Sans:400,700"
