@@ -9,14 +9,11 @@ module.exports.ui =
             1: "link(rel='stylesheet' href='#{@C._.font_style.pt_sans}')"
             #2: "script(type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyB2RuPxiq1JbG18Lq793FdEzWM-7-MYX8Q')"
             3: "script(type='text/javascript' src='https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places')"
-            4: "meta(name='viewport', content='initial-scale=1.0, user-scalable=no')"
-            5: "meta(charset='utf-8')"
+            #4: "script(type='text/javascript' src='')"
+            5: "meta(name='viewport', content='initial-scale=1.0, user-scalable=no')"
+            6: "meta(charset='utf-8')"
         startup: ->
-            # console.log 'collection:', Config.collections
-            Config.collections #.forEach (a) ->
-            #    db[a] = new Meteor.Collection a if !db[a]?
-            #    Meteor.subscribe [a]
-            #    console.log a
+            ''
         styl: -> 
             html: height: '100%'
             body: 
@@ -49,7 +46,7 @@ module.exports.ui =
             .popover-inner
                 width 100%
             """
-    map:
+    address:
         css: """
           html, body, #map-canvas {
             height: 100%;

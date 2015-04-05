@@ -1,6 +1,3 @@
-if ("undefined" === typeof x || null === x) {
-  x = {$:{}};
-}
 
 x.$.getStyle = function() {
     var dom = this.get(0);
@@ -66,31 +63,31 @@ x.$.editable = function() {
     return that;    
 };
 
-x.gmapInit = function () {
-  var mapOptions = {
-    center: new google.maps.LatLng(-33.8688, 151.2195),
-    zoom: 13
+x.gmapInit = function (options) {
+  var gmaps = google.maps
+  var mapOptions = ! x.isEmpty(options) ? options : {
+    disableDefaultUI: true, 
+    center: new gmaps.LatLng(53.52, -113.5),
+    zoom: 12
   };
-  var map = new google.maps.Map(document.getElementById('map-canvas'),
-    mapOptions);
+  var map = new gmaps.Map(document.getElementById('map-canvas'), mapOptions);
 
-  var input = /** @type {HTMLInputElement} */(
-      document.getElementById('pac-input'));
+  var input = document.getElementById('pac-input');
 
-  var types = document.getElementById('type-selector');
-  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-  map.controls[google.maps.ControlPosition.TOP_LEFT].push(types);
+  // var types = document.getElementById('type-selector');
+  map.controls[gmaps.ControlPosition.TOP_LEFT].push(input);
+  // map.controls[gmaps.ControlPosition.TOP_LEFT].push(types);
 
-  var autocomplete = new google.maps.places.Autocomplete(input);
+  var autocomplete = new gmaps.places.Autocomplete(input);
   autocomplete.bindTo('bounds', map);
 
-  var infowindow = new google.maps.InfoWindow();
-  var marker = new google.maps.Marker({
+  var infowindow = new gmaps.InfoWindow();
+  var marker = new gmaps.Marker({
     map: map,
-    anchorPoint: new google.maps.Point(0, -29)
+    anchorPoint: new gmaps.Point(0, -29)
   });
 
-  google.maps.event.addListener(autocomplete, 'place_changed', function() {
+  gmaps.event.addListener(autocomplete, 'place_changed', function() {
     infowindow.close();
     marker.setVisible(false);
     var place = autocomplete.getPlace();
@@ -103,14 +100,15 @@ x.gmapInit = function () {
       map.fitBounds(place.geometry.viewport);
     } else {
       map.setCenter(place.geometry.location);
-      map.setZoom(17);  // Why 17? Because it looks good.
+      map.setZoom(16);  // Why 16? Because it looks good.
+      map.setMapTypeId('hybrid');
     }
-    marker.setIcon(/** @type {google.maps.Icon} */({
+    marker.setIcon(/** @type {gmaps.Icon} */({
       url: place.icon,
-      size: new google.maps.Size(71, 71),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(17, 34),
-      scaledSize: new google.maps.Size(35, 35)
+      size: new gmaps.Size(71, 71),
+      origin: new gmaps.Point(0, 0),
+      anchor: new gmaps.Point(17, 34),
+      scaledSize: new gmaps.Size(35, 35)
     }));
     marker.setPosition(place.geometry.location);
     marker.setVisible(true);
@@ -124,15 +122,16 @@ x.gmapInit = function () {
       ].join(' ');
     }
 
-    infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
-    infowindow.open(map, marker);
+    // infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+    // infowindow.open(map, marker);
   });
 
   // Sets a listener on a radio button to change the filter type on Places
   // Autocomplete.
+  /*
   function setupClickListener(id, types) {
     var radioButton = document.getElementById(id);
-    google.maps.event.addDomListener(radioButton, 'click', function() {
+    gmaps.event.addDomListener(radioButton, 'click', function() {
       autocomplete.setTypes(types);
     });
   }
@@ -141,5 +140,8 @@ x.gmapInit = function () {
   setupClickListener('changetype-address', ['address']);
   setupClickListener('changetype-establishment', ['establishment']);
   setupClickListener('changetype-geocode', ['geocode']);
+  */
 } 
+
+
 

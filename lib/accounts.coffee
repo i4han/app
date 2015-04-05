@@ -118,7 +118,7 @@ module.exports.accounts =
         jade:  
             'li.dropdown#login-dropdown':
                 'a.dropdown-toggle#login-id(data-toggle="dropdown")':
-                    '{{username}}':''
+                    '| {{username}}':''
                     'i.fa(class="fa-chevron-down")':''
                 '.dropdown-menu(id="{{id}}")':
                     '+Template.dynamic(template=template)':''

@@ -1,3 +1,5 @@
+var validateRe;
+
 if (typeof x === "undefined" || x === null) {
   global.x = {
     $: {}
@@ -40,7 +42,7 @@ x.isVisible = function(v) {
   }
 };
 
-x.isAlphabet = function(str) {
+x.isPortableKey = function(str) {
   return /^[a-z]+$/i.test(str);
 };
 
@@ -48,7 +50,7 @@ x.isDigit = function(str) {
   return /^[0-9]+$/.test(str);
 };
 
-x.parseValue = function(value) {
+x.value = function(value) {
   if ('number' === typeof value) {
     return value.toString() + 'px';
   } else if ('string' === typeof value) {
@@ -64,6 +66,41 @@ x.timeout = function(time, func) {
   return Meteor.setTimeout(func, time);
 };
 
+x.func = function(func) {
+  if ('function' === typeof func) {
+    return func();
+  } else if ('undefined' === func) {
+    return {};
+  } else {
+    return func;
+  }
+};
+
+x.funcConcat = function(func1, func2) {
+  return function() {
+    func1();
+    return func2();
+  };
+};
+
+x.keys = function(obj) {
+  return Object.keys(obj);
+};
+
+x.isValue = function(v) {
+  if ('string' === typeof v || 'number' === typeof v) {
+    return v;
+  } else {
+    return false;
+  }
+};
+
+x.interpolate = function(str, o) {
+  return str.replace(/{([^{}]*)}/g, function(a, b) {
+    return x.isValue(o[b]) || a;
+  });
+};
+
 x.o = function(obj, depth) {
   if (depth == null) {
     depth = 1;
@@ -71,10 +108,10 @@ x.o = function(obj, depth) {
   return ((Object.keys(obj)).map(function(key) {
     var value;
     value = obj[key];
-    if (x.isAlphabet(key)) {
+    if (x.isPortableKey(key)) {
       key = x.toDash(key);
     }
-    return (Array(depth).join('    ')) + ('object' === typeof value ? [key, x.o(value, depth + 1)].join('\n') : '' === value ? key : '' === key || x.isDigit(key) ? x.parseValue(value) : key + ' ' + x.parseValue(value));
+    return (Array(depth).join('    ')) + ('object' === typeof value ? [key, x.o(value, depth + 1)].join('\n') : '' === value ? key : '' === key || x.isDigit(key) ? x.value(value) : key + ' ' + x.value(value));
   })).join('\n');
 };
 
@@ -168,6 +205,14 @@ x.trimmedValue = function(id) {
   } else {
     return null;
   }
+};
+
+validateRe = {
+  email: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i
+};
+
+x.validate = function(key, value) {
+  return validateRe[key].test(value);
 };
 
 x.reKey = function(obj, oldName, newName) {
@@ -440,6 +485,10 @@ x.calendar = function(fym, id_ym) {
       id: id_ym
     });
   }
+};
+
+x.oauth = function(obj) {
+  return obj.url + "?" + x.queryString(obj.query);
 };
 
 x.list = function(what) {

@@ -4,3 +4,9 @@
 [submodule "apps/insta/app"]
 	path = apps/insta/app
 	url = https://github.com/i4han/insta.git
+[submodule "isaac:intl-tel-input"]
+	path = meteor/packages/meteor-intl-tel-input
+	url = https://github.com/i4han/meteor-intl-tel-input
+[submodule "meteor/packages/isaac:intl-tel-input/intl-tel-input"]
+	path = meteor/packages/isaac:intl-tel-input/intl-tel-input
+	url = https://github.com/Bluefieldscom/intl-tel-input.git

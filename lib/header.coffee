@@ -1,5 +1,7 @@
 #!/usr/bin/env coffee
 
+# delete this file
+
 String::toDash = -> @.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase()
 
 

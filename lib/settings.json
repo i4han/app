@@ -1,0 +1,18 @@
+{
+    "collections": [
+        "Connects",
+        "Items",
+        "Updates",
+        "Calendar",
+        "User"
+    ],
+    "public": {
+        "collections": [
+            "Connects",
+            "Items",
+            "Updates",
+            "Calendar",
+            "User"
+        ]
+    }
+}

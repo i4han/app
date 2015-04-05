@@ -1,34 +1,40 @@
 #!/usr/bin/env coffee
 
-global.x = {$:{}} if !x?
-module.exports.x = x if !Meteor?
+global.x = {$:{}} if !x?         # for cake
+module.exports.x = x if !Meteor? # for cake
 
 x.extend = (object, properties) -> object[key] = val for key, val of properties; object
 x.capitalize = (str) -> str[0].toUpperCase() + str[1..]
 x.isLowerCase = (char, index) -> 'a' <= char[index] <= 'z'
 x.isString = (str) -> str? and 'string' == typeof str and str.length > 0
 x.isVisible = (v) -> if 'function' == typeof v then v() else if false is v then false else true
-x.isAlphabet = (str) -> /^[a-z]+$/i.test str
+x.isPortableKey = (str) -> /^[a-z]+$/i.test str # . or #
 x.isDigit = (str) -> /^[0-9]+$/.test str
-x.parseValue = (value) ->
+x.value = (value) ->
     if      'number'   == typeof value then value.toString() + 'px'
     else if 'string'   == typeof value then value # (value = value.replace v,k for k,v of repcode()).pop()
     else if 'function' == typeof value then value() else value
-
 x.timeout = (time, func) -> Meteor.setTimeout func, time
+x.func = (func) -> 
+    if 'function' == typeof func then func() 
+    else if 'undefined' == func then {} else func
+x.funcConcat = (func1, func2) -> -> func1() ; func2()
+x.keys = (obj) -> Object.keys obj
+
+x.isValue = (v) -> if 'string' == typeof v || 'number' == typeof v then v else false
+x.interpolate = (str, o) -> str.replace /{([^{}]*)}/g, (a, b) -> x.isValue(o[b]) or a
 
 x.o = (obj, depth=1) -> 
     ((Object.keys obj).map (key) ->
         value = obj[key]
-        key = x.toDash(key) if x.isAlphabet(key)
+        key = x.toDash(key) if x.isPortableKey(key)
         (Array(depth).join '    ') + 
         if  'object' == typeof value then [key, x.o(value, depth + 1)].join '\n'
         else if '' is value          then key
-        else if '' is key or x.isDigit(key) then x.parseValue value
-        else key + ' ' + x.parseValue value
+        else if '' is key or x.isDigit(key) then x.value value
+        else key + ' ' + x.value value
     ).join '\n'
 
-# String::toDash = -> @.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase()
 x.toDash = (str) -> if str? then str.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase() else null
 
 x.query = -> Iron.Location.get().queryObject
@@ -52,6 +58,12 @@ x.getValue = (id) ->
 x.trimmedValue = (id) ->
         element = document.getElementById(id)
         if element then element.value.replace(/^\s*|\s*$/g, "") else null
+
+validateRe =
+    email: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i
+
+x.validate = (key, value) -> validateRe[key].test value
+
 x.reKey = (obj, oldName, newName) ->
         if obj.hasOwnProperty(oldName)
             obj[newName] = obj[oldName]
@@ -192,11 +204,13 @@ x.calendar = (fym, id_ym) ->
     else
         $('#bottom').data id:id_ym
 
+x.oauth = (obj) -> obj.url + "?" + x.queryString obj.query
 
 x.list = (what) -> # add id
     ((what = if 'string' == typeof what then what.split ' ' 
     else if Array.isArray(what) then what else [])
         .map (a) -> ".#{a} {{#{a}}}").join '\n'
+
 
 x.sidebar = (list, id='sidebar_menu') ->
     list: list
@@ -216,7 +230,7 @@ x.popover = (list) -> list.reduce ((o, v) -> x.assignPopover o, v), {}
 
 x.log = ->
     (arguments != null) and ([].slice.call(arguments)).concat(['\n']).map (str) ->
-        if Meteor.isServer then fs.appendFileSync Config.log_file, str + ' '
+        if Meteor.isServer then fs.appendFileSync Config.log_file, str + ' ' # fs? server?
         else console.log str
 
 window? and ('DIV H2 BR'.split ' ').map (a) -> window[a] = (obj, str) -> 

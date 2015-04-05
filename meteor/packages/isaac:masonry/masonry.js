@@ -42,6 +42,7 @@
     var d = Array.prototype.slice;
     "function" == typeof define && define.amd ? define("jquery-bridget/jquery.bridget", ["jquery"], c) : c("object" == typeof exports ? require("jquery") : a.jQuery)
 }(window),
+
 function(a) {
     function b(b) {
         var c = a.event;
@@ -77,6 +78,7 @@ function(a) {
     };
     "function" == typeof define && define.amd ? define("eventie/eventie", f) : "object" == typeof exports ? module.exports = f : a.eventie = f
 }(this),
+
 function(a) {
     function b(a) {
         "function" == typeof a && (b.isReady ? a() : g.push(a))
@@ -102,6 +104,7 @@ function(a) {
         g = [];
     b.isReady = !1, "function" == typeof define && define.amd ? define("doc-ready/doc-ready", ["eventie/eventie"], e) : "object" == typeof exports ? module.exports = e(require("eventie")) : a.docReady = e(a.eventie)
 }(window),
+
 function() {
     function a() {}
 
@@ -196,6 +199,7 @@ function() {
         return a
     }) : "object" == typeof module && module.exports ? module.exports = a : e.EventEmitter = a
 }.call(this),
+
     function(a) {
         function b(a) {
             if (a) {
@@ -211,6 +215,7 @@ function() {
             return b
         }) : "object" == typeof exports ? module.exports = b : a.getStyleProperty = b
     }(window),
+
     function(a) {
         function b(a) {
             var b = parseFloat(a),
@@ -305,6 +310,7 @@ function() {
             g = ["paddingLeft", "paddingRight", "paddingTop", "paddingBottom", "marginLeft", "marginRight", "marginTop", "marginBottom", "borderLeftWidth", "borderRightWidth", "borderTopWidth", "borderBottomWidth"];
         "function" == typeof define && define.amd ? define("get-size/get-size", ["get-style-property/get-style-property"], e) : "object" == typeof exports ? module.exports = e(require("desandro-get-style-property")) : a.getSize = e(a.getStyleProperty)
     }(window),
+
     function(a) {
         function b(a, b) {
             return a[g](b)
@@ -344,6 +350,7 @@ function() {
             return f
         }) : "object" == typeof exports ? module.exports = f : window.matchesSelector = f
     }(Element.prototype),
+
     function(a) {
         function b(a, b) {
             for (var c in b) a[c] = b[c];
@@ -559,6 +566,7 @@ function() {
             };
         "function" == typeof define && define.amd ? define("outlayer/item", ["eventEmitter/EventEmitter", "get-size/get-size", "get-style-property/get-style-property"], e) : "object" == typeof exports ? module.exports = e(require("wolfy87-eventemitter"), require("get-size"), require("desandro-get-style-property")) : (a.Outlayer = {}, a.Outlayer.Item = e(a.EventEmitter, a.getSize, a.getStyleProperty))
     }(window),
+
     function(a) {
         function b(a, b) {
             for (var c in b) a[c] = b[c];
@@ -882,6 +890,7 @@ function() {
             };
         "function" == typeof define && define.amd ? define("outlayer/outlayer", ["eventie/eventie", "doc-ready/doc-ready", "eventEmitter/EventEmitter", "get-size/get-size", "matches-selector/matches-selector", "./item"], g) : "object" == typeof exports ? module.exports = g(require("eventie"), require("doc-ready"), require("wolfy87-eventemitter"), require("get-size"), require("desandro-matches-selector"), require("./item")) : a.Outlayer = g(a.eventie, a.docReady, a.EventEmitter, a.getSize, a.matchesSelector, a.Outlayer.Item)
     }(window),
+    
     function(a) {
         function b(a, b) {
             var d = a.create("masonry");

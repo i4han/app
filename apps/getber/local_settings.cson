@@ -1,0 +1,42 @@
+collections: [
+	"Connects"
+	"Items"
+	"Updates"
+	"Calendar"
+	"User"
+]
+public:
+	collections: [
+		"Connects"
+		"Items"
+		"Updates"
+		"Calendar"
+		"User"
+	]
+private:
+	uber:
+		oauth:
+			url: "https://login.uber.com/oauth/authorize"
+			query:
+				scope: "request profile history_lite"
+				client_id: "xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q"
+				redirect_uri: "https://www.getber.com/submit"
+				response_type: "token"
+		profile:
+			meteor_method: 'uber_profile'
+			api:
+				method: 'GET'
+				url: "https://api.uber.com/v1/me"
+				options:
+					headers: 
+						Authorization: 'Bearer {token}'
+	whitepages:
+		phone:
+			meteor_method: 'whitepages_phone'
+			api:
+				method: 'GET'
+				url: "https://proapi.whitepages.com/2.1/phone.json"
+				options:
+					query:
+						api_key: "4846edbe3b172b67638c636e3135bb26"
+						phone_number: "{phone}"

@@ -1,0 +1,25 @@
+{
+    "collections": [
+        "Connects",
+        "Items",
+        "Updates",
+        "Calendar",
+        "User"
+    ],
+    "public": {
+        "collections": [
+            "Connects",
+            "Items",
+            "Updates",
+            "Calendar",
+            "User"
+        ]
+    },
+    "uber_oauth_url": "https://login.uber.com/oauth/authorize",
+    "uber_oauth": {
+        "scope": "request profile history_lite",
+        "client_id": "xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q",
+        "redirect_uri": "https://www.getber.com/submit",
+        "response_type": "token"
+    }
+}

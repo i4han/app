@@ -1,0 +1,566 @@
+var changePassword, closeDropdown, ensureMessageVisible, errorMessage, forgotPassword, get_username, infoMessage, login, loginFlow, orTest, resetMessages, signup;
+
+resetMessages = function() {
+  Session.set('login.errorMessage', null);
+  return Session.set('login.infoMessage', null);
+};
+
+closeDropdown = function() {
+  ('inSignupFlow inForgotPasswordFlow inChangePasswordFlow inMessageOnlyFlow dropdownVisible'.split(' ')).forEach(function(key) {
+    return Session.set('login.' + key, false);
+  });
+  return resetMessages();
+};
+
+orTest = function() {
+  return function(array) {
+    array.forEach(function(key) {
+      if (Session.get(key)) {
+        return true;
+      }
+    });
+    return false;
+  };
+};
+
+ensureMessageVisible = function() {
+  if (!orTest('resetPasswordToken enrollAccountToken justVerifiedEmail'.split(' '))) {
+    return Session.set('dropdownVisible', true);
+  }
+};
+
+errorMessage = function(message) {
+  message = message ? message : "Unknown error";
+  Session.set("login.errorMessage", message);
+  Session.set("login.infoMessage", null);
+  return ensureMessageVisible();
+};
+
+infoMessage = function(message) {
+  Session.set("login.errorMessage", null);
+  Session.set("login.infoMessage", message);
+  return ensureMessageVisible();
+};
+
+login = function() {
+  var email, loginSelector, password, username, usernameOrEmail;
+  resetMessages();
+  username = x.getValue('username');
+  email = x.getValue('email');
+  usernameOrEmail = x.trim(x.getValue('username-or-email'));
+  password = x.getValue('password');
+  loginSelector = null;
+  if (username != null) {
+    loginSelector = {
+      username: username
+    };
+  }
+  if (email != null) {
+    loginSelector = {
+      email: email
+    };
+  }
+  loginSelector = usernameOrEmail;
+  return Meteor.loginWithPassword(loginSelector, password, function(err, result) {
+    if (err) {
+      return errorMessage(err.reason);
+    } else {
+      return closeDropdown();
+    }
+  });
+};
+
+signup = function() {
+  var options;
+  resetMessages();
+  options = {
+    username: x.trimmedValue('username'),
+    email: x.trimmedValue('email'),
+    password: x.getValue('password'),
+    profile: {}
+  };
+  return Accounts.createUser(options, function(err) {
+    if (err) {
+      return errorMessage(err.reason);
+    } else {
+      return closeDropdown();
+    }
+  });
+};
+
+changePassword = function() {
+  var oldPassword, password;
+  resetMessages();
+  oldPassword = x.getValue('old-password');
+  password = x.getValue('password');
+  return Accounts.changePassword(oldPassword, password, function(err) {
+    if (err) {
+      return errorMessage(err.reason);
+    } else {
+      infoMessage("Password changed");
+      return x.timeout(2400, function() {
+        resetMessages();
+        closeDropdown();
+        return $('#login-dropdown').removeClass('open');
+      });
+    }
+  });
+};
+
+forgotPassword = function() {
+  var email;
+  resetMessages();
+  email = x.trimmedValue("forgot-password-email");
+  return infoMessage("Email sent");
+};
+
+get_username = function() {
+  var user;
+  user = Meteor.user();
+  if (user == null) {
+    return 'no name';
+  }
+  return (user.profile && user.profile.name) || user.username || (user.emails && user.emails[0] && user.emails[0].address);
+};
+
+loginFlow = function() {
+  return !Session.get('login.inSignupFlow') && !Session.get('login.inForgotPasswordFlow');
+};
+
+
+/*
+        jade: (C,_) -> 
+            _.slice """li.dropdown#login-dropdown ~
+                |>a.dropdown-toggle#login-id(data-toggle='dropdown') {{username}}|>i.fa(class='fa-chevron-down') ~
+                |<.dropdown-menu(id='{{id}}')|>+Template.dynamic(template=template)"""
+        styl$: (C,_) -> _.slice """#logged-in-dropdown-menu|>right 0|left auto
+                width #{C.$.navbar.login.dropdown.width}
+                padding 5px 0px
+             *login-dropdown input
+                margin-bottom 0px
+                border-radius 0px 5px 5px 0px
+            .dropdown-menu
+                width   #{C.$.navbar.dropdown.width}
+                padding #{C.$.navbar.dropdown.padding}
+            """
+ */
+
+module.exports.accounts = {
+  login: {
+    styl$: {
+      '#login-buttons': {
+        float: 'right',
+        border: 0
+      },
+      '#login-buttons + li .dropdown-menu': {
+        float: 'right',
+        right: 0,
+        left: 'auto'
+      }
+    },
+    jade: {
+      'ul.nav.navbar-nav#login-buttons': {
+        '+Template.dynamic(template=template)': ''
+      }
+    },
+    events: {
+      'click input, click label, click button, click .dropdown-menu, click .alert': function(event) {
+        return event.stopPropagation();
+      },
+      'click .login-close': function() {
+        closeDropdown();
+        $('#login-dropdown').removeClass('open');
+        return console.log("login-close");
+      },
+      'click #login-name-link, click #login-sign-in-link': function(event) {
+        event.stopPropagation();
+        Session.set('login.dropdownVisible', true);
+        return Meteor.flush();
+      }
+    },
+    helpers: {
+      template: function() {
+        return 'dropdown_' + (!Meteor.user() ? 'logged_out' : Meteor.loggingIn() ? 'logging_in' : 'logged_in');
+      }
+    }
+  },
+  dropdown_logged_in: {
+    jade: {
+      'li.dropdown#login-dropdown': {
+        'a.dropdown-toggle#login-id(data-toggle="dropdown")': {
+          '| {{username}}': '',
+          'i.fa(class="fa-chevron-down")': ''
+        },
+        '.dropdown-menu(id="{{id}}")': {
+          '+Template.dynamic(template=template)': ''
+        }
+      }
+    },
+    styl$: function() {
+      return {
+        '#logged-in-dropdown-menu': {
+          right: 0,
+          left: 'auto',
+          width: this.C.$.navbar.login.dropdown.width,
+          padding: '5px 0px'
+        },
+        '#login-dropdown input': {
+          marginBottom: 0,
+          borderRadius: '0px 5px 5px 0px'
+        },
+        '.dropdown-menu': {
+          width: this.C.$.navbar.dropdown.width,
+          padding: this.C.$.navbar.dropdown.padding
+        }
+      };
+    },
+    helpers: {
+      template: function() {
+        if (Session.get('login.inMessageOnlyFlow')) {
+          return 'login_messages';
+        } else if (Session.get('login.inChangePasswordFlow')) {
+          return 'change_password';
+        } else {
+          return 'dropdown_menu_logged_in';
+        }
+      },
+      id: function() {
+        if (Session.get('login.inMessageOnlyFlow') || Session.get('login.inChangePasswordFlow')) {
+          return 'logged-in-dropdown';
+        } else {
+          return 'logged-in-dropdown-menu';
+        }
+      },
+      username: function() {
+        return get_username();
+      }
+    }
+  },
+  dropdown_menu_logged_in: {
+    styl$: function(C, _) {
+      return ".dropdown-menu a\n    display block\n    padding 0px 8px\n    height " + C.$.navbar.dropdown.a.height + "\n.dropdown-menu a:hover\n    cursor pointer\n    background-color: " + C.$.navbar.dropdown.a.hover.background_color + "\n#logged-in-dropdown-menu > li > a\n    height 30px\n    padding 7px 20px";
+    },
+    jade: {
+      'each items': {
+        '+menu': ''
+      }
+    },
+    helpers: {
+      items: function() {
+        return [
+          {
+            label: 'Profile',
+            id: 'menu-profile',
+            icon: 'list-alt'
+          }, {
+            label: 'Settings',
+            id: 'menu-settings',
+            icon: 'cog'
+          }, {
+            label: 'Change Password',
+            id: 'menu-change-password',
+            icon: 'key'
+          }, {
+            label: '-'
+          }, {
+            label: 'Sign Out',
+            id: 'menu-logout',
+            icon: 'sign-out'
+          }
+        ];
+      }
+    },
+    events: {
+      'click #menu-logout': function() {
+        return Meteor.logout(function() {
+          closeDropdown();
+          return Router.go('home');
+        });
+      },
+      'click #menu-profile': function() {
+        $('#login-dropdown').removeClass('open');
+        return Router.go('profile');
+      },
+      'click #menu-settings': function() {
+        $('#login-dropdown').removeClass('open');
+        return Router.go('help');
+      },
+      'click #menu-change-password': function(event) {
+        event.stopPropagation();
+        resetMessages();
+        Session.set('login.inChangePasswordFlow', true);
+        return Meteor.flush();
+      }
+    }
+  },
+  change_password: {
+    jade: {
+      'each fields': {
+        '+form': ''
+      },
+      br: '',
+      '+login_messages': '',
+      '#dropdown-menu-buttons': {
+        'each buttons': {
+          '+button': ''
+        }
+      },
+      '#dropdown-other-options': {
+        'each links': {
+          '+a': ''
+        }
+      }
+    },
+    events: {
+      'keypress #old-password, keypress #password, keypress #password-again': function(event) {
+        if (event.keyCode === 13) {
+          return changePassword();
+        }
+      },
+      'click #login-buttons-change-password': function(event) {
+        event.stopPropagation();
+        return changePassword();
+      },
+      'click #login-buttons-back-to-menu': function(event) {
+        event.stopPropagation();
+        Session.set('login.inChangePasswordFlow', false);
+        return $('#login-dropdown').removeClass('open');
+      }
+    },
+    helpers: {
+      buttons: function() {
+        return [
+          {
+            label: 'Change password',
+            id: 'login-buttons-change-password',
+            type: 'button'
+          }
+        ];
+      },
+      links: function() {
+        return [
+          {
+            label: 'Close',
+            id: 'login-buttons-back-to-menu',
+            "class": 'dropdown-menu-link',
+            visible: true
+          }
+        ];
+      },
+      fields: function() {
+        return [
+          {
+            id: 'old-password',
+            label: 'Current Password',
+            icon: 'key',
+            type: 'password'
+          }, {
+            id: 'password',
+            label: 'New Password',
+            icon: 'asterisk',
+            type: 'password'
+          }, {
+            id: 'password-again',
+            label: 'New Password (again)',
+            type: 'password',
+            visible: false
+          }
+        ];
+      }
+    }
+  },
+  dropdown_logged_out: {
+    styl$: ".dropdown-menu\n    top 50px\n    margin 0px\n    font-weight 200\n    text-align left\n    line-height 14px\n    border-radius 0px\n.dropdown-menu-icon\n    margin-right 12px\n#dropdown-menu-buttons\n    text-align center\n#dropdown-other-options\n    padding-top 8px\n    line-height 25px",
+    jade: "li.dropdown#login-dropdown\n    a.dropdown-toggle(data-toggle=\"dropdown\")\n        | Sign In\n        i.fa.fa-chevron-down\n    .dropdown-menu\n        each fields\n            +form\n        br\n        +login_messages\n        #dropdown-menu-buttons\n            each buttons\n                +button\n        #dropdown-other-options\n            each links\n                +a",
+    helpers: {
+      links: function() {
+        return [
+          {
+            label: 'Forgot password?',
+            id: 'forgot-password-link',
+            "class": 'dropdown-menu-link',
+            visible: function() {
+              return loginFlow();
+            }
+          }, {
+            label: 'Create account',
+            id: 'signup-link',
+            "class": 'dropdown-menu-link',
+            visible: function() {
+              return loginFlow();
+            }
+          }, {
+            label: 'Back to login',
+            id: 'back-to-login-link',
+            "class": 'dropdown-menu-link',
+            visible: function() {
+              return !loginFlow();
+            }
+          }
+        ];
+      },
+      buttons: function() {
+        return [
+          {
+            label: 'Reset Password',
+            id: 'login-buttons-forgot-password',
+            type: 'button',
+            visible: function() {
+              return Session.get('login.inForgotPasswordFlow');
+            }
+          }, {
+            label: 'Sign up',
+            id: 'login-buttons-signup',
+            type: 'button',
+            visible: function() {
+              return Session.get('login.inSignupFlow');
+            }
+          }, {
+            label: 'Sign in',
+            id: 'login-buttons-login',
+            type: 'button',
+            visible: function() {
+              return loginFlow();
+            }
+          }
+        ];
+      },
+      fields: function() {
+        if (Session.get('login.inSignupFlow')) {
+          return [
+            {
+              label: 'Username',
+              icon: 'user'
+            }, {
+              label: 'Email',
+              icon: 'envelope-o',
+              type: 'email'
+            }, {
+              label: 'Password',
+              icon: 'key',
+              type: 'password'
+            }, {
+              label: 'Password again',
+              icon: 'key',
+              type: 'password',
+              visible: function() {
+                return false;
+              }
+            }
+          ];
+        } else if (Session.get('login.inForgotPasswordFlow')) {
+          return [
+            {
+              label: 'Email',
+              icon: 'envelope-o',
+              type: 'email',
+              id: 'forgot-password-email'
+            }
+          ];
+        } else {
+          return [
+            {
+              label: 'Username or email',
+              icon: 'user'
+            }, {
+              label: 'Username',
+              icon: 'user',
+              visible: function() {
+                return false;
+              }
+            }, {
+              label: 'Email',
+              icon: 'envelope-o',
+              type: 'email',
+              visible: function() {
+                return false;
+              }
+            }, {
+              label: 'Password',
+              icon: 'key',
+              type: 'password'
+            }
+          ];
+        }
+      }
+    },
+    events: {
+      'click #login-buttons-signup': function() {
+        return signup();
+      },
+      'click #login-buttons-login': function() {
+        return login();
+      },
+      'keypress #username, keypress #email, keypress #username-or-email, keypress #password, keypress #password-again': function(event) {
+        if (event.keyCode === 13) {
+          if (Session.get('login.inSignupFlow')) {
+            return signup();
+          } else {
+            return login();
+          }
+        }
+      },
+      'keypress #forgot-password-email': function(event) {
+        if (event.keyCode === 13) {
+          return forgotPassword();
+        }
+      },
+      'click #login-buttons-forgot-password': function(event) {
+        event.stopPropagation();
+        return forgotPassword();
+      },
+      'click #signup-link': function(event) {
+        var email, password, username, usernameOrEmail;
+        event.stopPropagation();
+        resetMessages();
+        username = x.trimmedValue('username');
+        email = x.trimmedValue('email');
+        usernameOrEmail = x.trimmedValue('username-or-email');
+        password = x.getValue('password');
+        Session.set('login.inSignupFlow', true);
+        Session.set('login.inForgotPasswordFlow', false);
+        return Meteor.flush();
+      },
+      'click #forgot-password-link': function(event) {
+        var email, usernameOrEmail;
+        event.stopPropagation();
+        resetMessages();
+        email = x.trimmedValue('email');
+        usernameOrEmail = x.trimmedValue('username-or-email');
+        Session.set('login.inSignupFlow', false);
+        Session.set('login.inForgotPasswordFlow', true);
+        return Meteor.flush();
+      },
+      'click #back-to-login-link': function() {
+        var email, username;
+        event.stopPropagation();
+        resetMessages();
+        username = x.trimmedValue('username');
+        email = x.trimmedValue('email') || x.trimmedValue('forgot-password-email');
+        Session.set('login.inSignupFlow', false);
+        Session.set('login.inForgotPasswordFlow', false);
+        return Meteor.flush();
+      }
+    }
+  },
+  login_messages: {
+    styl$: {
+      '#login-dropdown .alert': {
+        padding: 6,
+        marginBottom: 14
+      }
+    },
+    jade: {
+      '+alert(class="alert-danger"  message=error_message)': '',
+      '+alert(class="alert-success" message=info_message )': ''
+    },
+    helpers: {
+      error_message: function() {
+        return Session.get('login.errorMessage');
+      },
+      info_message: function() {
+        return Session.get('login.infoMessage');
+      }
+    }
+  }
+};

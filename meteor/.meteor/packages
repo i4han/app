@@ -5,5 +5,15 @@
 # but you can also edit it by hand.
 
 meteor-platform
-autopublish
-insecure
+accounts-password
+fortawesome:fontawesome
+http
+iron:router
+jquery
+less
+mizzao:bootstrap-3
+mizzao:jquery-ui
+mquandalle:jade
+stylus
+underscore
+sat

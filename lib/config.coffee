@@ -80,7 +80,7 @@ local = {}
         head:
             file: main.target_dir + main.autogen_prefix + '0.jade'
             indent: 1
-            header: 'head\n'                  #  'doctype html\n' has not suppored by jade
+            header: -> 'head\n'                #  'doctype html\n' has not suppored by jade
             format: (name, block) -> block + '\n'
         less:
             file: main.target_dir + main.autogen_prefix + '7.less'
@@ -89,6 +89,7 @@ local = {}
         css:
             file: main.target_dir + main.autogen_prefix + '5.css'
             indent: 0
+            header: -> fs.readFileSync "/Users/isaac/workspace/lib/css/intl-tel-input.css"
             format: (name, block) -> block + '\n'
         styl:
             file: main.target_dir + main.autogen_prefix + '4.styl'
@@ -146,87 +147,3 @@ local = {}
 
 !Meteor? and module.exports = __: @__, Config: @Config
 
-###
-
-@__.slice = (str, tab=1, indent='    ') -> (((str.replace /~\s+/g, '').split '|').map (s) ->
-    s = if 0 == s.search /^(<+)/ then s.replace /^(<+)/, Array(tab = Math.max tab - RegExp.$1.length, 1).join indent 
-    else if 0 == s.search /^>/ then s.replace /^>/, Array(++tab).join indent 
-    else s.replace /^/, Array(tab).join indent).join '\n'
-
-
-@__ =
-    queryString: (obj) ->
-        parts = []
-        for i of obj
-            parts.push encodeURIComponent(i) + "=" + encodeURIComponent(obj[i])
-        parts.join "&"
-
-    trim: (str) -> if str? then str.trim() else null
-    capitalize: (string) -> string.charAt(0).toUpperCase() + string.slice(1)
-    dasherize: (str) -> str.trim().replace(/([A-Z])/g, "-$1").replace(/[-_\s]+/g, "-").toLowerCase()
-    prettyJSON: (obj) -> JSON.stringify obj, null, 4
-    getValue: (id) ->
-        element = document.getElementById(id)
-        if element then element.value else null
-    trimmedValue: (id) ->
-        element = document.getElementById(id)
-        if element then element.value.replace(/^\s*|\s*$/g, "") else null
-    reKey: (obj, oldName, newName) ->
-        if obj.hasOwnProperty(oldName)
-            obj[newName] = obj[oldName]
-            delete obj[oldName]
-        this
-
-
-@__.insertTemplate = (page, id, data={}) ->
-    $('#' + id).empty()
-    Blaze.renderWithData(
-        Template[page], 
-        if Object.keys(data).length then data else Template[page].helpers 
-        document.getElementById id  )
-
-@__.currentRoute = -> Router.current().route.getName()
-
-@__.render = (page) -> Template[page].renderFunction().value
-
-@__.renameKeys = (obj, keyObject) ->
-    _.each _.keys keyObject, (key) -> @__.reKey obj, key, keyObject[key]
-
-@__.repeat = (pattern, count) ->
-    return '' if count < 1
-    result = ''
-    while count > 0
-        result += pattern if count & 1
-        count >>= 1
-        pattern += pattern
-    result
-
-@__.deepExtend = (target, source) ->
-    for prop of source
-        if prop of target
-            @__.deepExtend target[prop], source[prop]
-        else
-            target[prop] = source[prop]
-    target
-
-
-@__.flatten = (obj, chained_keys) ->
-    toReturn = {}       
-    for i in obj
-        if typeof obj[i] == 'object'
-            flatObject = @__.flatten obj[i]
-            for j in flatObject
-                if chained_keys
-                    toReturn[i+'_'+j] = flatObject[j]
-                else
-                    toReturn[j] = flatObject[j]
-        else
-            toReturn[i] = obj[i]
-    toReturn
-
-@__.log = (arg) ->
-     console.log( arg + '' );
-###
-#    if this.Config.redis.connected
-#        this.Config.redis.rpush( 'log', arg + '' );
-#    else

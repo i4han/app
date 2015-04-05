@@ -1,6 +1,4 @@
 
-site = process.env.site or 'apps/getber'
-  
 fs       = require 'fs'
 path     = require 'path'
 md5      = require 'MD5'
@@ -10,20 +8,26 @@ eco      = require 'eco'
 chokidar = require 'chokidar'
 rm_rf    = require 'rimraf'
 {ncp}    = require 'ncp'
-
+path     = require 'path'
+cson     = require 'CSON'
 
 cwd  = process.cwd()    
 home = process.env.HOME
-site = process.env.site
-work = home + '/workspace'
-site_path = work + '/' + site
+site = process.env.site or    'apps/getber'
+work        = path.join home, 'workspace'
+site_path   = path.join work, site 
+lib_path    = path.join work, 'lib'
+meteor_path = path.join work, 'meteor'
+x_path      = path.join meteor_path, 'packages/isaac:x'
 
-{x} = require work + '/meteor/packages/isaac:x/x.coffee'
-x.extend x, (require work + '/meteor/packages/isaac:x/x').x
+settings_json = path.join lib_path, 'settings.json'
+settings_cson = path.join lib_path, 'settings.cson'
+local_settings_json = path.join site_path, 'app', 'local_settings.json'
+local_settings_cson = path.join site_path, 'local_settings.cson'
 
-console.log site_path + '/app/packages/sat/config'
-console.log work + '/lib/config'
-
+{x} = require path.join x_path, 'x.coffee'
+x.extend x, (require path.join x_path, 'x').x
+Settings = {}
 try
     {Config, __} = require site_path + '/app/packages/sat/config'    
 catch e
@@ -58,6 +62,27 @@ local = {
     other_files: []
 } if !local? or 0 == Object.keys(local).length
 
+Settings = cson.load local_settings_cson
+
+settings = ->
+    Settings = {}
+    Settings = require settings_json
+    x.extend Settings, cson.load settings_cson
+    fs.writeFile settings_json, JSON.stringify(Settings, null, 4) + '\n', (err, data) ->
+        err || fs.writeFile settings_cson, cson.createCSONString Settings
+        local_settings()
+
+local_settings = ->
+    x.extend Settings, require local_settings_json
+    x.extend Settings, cson.load local_settings_cson
+    json_source = JSON.stringify(Settings, null, 4) + '\n'
+    fs.writeFile local_settings_cson, cson.createCSONString(Settings), (err, data) ->
+        json_source = Settings
+        delete json_source.private
+        err ||  fs.writeFile local_settings_json, JSON.stringify(json_source, '', 4) + '\n', ->
+            err || console.log 'Successful.'
+
+
 logio_port = 8777
 rmate_port = 8080
 mongo_port = 7017
@@ -91,6 +116,7 @@ profile = ->
         export BUILD=#{work}/#{site}/build
         export MONGO_URL=#{mongo_str}
         export MODULE_LIB=#{work}/lib
+        export METEOR_SETTINGS=`cat #{work}/lib/settings.json`
         export METEOR_APP=#{work}/app
         export METEOR_LIB=$METEOR_APP/lib
         export PACKAGES=$METEOR_APP/packages
@@ -113,7 +139,7 @@ profile = ->
 install = ->
     npm_modules = 'coffee-script underscore express stylus fs-extra fibers mongodb chokidar '  + # hiredis redis
               'node-serialize request event-stream prompt jade ps-node MD5 googleapis log.io ' +
-              'node-curl node-uber rimraf eco ' #node-uber
+              'node-curl node-uber rimraf eco js2coffee path' #node-uber
     data = """
         #!/usr/bin/env bash
         curl -fsSL https://raw.github.com/action-io/autoparts/master/setup.rb | ruby
@@ -147,7 +173,7 @@ install = ->
         use meteor
         EOF
         """
-    fs.writeFile file = work + '/install.sh', data, (err) -> 
+    fs.writeFile file = path.join(work, 'install.sh'), data, (err) -> 
         if err then log err else fs.chmod file, 0o755, (err) -> log err or data
 
 logconf = ->
@@ -180,8 +206,8 @@ logconf = ->
             }
             """
     ([k,v] for k,v of obj).forEach (a) ->
-        fs.writeFile home + '/' + a[0], a[1], (err) -> log err or a[1]
-    logs.map (a) -> fs.exists f = home+'/.log.io/'+a, (ex) -> ex or fs.writeFile f
+        fs.writeFile path.join(home, a[0]), a[1], (err) -> log err or a[1]
+    logs.map (a) -> fs.exists f = path.join( home,'.log.io', a), (ex) -> ex or fs.writeFile f
 
 {spawn, exec} = require 'child_process'
 
@@ -334,7 +360,7 @@ vfunc$str = (obj, pages) ->
 
 func$str = (what, obj, pages) ->
     @C = Config
-    @_ = __
+    @Settings = Settings
     @Pages = pages
     obj = if 'function' == typeof obj then vfunc$str obj(), pages else vfunc$str obj, pages
     if !what? then undefined
@@ -352,7 +378,7 @@ build = () ->
     console.log Pages, Config
     (Config.templates).map (kind) ->
         $$ = Config.pages[kind]
-        data = ($$.header || '') + (((Object.keys Pages).map (module) ->
+        data = (x.func($$.header) || '') + (((Object.keys Pages).map (module) ->
             (((Object.keys Pages[module]).map (page) ->
                 if block = func$str Pages[module][page][kind], Pages[module][page]['eco'], Pages
                     $$.format.call @, page, indent block, $$.indent 
@@ -390,6 +416,7 @@ task 'build',     'Build meteor client files.', -> build()
 task 'install',   'Create install.sh',          -> install()
 task 'gitpass',   'github.com auto login',      -> gitpass()
 task 'daemon',     'start daemons',             -> daemon()
+task 'settings',  'Settings',                   -> settings()
 
 Config.quit()
 
