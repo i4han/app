@@ -1,13 +1,13 @@
-template(name="logo")
+template(name='logo')
     #logo Getber
 
-template(name="layout")
+template(name='layout')
     +navbar
     #wrapper
         +sidebar
         +yield
 
-template(name="home")
+template(name='home')
     #contentWrapper
         h2#title Sign up with UBER
         .col-md-6#e1
@@ -24,24 +24,24 @@ template(name="home")
                 each items
                     +item
 
-template(name="sidebar_home")
+template(name='sidebar_home')
     each items
         +menu_list
 
-template(name="profile")
+template(name='profile')
     #contentWrapper
         with user
             | {{name}}
             | {{phone}}
 
-template(name="item")
+template(name='item')
     .item(style='height:{{height}}px;color:{{color}}')
 
-template(name="submit")
+template(name='submit')
     h2 Connected
     p access_token is {{token}} {{output}}
 
-template(name="vehicle")
+template(name='vehicle')
     #contentWrapper
         h1 You vehicle information
         br
@@ -50,56 +50,60 @@ template(name="vehicle")
                 +form
                 br
 
-template(name="popover_maker")
+template(name='popover_maker')
     ul
         li manufacturer in 20 characters
 
-template(name="popover_model")
+template(name='popover_model')
     ul
         li For digit
 
-template(name="popover_color")
+template(name='popover_color')
     ul
         li White or black only
 
-template(name="sidebar_vehicle")
+template(name='sidebar_vehicle')
     each items
         +menu_list
 
-template(name="map")
+template(name='map')
     #map-canvas
 
-template(name="sidebar_map")
+template(name='sidebar_map')
     each items
         +menu_list
 
-template(name="calendar")
+template(name='calendar')
     #contentWrapper
         #containerCalendar
             .scrollspy#top &nbsp;
             #items
             .scrollspy#bottom &nbsp;
 
-template(name="log")
+template(name='log')
     #log-canvas
 
-template(name="policy")
+template(name='policy')
     h2 Privacy Policy
 
-template(name="uber")
+template(name='uber')
     h2 Uber
 
-template(name="redirect")
+template(name='redirect')
     h2 redirect
 
-template(name="day")
+template(name='day')
     .init {{init}}
     .title {{title}}
     .date {{date}}
     .day {{day}}
     .event {{event}}
 
-template(name="request")
+template(name='gmap')
+    input(id="pac-input", class="controls", type="text", placeholder="Enter a location")
+    #map-canvas
+
+template(name='request')
     #contentWrapper
         h1 Request
         br
@@ -113,28 +117,28 @@ template(name="request")
         .col-sm-9#e13
             +gmap
 
-template(name="popover_name")
+template(name='popover_name')
     ul
         li Write your name.
         li No longer then 12 letters.
 
-template(name="popover_phone")
+template(name='popover_phone')
     ul
         li Write your phone number.
 
-template(name="popover_address")
+template(name='popover_address')
     ul
         li Write your zipcode.
 
-template(name="help")
+template(name='help')
     #contentWrapper
         h1 Help
 
-template(name="login")
+template(name='login')
     ul.nav.navbar-nav#login-buttons
         +Template.dynamic(template=template)
 
-template(name="dropdown_logged_in")
+template(name='dropdown_logged_in')
     li.dropdown#login-dropdown
         a.dropdown-toggle#login-id(data-toggle="dropdown")
             | {{username}}
@@ -142,11 +146,11 @@ template(name="dropdown_logged_in")
         .dropdown-menu(id="{{id}}")
             +Template.dynamic(template=template)
 
-template(name="dropdown_menu_logged_in")
+template(name='dropdown_menu_logged_in')
     each items
         +menu
 
-template(name="change_password")
+template(name='change_password')
     each fields
         +form
     br
@@ -158,7 +162,7 @@ template(name="change_password")
         each links
             +a
 
-template(name="dropdown_logged_out")
+template(name='dropdown_logged_out')
     li.dropdown#login-dropdown
         a.dropdown-toggle(data-toggle="dropdown")
             | Sign In
@@ -175,15 +179,15 @@ template(name="dropdown_logged_out")
                 each links
                     +a
 
-template(name="login_messages")
+template(name='login_messages')
     +alert(class="alert-danger"  message=error_message)
     +alert(class="alert-success" message=info_message )
 
-template(name="menu_list")
+template(name='menu_list')
     li
         a(href="{{path}}" id="{{id}}") {{label}}
 
-template(name="navbar")
+template(name='navbar')
     .navbar.navbar-default.navbar-fixed-top
         +logo
         .navbar-left 
@@ -199,26 +203,26 @@ template(name="navbar")
         .navbar-right
             +login
 
-template(name="sidebar")
+template(name='sidebar')
     form#listen-to-menu-change
     #sidebar-wrapper
         #sidebar-top
         ul.sidebar-nav#sidebar_menu_insert
 
-template(name="html")
+template(name='html')
      
 
-template(name="form")
+template(name='form')
     if visible
         .input-group.margin-bottom-sm
            span.input-group-addon: i.fa.fa-fw(class="fa-{{icon}}")
            input.form-control(id="{{id}}" type="{{type}}" placeholder="{{label}}" title="{{title}}" data-toggle="popover" data-trigger="hover" data-placement="right" data-html="true")
 
-template(name="button")
+template(name='button')
     if visible
         button.btn(class="{{class}}" id="{{id}}" type="{{type}}") {{label}}
 
-template(name="dialog")
+template(name='dialog')
     button.btn(href="#myModal" role="button" data-toggle="modal") Modal
     .modal.fade#myModal(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true")
         .modal-dialog: .modal-content
@@ -231,11 +235,11 @@ template(name="dialog")
                 button.btn(data-dismiss="modal" aria-hidden="true") {{modalCloseButton}}
                 button.btn.btn-primary {{modalActionButton}}
 
-template(name="a")
+template(name='a')
     if visible
         a(class="{{class}}" id="{{id}}") {{label}}
 
-template(name="menu")
+template(name='menu')
     if visible
         if divider
             li.divider
@@ -244,7 +248,7 @@ template(name="menu")
                 i.fa(class="fa-{{icon}}" class="{{icon_class}}")
                 | {{label}}
 
-template(name="alert")
+template(name='alert')
     if visible
         .alert(class="{{class}}") {{message}}
 

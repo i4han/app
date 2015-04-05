@@ -30,8 +30,8 @@ iron:url@1.0.7
 isaac:intl-tel-input@0.1.0
 isaac:masonry@0.0.1
 isaac:moment@0.0.1
-isaac:settings@0.1.0
-isaac:x@0.2.12
+isaac:settings@0.1.1
+isaac:x@0.2.24
 jquery@1.11.3_2
 json@1.0.3
 launch-screen@1.0.2

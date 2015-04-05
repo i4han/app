@@ -1,7 +1,6 @@
 #
 
 fym = 'YYYYMM'
-
 date_box_size = 120
 calendar_size = date_box_size * 7 + 14
 
@@ -65,14 +64,10 @@ module.exports.index =
         jade: 
             h2:'Connected'
             p:'access_token is {{token}} {{output}}'
-        methods: uber_me: (token) -> 
-            HTTP.call 'GET', 'https://api.uber.com/v1/me', headers: Authorization: 'Bearer ' + token
         helpers:
             token: -> x.hash().access_token
-            output: -> JSON.stringify Session.get('uber_me'), null, 4
-        onCreated: ->
-            Meteor.call 'uber_me', x.hash().access_token, (e, result) -> 
-                Session.set 'uber_me', result
+            output: -> JSON.stringify Session.get('uber_profile'), null, 4
+        onCreated: -> x.call 'uber_profile', token:x.hash().access_token
 
     vehicle:
         label: 'Vehicle', sidebar: 'sidebar_vehicle', router: path: 'vehicle'

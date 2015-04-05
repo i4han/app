@@ -101,6 +101,23 @@ x.interpolate = function(str, o) {
   });
 };
 
+x.fillObj = function(o, data) {
+  x.keys(o).map(function(k) {
+    return o[k] = x.interpolate(o[k], data);
+  });
+  return o;
+};
+
+x.call = function(key, o) {
+  return Meteor.call(key, o, function(e, r) {
+    if (e) {
+      return Session.set(key + '_error', e);
+    } else {
+      return Session.set(key, r);
+    }
+  });
+};
+
 x.o = function(obj, depth) {
   if (depth == null) {
     depth = 1;
@@ -545,13 +562,3 @@ x.log = function() {
     }
   });
 };
-
-(typeof window !== "undefined" && window !== null) && ('DIV H2 BR'.split(' ')).map(function(a) {
-  return window[a] = function(obj, str) {
-    if (str != null) {
-      return HTML.toHTML(HTML[a](obj, str));
-    } else {
-      return HTML.toHTML(HTML[a](obj));
-    }
-  };
-});

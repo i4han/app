@@ -60,7 +60,7 @@ module.exports.index = {
           }
         },
         '.col-md-6#e2': {
-          '': 'a(class="btn-info", href="<%= @oauth %>") Connect with Uber'
+          'a(class="btn-info", href="<%= @oauth %>") Connect with Uber': ''
         },
         '.col-md-6#e3': 'S {{hello}}',
         '#items': {
@@ -75,7 +75,7 @@ module.exports.index = {
     eco: function() {
       return {
         oauth: function() {
-          return Settings["private"].uber_oauth_url + "?" + x.queryString(Settings["private"].uber_oauth);
+          return x.oauth(Settings["private"].uber.oauth);
         }
       };
     },
@@ -182,26 +182,17 @@ module.exports.index = {
       h2: 'Connected',
       p: 'access_token is {{token}} {{output}}'
     },
-    methods: {
-      uber_me: function(token) {
-        return HTTP.call('GET', 'https://api.uber.com/v1/me', {
-          headers: {
-            Authorization: 'Bearer ' + token
-          }
-        });
-      }
-    },
     helpers: {
       token: function() {
         return x.hash().access_token;
       },
       output: function() {
-        return JSON.stringify(Session.get('uber_me'), null, 4);
+        return JSON.stringify(Session.get('uber_profile'), null, 4);
       }
     },
     onCreated: function() {
-      return Meteor.call('uber_me', x.hash().access_token, function(e, result) {
-        return Session.set('uber_me', result);
+      return x.call('uber_profile', {
+        token: x.hash().access_token
       });
     }
   },
@@ -479,10 +470,23 @@ module.exports.index = {
     }
   },
   gmap: {
-    HTML: "<input id=\"pac-input\" class=\"controls\" type=\"text\" placeholder=\"Enter a location\">\n<div id=\"type-selector\" class=\"controls\">\n  <!--input type=\"radio\" name=\"type\" id=\"changetype-all\" checked=\"checked\">\n  <label for=\"changetype-all\">All</label>\n\n  <input type=\"radio\" name=\"type\" id=\"changetype-establishment\">\n  <label for=\"changetype-establishment\">Establishments</label>\n\n  <input type=\"radio\" name=\"type\" id=\"changetype-address\">\n  <label for=\"changetype-address\">Addresses</label>\n\n  <input type=\"radio\" name=\"type\" id=\"changetype-geocode\">\n  <label for=\"changetype-geocode\">Geocodes</label-->\n</div>\n<div id=\"map-canvas\"></div>",
+    jade: {
+      'input(id="pac-input", class="controls", type="text", placeholder="Enter a location")': '',
+      '#map-canvas': ''
+    },
     onRendered: function() {
       google.maps.event.addDomListener(window, 'load');
-      return x.timeout(10, x.gmapInit);
+      return x.timeout(10, function() {
+        return x.gmapInit({
+          disableDefaultUI: true,
+          mapTypeId: "roadmap",
+          zoom: 11,
+          center: {
+            lat: 53.52,
+            lng: -113.5
+          }
+        });
+      });
     }
   },
   request: {
@@ -518,11 +522,6 @@ module.exports.index = {
       items: function() {
         return [
           {
-            label: 'Name',
-            id: 'name',
-            title: 'Your name',
-            icon: 'user'
-          }, {
             label: 'Phone',
             id: 'phone',
             title: 'Phone Number',
@@ -532,6 +531,11 @@ module.exports.index = {
             id: 'datepicker',
             title: 'Pick your date',
             icon: 'calendar'
+          }, {
+            label: 'Name',
+            id: 'name',
+            title: 'Your name',
+            icon: 'user'
           }
         ];
       }
@@ -547,21 +551,23 @@ module.exports.index = {
         borderRadius: 0
       },
       '.ui-datepicker-header': {
-        backgroundColor: '#eee',
-        borderRadius: 0
-      },
-      '.ui-datepicker-title': {
-        fontWeight: ''
+        removeClass: 'ui-corner-all ui-widget-header'
       },
       '#ui-datepicker-div': {
-        removeClass: '.ui-corner-all'
-      },
-      '.ui-datepicker-header': {
-        removeClass: '.ui-corner-all'
+        removeClass: 'ui-corner-all ui-widget'
       }
     },
     onRendered: function() {
-      $('#datepicker').datepicker();
+      var datepicker;
+      $('#datepicker').css("opacity", '50%').datepicker();
+      datepicker = document.querySelector('#datepicker');
+      datepicker.addEventListener('focus', function() {
+        console.log('focus');
+        datepicker.removeEventListener('focus');
+        return x.timeout(100, function() {
+          return $('.ui-datepicker-header').removeClass('ui-corner-all ui-widget-header');
+        });
+      });
       return x.timeout(100, function() {
         return $('#mobile-number').intlTelInput({
           preferredCountries: ["ca", "us"],

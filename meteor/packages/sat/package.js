@@ -12,7 +12,7 @@ Package.on_use( function (api) {
     api.use('isaac:intl-tel-input@0.1.0')
     api.use('isaac:masonry');
     api.use('isaac:moment');
-    api.use('isaac:x@0.2.12');
+    api.use('isaac:x@0.2.24');
     api.add_files( 'config.js',     ['client', 'server'] );
     api.add_files( 'sat.coffee.js', ['client', 'server'] );
     api.add_files( 'sat.js',        ['client', 'server'] );

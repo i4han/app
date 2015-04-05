@@ -9,6 +9,9 @@ chokidar = require 'chokidar'
 rm_rf    = require 'rimraf'
 {ncp}    = require 'ncp'
 path     = require 'path'
+jade     = require 'jade'
+stylus   = require 'stylus'
+
 cson     = require 'CSON'
 
 cwd  = process.cwd()    
@@ -17,12 +20,18 @@ site = process.env.site or    'apps/getber'
 work        = path.join home, 'workspace'
 site_path   = path.join work, site 
 lib_path    = path.join work, 'lib'
+style_path  = path.join work, 'style'
 meteor_path = path.join work, 'meteor'
+site_client_path   = path.join site_path, 'app/client'
+site_lib_path      = path.join site_path, 'app/lib'
+meteor_client_path = path.join meteor_path, 'client'
+meteor_lib_path    = path.join meteor_path, 'lib'
+
 x_path      = path.join meteor_path, 'packages/isaac:x'
 
 settings_json = path.join lib_path, 'settings.json'
 settings_cson = path.join lib_path, 'settings.cson'
-local_settings_json = path.join site_path, 'app', 'local_settings.json'
+local_settings_json = path.join site_path, 'local_settings.json'
 local_settings_cson = path.join site_path, 'local_settings.cson'
 
 {x} = require path.join x_path, 'x.coffee'
@@ -78,7 +87,6 @@ local_settings = ->
     json_source = JSON.stringify(Settings, null, 4) + '\n'
     fs.writeFile local_settings_cson, cson.createCSONString(Settings), (err, data) ->
         json_source = Settings
-        delete json_source.private
         err ||  fs.writeFile local_settings_json, JSON.stringify(json_source, '', 4) + '\n', ->
             err || console.log 'Successful.'
 
@@ -218,7 +226,11 @@ meteor = ->
     cd Config.meteor_dir
     spawn 'meteor', [], stdio:'inherit'
 
-isType = (file, type) -> path.extname(file) is '.' + type
+isType = (file, type) -> path.extname(file) is '.' + type  # move to x?
+
+collectExt = (dir, ext) ->
+    ((fs.readdirSync dir).map (file) -> 
+        if isType(file, ext) then fs.readFileSync path.join dir, file else '').join '\n'
 
 cd     = (dir) -> process.chdir dir
 
@@ -227,8 +239,15 @@ deldir = (path) ->           # consider async
         ( fs.readdirSync path ).forEach (file, index) -> 
             curPath = path + '/' + file
             fs.unlinkSync curPath unless (fs.lstatSync curPath).isDirectory()
-            
+
+meteor_client = -> 
+    deldir meteor_client_path
+    deldir meteor_lib_path
+    ncp site_client_path, meteor_client_path
+    ncp site_lib_path, meteor_lib_path
+
 clean_up = ->
+    return
     deldir Config.sync_dir 
     for file in Config.auto_generated_files
         fs.unlinkSync file if fs.existsSync file
@@ -338,6 +357,7 @@ configure = () ->
 indent = (block, indent) -> 
     if indent then block.replace /^/gm, Array(++indent).join Config.indent_string else block
 
+###
 touch = () ->
     log Config.site_dir, Config.build_dir
     mkdir Config.build_dir
@@ -352,6 +372,7 @@ touch = () ->
                     fs.writeFile Config.build_dir + file + '.coffee', head + data, (err) ->
 
                         if err then log err else build()
+###
 
 vfunc$str = (obj, pages) ->
     for key, value of obj
@@ -368,25 +389,55 @@ func$str = (what, obj, pages) ->
     else if 'object'   == typeof what then (if x.isEmpty obj then x.o what else eco.render (x.o what), obj)
     else if 'function' == typeof what then func$str (what.call @, @C, @_), obj, pages
 
+directives =
+    jade:
+        file: '1.jade', indent: 1
+        format: (name, block) -> "template(name='#{name}')\n#{block}\n\n"
+    jade$:
+        file: '2.html', indent: 1
+        format: (name, block) -> jade.compile( "template(name='#{name}')\n#{block}\n\n", null )()  
+    HTML:
+        file: '3.html', indent: 1
+        format: (name, block) -> "<template name=\"#{name}\">\n#{block}\n</template>\n"
+    head:
+        file: '0.jade', indent: 1
+        header: -> 'head\n'    #  'doctype html\n' has not suppored
+        format: (name, block) -> block + '\n'
+    less:
+        file: '7.less', indent: 0
+        format: (name, block) -> block + '\n'
+    css:
+        file: '5.css',  indent: 0
+        header: -> (collectExt style_path, 'css') + '\n'
+        format: (name, block) -> block + '\n'
+    styl:
+        file: '4.styl', indent: 0
+        format: (name, block) -> block + '\n\n'
+    styl$:
+        file: '6.css',  indent: 0
+        format: (name, block) -> stylus(block).render() + '\n'
+
 build = () ->
-    log Config.index_module, Config.target_dir
-    mkdir Config.target_dir
+    log Config.index_module, site_client_path
+    mkdir site_client_path
     Pages = ([require Config.site_dir + '/index.coffee']).concat(
         (local.modules)    .map (module) -> require Config.module_dir + module,
         (local.other_files).map (file)   -> require Config.site_dir   + file )
         .reduce(((o,v) -> key = Object.keys(v)[0] ; o[key] = v[key] ; o), {})
-    console.log Pages, Config
-    (Config.templates).map (kind) ->
-        $$ = Config.pages[kind]
-        data = (x.func($$.header) || '') + (((Object.keys Pages).map (module) ->
+    #console.log Pages, Config
+    x.keys(directives).map (kind) ->
+        it = directives[kind]
+        #console.log 'it', it
+        data = (x.func(it.header) || '') + (((Object.keys Pages).map (module) ->
             (((Object.keys Pages[module]).map (page) ->
                 if block = func$str Pages[module][page][kind], Pages[module][page]['eco'], Pages
-                    $$.format.call @, page, indent block, $$.indent 
+                    it.format.call @, page, indent block, it.indent 
             ).filter (o) -> o?).join ''
         ).filter (o) -> o?).join ''
-        fs.readFile $$.file, (err, d) -> 
-            (md5(data) != md5 d) and fs.writeFile $$.file, data, (err) ->
-                log if err then err else $$.file
+        file = path.join site_client_path, it.file
+        fs.readFile file, (err, d) -> 
+            (data != d) and fs.writeFile file, data, (err) ->
+                log if err then err else it.file
 
 # task 'redis',   'Start redis',                -> redis()
 gitpass = ->
@@ -411,7 +462,7 @@ task 'mongoconf', 'Create mongo config file',   -> mongoconf()
 task 'packages',  'Update packages',            -> packages()
 task 'profile',   'Make shell profile',         -> profile()
 task 'sync',      'Sync source to meteor client files.', -> sync()
-task 'touch',     'Compile site files.',        -> touch() ; build() ; sync()
+task 'touch',     'Compile site files.',        -> build() ; sync() ; meteor_client()
 task 'build',     'Build meteor client files.', -> build()
 task 'install',   'Create install.sh',          -> install()
 task 'gitpass',   'github.com auto login',      -> gitpass()

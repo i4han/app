@@ -23,7 +23,11 @@ x.keys = (obj) -> Object.keys obj
 
 x.isValue = (v) -> if 'string' == typeof v || 'number' == typeof v then v else false
 x.interpolate = (str, o) -> str.replace /{([^{}]*)}/g, (a, b) -> x.isValue(o[b]) or a
-
+x.fillObj = (o, data) -> 
+    x.keys(o).map (k) -> o[k] = x.interpolate o[k], data
+    o
+x.call = (key, o) -> Meteor.call key, o, (e, r) -> 
+    if e then Session.set(key + '_error', e) else Session.set key, r
 x.o = (obj, depth=1) -> 
     ((Object.keys obj).map (key) ->
         value = obj[key]
@@ -83,7 +87,6 @@ x.insertTemplate = (page, id, data={}) ->
         document.getElementById id  )
 
 x.currentRoute = -> Router.current().route.getName()
-
 x.render = (page) -> Template[page].renderFunction().value
 
 x.renameKeys = (obj, keyObject) ->
@@ -227,11 +230,8 @@ x.assignPopover = (o,v) ->
 
 x.popover = (list) -> list.reduce ((o, v) -> x.assignPopover o, v), {}
 
-
 x.log = ->
     (arguments != null) and ([].slice.call(arguments)).concat(['\n']).map (str) ->
         if Meteor.isServer then fs.appendFileSync Config.log_file, str + ' ' # fs? server?
         else console.log str
 
-window? and ('DIV H2 BR'.split ' ').map (a) -> window[a] = (obj, str) -> 
-    if str? then HTML.toHTML HTML[a] obj, str else HTML.toHTML HTML[a] obj
