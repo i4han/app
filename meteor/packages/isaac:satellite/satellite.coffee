@@ -1,6 +1,8 @@
 
+collections = -> x.toArray Meteor.settings.public.collections
+
 db.server = ->
-    Meteor.settings.public.collections.map (collection) ->
+    collections().map (collection) ->
         console.log collection
         db[collection] = new Meteor.Collection collection
         db[collection].allow
@@ -13,7 +15,7 @@ db.server = ->
         Meteor.publish collection, -> db[collection].find {}
 
 db.client = ->
-    Meteor.settings.public.collections.map (collection) ->
+    collections().map (collection) ->
         db[collection] = new Meteor.Collection collection
         Meteor.subscribe collection
 
@@ -24,7 +26,7 @@ Pages.init = ->
         Pages[key] = val for key, val of pagesInFile[file] if file[0..1] != '__'
         (( x.keys pagesInFile[file] ).filter (key) -> key[0..1] == '__').map (name) -> delete Pages[name]
 
-Sat.init = ->
+x.satelliteInit = ->
     Pages.init()
     if Meteor.isServer
         db.server()
@@ -65,8 +67,8 @@ Sat.init = ->
 
 if Meteor.isClient
     $ ($) -> 
-        Sat.init()
+        x.satelliteInit()
         $.fn[k] = x.$[k] for k of x.$
 else if Meteor.isServer
-    Meteor.startup -> Sat.init()
+    Meteor.startup -> x.satelliteInit()
 

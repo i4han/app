@@ -1,15 +1,3 @@
-collections: [
-	"Connects"
-	"Items"
-	"Updates"
-	"Calendar"
-	"User"
-]
 public:
-	collections: [
-		"Connects"
-		"Items"
-		"Updates"
-		"Calendar"
-		"User"
-	]
+	collections: "Connects Items Updates Calendar User"
+packages: "isaac:intl-tel-input isaac:settings isaac:x isaac:satellite"

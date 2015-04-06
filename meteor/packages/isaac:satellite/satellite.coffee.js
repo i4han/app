@@ -1,7 +1,12 @@
-var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+var collections,
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+collections = function() {
+  return x.toArray(Meteor.settings["public"].collections);
+};
 
 db.server = function() {
-  return Meteor.settings["public"].collections.map(function(collection) {
+  return collections().map(function(collection) {
     console.log(collection);
     db[collection] = new Meteor.Collection(collection);
     db[collection].allow({
@@ -30,7 +35,7 @@ db.server = function() {
 };
 
 db.client = function() {
-  return Meteor.settings["public"].collections.map(function(collection) {
+  return collections().map(function(collection) {
     db[collection] = new Meteor.Collection(collection);
     return Meteor.subscribe(collection);
   });
@@ -57,7 +62,7 @@ Pages.init = function() {
   });
 };
 
-Sat.init = function() {
+x.satelliteInit = function() {
   var atRendered, methods, router_map, startup;
   Pages.init();
   if (Meteor.isServer) {
@@ -147,7 +152,7 @@ Sat.init = function() {
 if (Meteor.isClient) {
   $(function($) {
     var k, _results;
-    Sat.init();
+    x.satelliteInit();
     _results = [];
     for (k in x.$) {
       _results.push($.fn[k] = x.$[k]);
@@ -156,6 +161,6 @@ if (Meteor.isClient) {
   });
 } else if (Meteor.isServer) {
   Meteor.startup(function() {
-    return Sat.init();
+    return x.satelliteInit();
   });
 }

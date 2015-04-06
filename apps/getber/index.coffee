@@ -27,7 +27,7 @@ module.exports.index =
                 '.col-md-6#e2':  'a(class="btn-info", href="<%= @oauth %>") Connect with Uber': ''
                 '.col-md-6#e3':  'S {{hello}}'
                 '#items': '.col-md-11#pack': 'each items': '+item': ''
-        eco: -> oauth: -> x.oauth Settings.private.uber.oauth
+        eco: -> oauth: -> x.oauth 'uber'
         methods:
             hello: (name) -> 'Hello ' + name + '!'
         helpers: 
@@ -178,7 +178,7 @@ module.exports.index =
             'Address |address |Your home Zip code |envelope']
         events: x.popover 'name phone address' .split ' '
         atRendered:
-            '.ui-datepicker': borderRadius: 0
+            #'.ui-datepicker': borderRadius: 0
             '.ui-datepicker-header': removeClass: 'ui-corner-all ui-widget-header'#, backgroundColor: '#eee', borderRadius: 0
             '#ui-datepicker-div':    removeClass: 'ui-corner-all ui-widget'
             #'.ui-datepicker-prev': {}

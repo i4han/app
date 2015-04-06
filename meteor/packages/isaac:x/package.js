@@ -1,7 +1,7 @@
 
 Package.describe({ 
     summary: 'x tools',
-    version: "0.2.24",
+    version: "0.2.31",
     documentation: null
 });
 
@@ -20,6 +20,6 @@ Package.on_use( function (api) {
     api.export( 'Pages',  ['client', 'server'] );    
     api.export( 'Settings',['client', 'server'] ); 
 //    api.export( 'Config', ['client', 'server'] );    
-    api.export( 'Sat',    ['client', 'server'] );    
+//    api.export( 'Sat',    ['client', 'server'] );    
     api.export( 'module', ['client', 'server'] );    
 });

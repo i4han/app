@@ -1,17 +1,14 @@
 
 
-getMenu = (Config, Pages) ->
+getMenu = (Pages) ->
     _ = require 'underscore'
     _.templateSettings = interpolate: /\[(.+?)\]/g
-    index = Pages[Config.index_file]
-    menu  = index.layout.navbar.menu
+    menu  = Pages.index.layout.navbar.menu
     ((if 'string' == typeof menu then menu.split ' ' 
     else if Array.isArray(menu) then menu else []).map (a) -> 
         ( _.template """            li: a(href="{{pathFor '[path]'}}" id='[id]') [label]""" )
-            path:a, label:index[a].label, id:'navbar-menu'
+            path:a, label:Pages.index[a].label, id:'navbar-menu'
     ).join '\n'
-
-#        jade: """li: a(href="{{path}}" id="{{id}}") {{label}}"""
 
 module.exports.menu =
 
@@ -23,9 +20,9 @@ module.exports.menu =
             
     navbar:                                    # seperate menu_list and navbar
         jade: ->
-            menu = getMenu(@C, @Pages)
+            menu = getMenu(@Pages)
             """
-            .navbar.navbar-default.navbar-#{@C.$.navbar.style}
+            .navbar.navbar-default.navbar-#{@Theme.navbar.style}
                 +logo
                 .navbar-left 
                     ul.nav.navbar-nav
@@ -44,45 +41,47 @@ module.exports.menu =
                 menu_selected = event.target.innerText.toLowerCase()
                 $('#listen-to-menu-change').trigger 'custom', [menu_selected]
 
-        styl$: -> """
+        styl$: ->
+            T = @Theme.navbar 
+            """
             #menu-toggle
                 width 50px
             #login-buttons
                 height 50px
-                width #{@C.$.navbar.login.width}
+                width #{T.login.width}
             li#login-dropdown-list
-                width #{@C.$.navbar.login.width}
-                height #{@C.$.navbar.height}
+                width #{T.login.width}
+                height #{T.height}
                 display table-cell
                 text-align center
                 vertical-align middle
             .navbar-default .navbar-nav > li > a
-                color #{@C.$.navbar.text.color}
+                color #{T.text.color}
             .navbar-left > ul > li > a
-                width #{@C.$.navbar.text.width}
+                width #{T.text.width}
                 text-align center
             .navbar-right > li:hover
             .navbar-left > ul > li:hover
             .navbar-nav > li > a:hover
                 text-decoration none
-                color #{@C.$.navbar.hover.color}
-                background-color #{@C.$.navbar.hover.background_color}
+                color #{T.hover.color}
+                background-color #{T.hover.background_color}
             .dropdown-toggle > i.fa-chevron-down
                 padding-left 4px
             #navbar-menu:focus
                 color black
-                background-color #{@C.$.navbar.focus.background_color}
+                background-color #{T.focus.background_color}
             #login-dropdown:hover
                 cursor pointer
             #login-dropdown-list > a
-                width  #{@C.$.navbar.login.width}
-                height #{@C.$.navbar.height}
-                color  #{@C.$.navbar.text.color}
+                width  #{T.login.width}
+                height #{T.height}
+                color  #{T.text.color}
                 text-decoration none
                 cursor pointer
-                padding ( ( #{@C.$.navbar.height} - #{@C.$.navbar.text.height} ) / 2 )
+                padding ( ( #{T.height} - #{T.text.height} ) / 2 )
             #login-dropdown-list > a:hover
-                background-color #{@C.$.navbar.hover.background_color}
+                background-color #{T.hover.background_color}
             """
     sidebar:
         styl$: -> sidebar_width = '160px'; """
@@ -130,7 +129,7 @@ module.exports.menu =
             .sidebar-nav li a 
                 display block
                 text-decoration none
-                color #{@C.$.sidebar.a.color}
+                color #{@Theme.sidebar.a.color}
             .sidebar-nav li a:hover
                 text-decoration: none
                 color #000

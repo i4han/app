@@ -76,26 +76,6 @@ get_username = ->
 
 loginFlow = -> ! Session.get('login.inSignupFlow') and ! Session.get('login.inForgotPasswordFlow')    
 
-#        styl$: (C,_) -> _.slice """#login-buttons|>float right|border 0 ~
-#            |<#login-buttons + li .dropdown-menu |>float right|right 0|left auto"""
-#        jade:  (C,_) -> _.slice "ul.nav.navbar-nav#login-buttons|>+Template.dynamic(template=template)"
-###
-        jade: (C,_) -> 
-            _.slice """li.dropdown#login-dropdown ~
-                |>a.dropdown-toggle#login-id(data-toggle='dropdown') {{username}}|>i.fa(class='fa-chevron-down') ~
-                |<.dropdown-menu(id='{{id}}')|>+Template.dynamic(template=template)"""
-        styl$: (C,_) -> _.slice """#logged-in-dropdown-menu|>right 0|left auto
-                width #{C.$.navbar.login.dropdown.width}
-                padding 5px 0px
-            #login-dropdown input
-                margin-bottom 0px
-                border-radius 0px 5px 5px 0px
-            .dropdown-menu
-                width   #{C.$.navbar.dropdown.width}
-                padding #{C.$.navbar.dropdown.padding}
-            """
-###
-
 module.exports.accounts =
 
     login: 
@@ -125,14 +105,14 @@ module.exports.accounts =
         styl$: ->
             '#logged-in-dropdown-menu':
                 right:0, left:'auto'
-                width: @C.$.navbar.login.dropdown.width
+                width: @Theme.navbar.login.dropdown.width
                 padding: '5px 0px'
             '#login-dropdown input':
                 marginBottom: 0
                 borderRadius: '0px 5px 5px 0px'
             '.dropdown-menu':
-                width:   @C.$.navbar.dropdown.width
-                padding: @C.$.navbar.dropdown.padding
+                width:   @Theme.navbar.dropdown.width
+                padding: @Theme.navbar.dropdown.padding
         helpers:
             template: -> 
                 if      Session.get 'login.inMessageOnlyFlow'    then 'login_messages' 
@@ -144,14 +124,14 @@ module.exports.accounts =
             username: -> get_username()
 
     dropdown_menu_logged_in:
-        styl$: (C,_) -> """
+        styl$: -> """
             .dropdown-menu a
                 display block
                 padding 0px 8px
-                height #{C.$.navbar.dropdown.a.height}
+                height #{@Theme.navbar.dropdown.a.height}
             .dropdown-menu a:hover
                 cursor pointer
-                background-color: #{C.$.navbar.dropdown.a.hover.background_color}
+                background-color: #{@Theme.navbar.dropdown.a.hover.background_color}
             #logged-in-dropdown-menu > li > a
                 height 30px
                 padding 7px 20px
@@ -174,9 +154,6 @@ module.exports.accounts =
                 Meteor.flush()
 
     change_password:
-#        jade: (C,_) -> _.slice """each fields|>+form|<br|+login_messages ~
-#            |#dropdown-menu-buttons   |>each buttons|>+button ~
-#            |<<#dropdown-other-options|>each links  |>+a"""
         jade: 
             'each fields':'+form':''
             br:''

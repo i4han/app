@@ -1,27 +1,33 @@
-collections: [
-	"Connects"
-	"Items"
-	"Updates"
-	"Calendar"
-	"User"
-]
 public:
-	collections: [
-		"Connects"
-		"Items"
-		"Updates"
-		"Calendar"
-		"User"
-	]
+	collections: "Connects Items Updates Calendar User"
+packages: "isaac:intl-tel-input isaac:settings isaac:x isaac:satellite"
+title: "Getber"
+theme: "clean"
+lib_files: "accounts menu ui responsive"
+other_files: []
 private:
+	google:
+		maps:
+			url: "https://maps.googleapis.com/maps/api/js"
+			options:
+				query:
+					key: "AIzaSyB2RuPxiq1JbG18Lq793FdEzWM-7-MYX8Q"
+		map_input:
+			url: "https://maps.googleapis.com/maps/api/js"
+			options:
+				query:
+					v: "3.exp"
+					signed_in: "true"
+					libraries: "places"
 	uber:
 		oauth:
 			url: "https://login.uber.com/oauth/authorize"
-			query:
-				scope: "request profile history_lite"
-				client_id: "xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q"
-				redirect_uri: "https://www.getber.com/submit"
-				response_type: "token"
+			options:
+				query:
+					scope: "request profile history_lite"
+					client_id: "xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q"
+					redirect_uri: "https://www.getber.com/submit"
+					response_type: "token"
 		profile:
 			meteor_method: "uber_profile"
 			method: "GET"

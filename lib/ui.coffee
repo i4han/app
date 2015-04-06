@@ -5,21 +5,23 @@ module.exports.ui =
     html:
         jade: ' '
         head: ->
-            title: @C.title
-            1: "link(rel='stylesheet' href='#{@C._.font_style.pt_sans}')"
+            title: @Settings.title
+            1: "link(rel='stylesheet' href='#{@Theme.font_stylesheet}')"
             #2: "script(type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyB2RuPxiq1JbG18Lq793FdEzWM-7-MYX8Q')"
-            3: "script(type='text/javascript' src='https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places')"
-            #4: "script(type='text/javascript' src='')"
+            #3: "script(type='text/javascript' src='<%= @googlemap %>')"
+            #4: "script(type='text/javascript' src='https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places')"
+            4: "script(type='text/javascript' src='<%= @googlemap_input %>')"
             5: "meta(name='viewport', content='initial-scale=1.0, user-scalable=no')"
             6: "meta(charset='utf-8')"
+        eco: -> googlemap_input: -> x.urlWithQuery Settings.private.google.map_input
         startup: ->
             ''
         styl: -> 
             html: height: '100%'
             body: 
                 height: '100%'
-                fontFamily: @C.$.font_family
-                fontWeight: @C.$.font_weight   
+                fontFamily: @Theme.font_family
+                fontWeight: @Theme.font_weight   
     form:
         jade: """
             if visible

@@ -4,7 +4,6 @@ global.x = {$:{}} if !x?         # for cake
 module.exports.x = x if !Meteor? # for cake
 
 x.extend = (object, properties) -> object[key] = val for key, val of properties; object
-x.capitalize = (str) -> str[0].toUpperCase() + str[1..]
 x.isLowerCase = (char, index) -> 'a' <= char[index] <= 'z'
 x.isString = (str) -> str? and 'string' == typeof str and str.length > 0
 x.isVisible = (v) -> if 'function' == typeof v then v() else if false is v then false else true
@@ -20,8 +19,11 @@ x.func = (func) ->
     else if 'undefined' == func then {} else func
 x.funcConcat = (func1, func2) -> -> func1() ; func2()
 x.keys = (obj) -> Object.keys obj
-
 x.isValue = (v) -> if 'string' == typeof v || 'number' == typeof v then v else false
+x.isArray = (a) -> if '[object Array]' == Object.prototype.toString.call(a) then true else false
+x.capitalize = (str) -> str[0].toUpperCase() + str[1..]
+x.toArray = (str) -> if x.isArray str then str else if 'string' == typeof str then str.split ' ' else str
+x.toDash = (str) -> if str? then str.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase() else null
 x.interpolate = (str, o) -> str.replace /{([^{}]*)}/g, (a, b) -> x.isValue(o[b]) or a
 x.fillObj = (o, data) -> 
     x.keys(o).map (k) -> o[k] = x.interpolate o[k], data
@@ -39,7 +41,6 @@ x.o = (obj, depth=1) ->
         else key + ' ' + x.value value
     ).join '\n'
 
-x.toDash = (str) -> if str? then str.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase() else null
 
 x.query = -> Iron.Location.get().queryObject
 x.hash  = -> 
@@ -207,7 +208,12 @@ x.calendar = (fym, id_ym) ->
     else
         $('#bottom').data id:id_ym
 
-x.oauth = (obj) -> obj.url + "?" + x.queryString obj.query
+x.urlWithQuery = (obj) -> obj.url + "?" + x.queryString obj.options.query
+
+x.oauth = (obj) ->
+    if 'string' == typeof obj
+        obj = Settings.private[obj].oauth
+    x.urlWithQuery obj
 
 x.list = (what) -> # add id
     ((what = if 'string' == typeof what then what.split ' ' 

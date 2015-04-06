@@ -19,10 +19,6 @@ x.extend = function(object, properties) {
   return object;
 };
 
-x.capitalize = function(str) {
-  return str[0].toUpperCase() + str.slice(1);
-};
-
 x.isLowerCase = function(char, index) {
   var _ref;
   return ('a' <= (_ref = char[index]) && _ref <= 'z');
@@ -95,6 +91,38 @@ x.isValue = function(v) {
   }
 };
 
+x.isArray = function(a) {
+  if ('[object Array]' === Object.prototype.toString.call(a)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+x.capitalize = function(str) {
+  return str[0].toUpperCase() + str.slice(1);
+};
+
+x.toArray = function(str) {
+  if (x.isArray(str)) {
+    return str;
+  } else if ('string' === typeof str) {
+    return str.split(' ');
+  } else {
+    return str;
+  }
+};
+
+x.toDash = function(str) {
+  if (str != null) {
+    return str.replace(/([A-Z])/g, function($1) {
+      return '-' + $1.toLowerCase();
+    });
+  } else {
+    return null;
+  }
+};
+
 x.interpolate = function(str, o) {
   return str.replace(/{([^{}]*)}/g, function(a, b) {
     return x.isValue(o[b]) || a;
@@ -130,16 +158,6 @@ x.o = function(obj, depth) {
     }
     return (Array(depth).join('    ')) + ('object' === typeof value ? [key, x.o(value, depth + 1)].join('\n') : '' === value ? key : '' === key || x.isDigit(key) ? x.value(value) : key + ' ' + x.value(value));
   })).join('\n');
-};
-
-x.toDash = function(str) {
-  if (str != null) {
-    return str.replace(/([A-Z])/g, function($1) {
-      return '-' + $1.toLowerCase();
-    });
-  } else {
-    return null;
-  }
 };
 
 x.query = function() {
@@ -504,8 +522,15 @@ x.calendar = function(fym, id_ym) {
   }
 };
 
+x.urlWithQuery = function(obj) {
+  return obj.url + "?" + x.queryString(obj.options.query);
+};
+
 x.oauth = function(obj) {
-  return obj.url + "?" + x.queryString(obj.query);
+  if ('string' === typeof obj) {
+    obj = Settings["private"][obj].oauth;
+  }
+  return x.urlWithQuery(obj);
 };
 
 x.list = function(what) {

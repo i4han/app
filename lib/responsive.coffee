@@ -1,5 +1,7 @@
-module.exports.responsive =
 
+module.exports.responsive =
+    responsive: 
+        jade:''
     __responsive:  # __ means "do not make template."
         styl$: """
         $desktop_width = 885px

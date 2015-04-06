@@ -2,7 +2,7 @@
 x      = { $:{} };
 db     = {};
 Pages  = {};
-Sat    = {};
+// Sat    = {};
 Config = {};
 Settings = Meteor.settings;
 

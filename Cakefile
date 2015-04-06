@@ -11,24 +11,26 @@ rm_rf    = require 'rimraf'
 path     = require 'path'
 jade     = require 'jade'
 stylus   = require 'stylus'
-
+async    = require 'async'
 cson     = require 'CSON'
 
+indent_str = '    '
 cwd  = process.cwd()    
 home = process.env.HOME
-site = process.env.site or    'apps/getber'
+site = process.env.site or    'apps/getber'  # <- site
 work        = path.join home, 'workspace'
-site_path   = path.join work, site 
 lib_path    = path.join work, 'lib'
 style_path  = path.join work, 'style'
 meteor_path = path.join work, 'meteor'
-site_client_path   = path.join site_path, 'app/client'
-site_lib_path      = path.join site_path, 'app/lib'
-meteor_client_path = path.join meteor_path, 'client'
-meteor_lib_path    = path.join meteor_path, 'lib'
-
-x_path      = path.join meteor_path, 'packages/isaac:x'
-
+site_path   = path.join work,  site 
+index_file  = path.join site_path, 'index.coffee'
+site_meteor_path    = path.join site_path, 'app'    
+site_client_path    = path.join site_path, 'app/client'
+site_lib_path       = path.join site_path, 'app/lib'
+meteor_client_path  = path.join meteor_path, 'client'
+meteor_lib_path     = path.join meteor_path, 'lib'
+meteor_package_path = path.join meteor_path, 'packages'
+x_path        = path.join meteor_path, 'packages/isaac:x'
 settings_json = path.join lib_path, 'settings.json'
 settings_cson = path.join lib_path, 'settings.cson'
 local_settings_json = path.join site_path, 'local_settings.json'
@@ -37,6 +39,15 @@ local_settings_cson = path.join site_path, 'local_settings.cson'
 {x} = require path.join x_path, 'x.coffee'
 x.extend x, (require path.join x_path, 'x').x
 Settings = {}
+Settings = cson.load local_settings_cson
+theme_file = path.join style_path, Settings.theme + '.cson'
+Theme      = cson.load theme_file
+lib_files   = x.toArray Settings.lib_files
+other_files = x.toArray Settings.other_files
+my_packages = x.toArray Settings.packages
+lib_paths   = lib_files.map (l) -> path.join lib_path, l + '.coffee'
+
+###
 try
     {Config, __} = require site_path + '/app/packages/sat/config'    
 catch e
@@ -71,25 +82,30 @@ local = {
     other_files: []
 } if !local? or 0 == Object.keys(local).length
 
-Settings = cson.load local_settings_cson
+
+__settings = ->
+    Settings = {}
+    # Settings = require settings_json
+    # x.extend Settings, cson.load settings_cson
+    Settings = cson.load settings_cson
+    #fs.writeFile settings_json, JSON.stringify(Settings, null, 4) + '\n', (err, data) ->
+    #    err || fs.writeFile settings_cson, cson.createCSONString Settings
+    #    local_settings()
+###
+
+Settings = cson.load settings_cson
+x.extend  Settings, cson.load local_settings_cson
 
 settings = ->
     Settings = {}
-    Settings = require settings_json
-    x.extend Settings, cson.load settings_cson
-    fs.writeFile settings_json, JSON.stringify(Settings, null, 4) + '\n', (err, data) ->
-        err || fs.writeFile settings_cson, cson.createCSONString Settings
-        local_settings()
-
-local_settings = ->
-    x.extend Settings, require local_settings_json
+    Settings = cson.load settings_cson
+    #x.extend Settings, require local_settings_json
     x.extend Settings, cson.load local_settings_cson
-    json_source = JSON.stringify(Settings, null, 4) + '\n'
+    #json_source = JSON.stringify(Settings, null, 4) + '\n'
     fs.writeFile local_settings_cson, cson.createCSONString(Settings), (err, data) ->
-        json_source = Settings
-        err ||  fs.writeFile local_settings_json, JSON.stringify(json_source, '', 4) + '\n', ->
+        #json_source = Settings
+        err ||  fs.writeFile local_settings_json, JSON.stringify(Settings, '', 4) + '\n', ->
             err || console.log 'Successful.'
-
 
 logio_port = 8777
 rmate_port = 8080
@@ -147,7 +163,7 @@ profile = ->
 install = ->
     npm_modules = 'coffee-script underscore express stylus fs-extra fibers mongodb chokidar '  + # hiredis redis
               'node-serialize request event-stream prompt jade ps-node MD5 googleapis log.io ' +
-              'node-curl node-uber rimraf eco js2coffee path' #node-uber
+              'node-curl node-uber rimraf eco js2coffee path async' #node-uber
     data = """
         #!/usr/bin/env bash
         curl -fsSL https://raw.github.com/action-io/autoparts/master/setup.rb | ruby
@@ -222,9 +238,12 @@ logconf = ->
 log = ->
     arguments? and ([].slice.call(arguments)).forEach (str) ->
         fs.appendFile home + '/.log.io/cake', str, (err) -> console.log err if err
+
 meteor = ->
-    cd Config.meteor_dir
-    spawn 'meteor', [], stdio:'inherit'
+    cd site_meteor_path
+    spawn 'meteor', ['--settings', local_settings_json], stdio:'inherit'
+
+meteor_publish = -> spawn 'meteor', ['publish'], stdio:'inherit'
 
 isType = (file, type) -> path.extname(file) is '.' + type  # move to x?
 
@@ -234,11 +253,12 @@ collectExt = (dir, ext) ->
 
 cd     = (dir) -> process.chdir dir
 
-deldir = (path) ->           # consider async
-    if fs.existsSync path
-        ( fs.readdirSync path ).forEach (file, index) -> 
-            curPath = path + '/' + file
+deldir = (dir) ->           # consider async
+    if fs.existsSync dir
+        ( fs.readdirSync dir ).forEach (file, index) -> 
+            curPath = path.join dir, file
             fs.unlinkSync curPath unless (fs.lstatSync curPath).isDirectory()
+    dir
 
 meteor_client = -> 
     deldir meteor_client_path
@@ -247,132 +267,74 @@ meteor_client = ->
     ncp site_lib_path, meteor_lib_path
 
 clean_up = ->
-    return
-    deldir Config.sync_dir 
-    for file in Config.auto_generated_files
-        fs.unlinkSync file if fs.existsSync file
+    deldir site_client_path 
+    deldir site_lib_path 
 
 daemon = ->
     ps.lookup command: 'node',   psargs: 'ux', (err, a) -> 
         node_ps = a.map (p) -> (p.arguments?[0].match /\/(log\.io-[a-z]+)$/)?[1]
         'log.io-server'    in node_ps or spawn 'log.io-server',    [], stdio:'inherit'
         'log.io-harvester' in node_ps or setTimeout( ( -> spawn 'log.io-harvester', [], stdio:'inherit' ), 100 )
-    ps.lookup command: 'mongod', psargs: 'ux', (err, a) -> 
-        a.length or spawn 'mongod', (mongod_option.split ' '), stdio:'inherit'
+    #ps.lookup command: 'mongod', psargs: 'ux', (err, a) -> 
+    #    a.length or spawn 'mongod', (mongod_option.split ' '), stdio:'inherit'
 
 start_up = ->
-    sync()  if ! fs.existsSync Config.sync_dir  
-    build() if ! fs.existsSync Config.client_dir  # check better than this.
+    sync()  if ! fs.existsSync site_lib_path  
+    build() if ! fs.existsSync site_client_path  # check better than this.    
     
-    [Config.index_module, Config.header_source].map (file) ->
-        chokidar.watch file + '.coffee', persistent:true
-            .on 'change', (file) -> touch()
-    local.modules.map (file) ->
-        chokidar.watch Config.module_dir + file + '.coffee', persistent:true
-            .on 'change', (file) -> build()
-    ['config_source', 'local_source', 'theme_source'].map (a) ->
-        chokidar.watch Config[a], persistent:true
-            .on 'change', (file) -> configure()
+    chokidar.watch(index_file, persistent:true).on 'change', -> sync() ; build()
+    chokidar.watch(theme_file, persistent:true).on 'change', -> build()
+    lib_paths.map (l) ->
+        chokidar.watch(l, persistent:true).on 'change', -> sync() ; build()
+    [settings_cson, local_settings_json].map (l) ->
+        chokidar.watch(l, persistent:true).on 'change', -> settings()
 
     meteor()
 
-mkdir = (path) -> 
-    if path? and !fs.existsSync path 
-        fs.mkdirSync path
+mkdir = (dir) -> fs.mkdirSync dir if dir? and !fs.existsSync dir 
+cp = (source, target) -> (fs.createReadStream source).pipe fs.createWriteStream target
 
-cp = (source, destination) ->
+fileStream = (source, target, f) ->
     fs.createReadStream source
-        .pipe fs.createWriteStream destination
+        .pipe es.mapSync (data) -> f(data)
+        .pipe fs.createWriteStream target
 
 sync = ->
-    log Config.index_module, local.modules
-    sync_dir = Config.sync_dir
-    if fs.existsSync sync_dir
-        (fs.readdirSync sync_dir).forEach (file) -> fs.unlink sync_dir + file
-    else
-        mkdir sync_dir
-
-    (local.modules.map (l) -> Config.module_dir + l + '.coffee' )
-        .concat([Config.site_dir + 'index.coffee'])    
-#        .concat((fs.readdirSync  Config.build_dir).map (l) -> Config.build_dir  + l )    
-        .forEach (path) ->
-            filename = path.replace /.*?([^\/]*)$/, "$1"
-            console.log path, filename
-            fs.createReadStream path
-                .pipe es.mapSync (data) -> c = coffee data ; c
-                .pipe fs.createWriteStream sync_dir + filename + '.js'
-
-coffee2js = (x) ->
-    console.log x
-    if fs.existsSync x
-        fs.createReadStream x
-            .pipe es.mapSync (data) ->  c = coffee data ; c
-            .pipe fs.createWriteStream x + '.js'
+    log index_file, lib_files
+    mkdir deldir sync_dir = site_lib_path
+    (lib_files.map (l) -> path.join lib_path, l + '.coffee').concat([index_file]).forEach (f) ->
+        fileStream f, path.join(sync_dir, path.basename(f) + '.js'), (d) -> c = coffee d; c
 
 packages = ->
-    target = Config.site_packages
-    console.log 'resetting:', target, site, Config.packages
-    if target.indexOf(site) > -1
-        rm_rf target, (err) -> 
-            log err if err
-            mkdir target
-            (fs.readdirSync Config.packages).map (d) ->
-                pack_dir = Config.packages + d
-                if fs.lstatSync(pack_dir).isDirectory()
-                    (fs.readdirSync pack_dir).map (e) ->
-                        file = pack_dir + '/' + e
-                        if e.indexOf('.coffee') == e.length - 7 > -1
-                            console.log 'coffee:', file
-                            coffee2js file
-                    if d.indexOf(':') == -1
-                        ncp pack_dir, target + d, (err) -> 
-                            log err if err
-                            configure() if 'sat' == d
+    (fs.readdirSync meteor_package_path).map (d) ->
+        pack_dir = path.join meteor_package_path, d
+        if fs.lstatSync(pack_dir).isDirectory()
+            (fs.readdirSync pack_dir).map (e) ->
+                file = path.join pack_dir, e
+                (isType e, 'coffee') and fileStream file, file + '.js', (d) -> c = coffee d; c
 
-readInclude = (path) ->
-    ((fs.readFileSync path, 'utf8').split "\n").filter((a)-> -1 == a.search /#exclude\s*$/).join "\n"
-
-include = (data) ->
-    if data.search(/^#include\s+local\s*.*/) != -1 then readInclude Config.local_source
-    else if data.search(/^#include\s+theme\s*.*/) != -1 then readInclude Config.theme_source
-    else data
+meteor_publish = ->
+    version = {}
+    my_packages.map (p, index) ->
+        package_js = path.join meteor_package_path, p, 'package.js'
+        fs.readFile package_js, 'utf8', (e, data) -> 
+            data.match /version:\s*['"]([0-9.]+)['"]\s*,/m
+            version[p] = v = ((RegExp.$1.split '.').map (d, i) -> 
+                if i == 2 then String(Number(d) + 1) else d).join '.'
+            data = data.replace /(version:\s*['"])[0-9.]+(['"])/m, "$1#{v}$2"
+            if my_packages.length - 1 != index
+                fs.writeFile package_js, data, 'utf8', (e) -> e and console.log e
+            else
+                async.map x.keys(version), (p) ->
+                    data = data.replace((new RegExp("api\.use\\('#{p}.+$", 'm')), "api.use('#{p}@#{version[p]}');")
+                fs.writeFile package_js, data, 'utf8', (e) -> 
+                    e or my_packages.map (d) -> 
+                        cd path.join meteor_package_path, d
+                        meteor_publish()
 
 coffee = (data) -> 
     cs = require 'coffee-script'
-    cs.compile '#!/usr/bin/env node' + data, bare:true
-
-configure = () ->
-    log Config.config_source
-    log Config.local_source
-    log Config.theme_source    
-    log Config.config_js
-    fs.createReadStream Config.config_source
-        .pipe es.split "\n"
-        .pipe es.mapSync (data) -> include data
-        .pipe es.join "\n"
-        .pipe es.wait()
-        .pipe es.mapSync (data) ->  c = coffee data ; c
-        .pipe fs.createWriteStream Config.config_js
-
-indent = (block, indent) -> 
-    if indent then block.replace /^/gm, Array(++indent).join Config.indent_string else block
-
-###
-touch = () ->
-    log Config.site_dir, Config.build_dir
-    mkdir Config.build_dir
-    fs.readFile Config.header_source, 'utf8', (err, head) ->
-        if err then log err
-        else ([local.index_file].concat(local.other_files)).filter((f)->f?).map (file) ->
-            fs.readFile Config.site_dir + file + '.coffee', (err, data) ->
-                if err 
-                    log err 
-                else 
-                    [head, data].map (a) -> coffee a
-                    fs.writeFile Config.build_dir + file + '.coffee', head + data, (err) ->
-
-                        if err then log err else build()
-###
+    cs.compile '#!/usr/bin/env node\n' + data, bare:true
 
 vfunc$str = (obj, pages) ->
     for key, value of obj
@@ -380,14 +342,18 @@ vfunc$str = (obj, pages) ->
     obj
 
 func$str = (what, obj, pages) ->
-    @C = Config
+#    @C = Config
     @Settings = Settings
     @Pages = pages
+    @Theme = Theme
     obj = if 'function' == typeof obj then vfunc$str obj(), pages else vfunc$str obj, pages
     if !what? then undefined
     else if 'string'   == typeof what then (if x.isEmpty obj then what else eco.render what, obj)
     else if 'object'   == typeof what then (if x.isEmpty obj then x.o what else eco.render (x.o what), obj)
-    else if 'function' == typeof what then func$str (what.call @, @C, @_), obj, pages
+    else if 'function' == typeof what then func$str (what.call @, @C), obj, pages
+
+indent = (block, indent) -> 
+    if indent then block.replace /^/gm, Array(++indent).join indent_str else block
 
 directives =
     jade:
@@ -418,26 +384,23 @@ directives =
         format: (name, block) -> stylus(block).render() + '\n'
 
 build = () ->
-    log Config.index_module, site_client_path
+    log index_file, site_client_path
     mkdir site_client_path
-    Pages = ([require Config.site_dir + '/index.coffee']).concat(
-        (local.modules)    .map (module) -> require Config.module_dir + module,
-        (local.other_files).map (file)   -> require Config.site_dir   + file )
-        .reduce(((o,v) -> key = Object.keys(v)[0] ; o[key] = v[key] ; o), {})
-    #console.log Pages, Config
+    Pages = [require index_file]
+        .concat lib_files  .map (lib)  -> require path.join site_lib_path, lib + '.coffee'
+        .concat other_files.map (file) -> require path.join site_path, file
+        .reduce ((o,v) -> k = x.keys(v)[0] ; o[k] = v[k] ; o), {}
     x.keys(directives).map (kind) ->
         it = directives[kind]
-        #console.log 'it', it
-        data = (x.func(it.header) || '') + (((Object.keys Pages).map (module) ->
-            (((Object.keys Pages[module]).map (page) ->
+        data = (x.func(it.header) || '') + (((x.keys Pages).map (module) ->
+            (((x.keys Pages[module]).map (page) ->
                 if block = func$str Pages[module][page][kind], Pages[module][page]['eco'], Pages
                     it.format.call @, page, indent block, it.indent 
             ).filter (o) -> o?).join ''
         ).filter (o) -> o?).join ''
         file = path.join site_client_path, it.file
         fs.readFile file, (err, d) -> 
-            (data != d) and fs.writeFile file, data, (err) ->
-                log if err then err else it.file
+            (data != d) and fs.writeFile file, data, (err) -> log if err then err else it.file
 
 # task 'redis',   'Start redis',                -> redis()
 gitpass = ->
@@ -450,16 +413,16 @@ gitpass = ->
                 login i4han
                 password #{result.password}
             """, flag: 'w+'
-        Config.quit(process.exit 1)
+#        Config.quit(process.exit 1)
 
 task 'watch',     'Start the server',           -> daemon() ; start_up()
-task 'config',    'Compile config file.',       -> configure()
 task 'clean',     'Remove generated files',     -> clean_up()
-task 'setup',     'Config and prepare profile', -> configure() ; profile()  ; logconf()
-task 'reset',     'Reset files',                -> configure() ; clean_up() ; sync() ; touch() ; build()    
+task 'setup',     'Config and prepare profile', -> profile()  ; logconf()
+task 'reset',     'Reset files',                -> clean_up() ; sync() ; touch() ; build()    
 task 'logconf',   'Create log config file',     -> logconf()
 task 'mongoconf', 'Create mongo config file',   -> mongoconf()
 task 'packages',  'Update packages',            -> packages()
+task 'publish',   'Publish Meteor packages',    -> meteor_publish()
 task 'profile',   'Make shell profile',         -> profile()
 task 'sync',      'Sync source to meteor client files.', -> sync()
 task 'touch',     'Compile site files.',        -> build() ; sync() ; meteor_client()
@@ -469,5 +432,5 @@ task 'gitpass',   'github.com auto login',      -> gitpass()
 task 'daemon',     'start daemons',             -> daemon()
 task 'settings',  'Settings',                   -> settings()
 
-Config.quit()
+#Config.quit()
 
