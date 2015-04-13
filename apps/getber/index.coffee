@@ -1,4 +1,4 @@
-#
+
 
 fym = 'YYYYMM'
 date_box_size = 120
@@ -15,39 +15,76 @@ module.exports.index =
         styl: body: backgroundColor: '#ddd'
         navbar: sidebar: true, login: true, menu: 'home map calendar vehicle request log help'
 
-    home:
+    layout_naked:
+        jade: '+yield'
+    lander:
+        label: 'lander', router: path: '/lander', layoutTemplate: 'layout_naked'
+        jade: 
+            'img(src="<%= @hero %>", id="bg", width="1200px")':''
+            '.logo#logo-left': 'get'
+            '.logo#logo-right': 'ber'
+            '#hero':
+                '#hero-copy': 'Simplify your teens rides'
+                '.copy#e1': 'For parents or gurdiens'
+                '+button(label="Connect with UBER")': ''
+                '.copy#e2': 'For teens'
+        styl: 
+            '#bg': position: 'fixed', top: 0, left: 0, zIndex: '-1'
+            '.bgwidth':  width:  '100%'
+            '.bgheight': height: '100%'
+            h1: '_'
+            '.logo': marginTop: 60, fontSize: 40, color: 'white', padding: 2, display: 'inline'
+            '#logo-left':  marginLeft: 80, backgroundColor: 'blue'
+            '#logo-right': marginLeft: 0,  backgroundColor: 'green'
+            '.copy': marginLeft: 80, textAlign: 'left', fontSize: 32, color: 'white', textShadow: '1px 1px 3px #000'
+            '#hero': width: '100%', backgroundColor: 'rgba(255,255,255,0.2)'
+            '#hero-copy': marginTop: 320, marginLeft: 80, textAlign: 'left', fontSize: 48, color: 'white', textShadow: '1px 1px 3px #000'
+        eco: -> hero: -> @Settings.lander.hero
+        onStartup: ->
+            $(window).load ->
+                theWindow = $ window
+                resizeBg = ->
+                    $bg       = $ '#bg'
+                    aspectRatio = $bg.width() / $bg.height()
+                    console.log 'ar', aspectRatio
+                    if theWindow.width() / theWindow.height() < aspectRatio
+                        $bg.removeClass().addClass 'bgheight'
+                    else
+                        $bg.removeClass().addClass 'bgwidth'
+                theWindow.resize(resizeBg).trigger 'resize'
+            $(window).trigger 'resize' 
+    home: 
         label: 'Home', sidebar: 'sidebar_home',  router: path: '/'  
         jade: '#contentWrapper': 
-                'h2#title':      'Sign up with UBER'
-                '.col-md-6#e1':
-                    'p#name':    'Isaac Han'
-                    'p#address': '2353 Hagen Link NW, Edmonton, AB T6R 0B2'
-                    br: ''
-                    'with uber': '+button': ''
-                '.col-md-6#e2':  'a(class="btn-info", href="<%= @oauth %>") Connect with Uber': ''
-                '.col-md-6#e3':  'S {{hello}}'
+                'h2#title': 'Sign up with UBER'
+                '+button(label="Connect with UBER")': ''                    
+                '.col-md-6#e3':  'See you soon{{hello}}'
                 '#items': '.col-md-11#pack': 'each items': '+item': ''
         eco: -> oauth: -> x.oauth 'uber'
-        methods:
+        methods: 
             hello: (name) -> 'Hello ' + name + '!'
+            uber_oauth: -> x.oauth 'uber'
         helpers: 
             items: -> db.Items.find {}, sort: created_time: -1
-            uber:  -> class:'btn-success', id:'uber-botton', label: 'Connect with Uber'
-            hello: -> Session.get 'hello2'
+            hello: -> Session.get 'hello'
         events:
-            'click #uber-botton': (event) -> console.log 'uber'
+            'click #connect-with-uber': -> Router.go '/forward/uber_oauth'
         styl: 
             '#items .item':backgroundColor:'white', width:240, height:240, float:'left', margin:6
             '#title':   width:500 
             '#name':    width:200 
             '#address': width:400
         onCreated: ->
-            Meteor.call 'hello', 'world', (e, result) -> Session.set 'hello2', result 
+            Meteor.call 'hello', 'world', (e, result) -> Session.set 'hello', result
+            Meteor.call 'uber_oauth', (e, result) -> Session.set 'uber_oauth', result
         onRendered: -> 
             x.timeout 40, -> $('#pack').masonry itemSelector: '.item', columnWidth: 126
             ('title name address'.split ' ').map (edit) -> $('#' + edit).editable()
  
     sidebar_home: x.sidebar ['home', 'calendar', 'help']
+    world:
+        label: 'Hello'
+        jade: h1: '{{a}} world'
     profile:
         lable: 'Profile', sidebar: 'sidebar_profile', router: path: 'profile'
         jade: '#contentWrapper':
@@ -73,7 +110,7 @@ module.exports.index =
         label: 'Vehicle', sidebar: 'sidebar_vehicle', router: path: 'vehicle'
         jade: '#contentWrapper': 
                 h1: 'You vehicle information', br: ''
-                '.col-sm-7': 'each items': '+form': '', br:''
+                '.col-sm-7': 'each items': '+form': '', br:'' 
         helpers: items: -> [
                 { label: 'Maker', id: 'maker', title: 'Car manufacturer',      icon: 'mobile' },
                 { label: 'Model', id: 'model', title: 'Year of the model',     icon: 'mobile' },
@@ -84,7 +121,7 @@ module.exports.index =
     popover_color: jade: ul:li: 'White or black only'
     sidebar_vehicle: x.sidebar 'home map calendar request vehicle log help'.split ' '             
 
-    map:
+    map: 
         label: 'Map', sidebar: 'sidebar_map', router: path: 'map'
         jade: '#map-canvas'
         styl: '#map-canvas': height: '100%', padding: 0, margin: 0
@@ -128,7 +165,6 @@ module.exports.index =
     redirect:
         label: 'redirect', router: path: 'redirect'
         jade: h2:'redirect'
-
     day:
         collection: 'calendar'
         jade: x.list 'init title date day event'
@@ -175,7 +211,7 @@ module.exports.index =
         __helpers: items: -> [ 'label, id, title, icon'
             'Name    |name    |Your name          |user'
             'Phone   |phone   |Phone Number       |mobile'
-            'Address |address |Your home Zip code |envelope']
+            'Address |address |Your home Zip code |envelope' ]
         events: x.popover 'name phone address' .split ' '
         atRendered:
             #'.ui-datepicker': borderRadius: 0
@@ -198,12 +234,21 @@ module.exports.index =
                 x.timeout 100, -> $('.ui-datepicker-header').removeClass 'ui-corner-all ui-widget-header'
             x.timeout 100, -> $('#mobile-number').intlTelInput 
                 preferredCountries: ["ca", "us"]
-                utilsScript: "http://jackocnr.com/lib/intl-tel-input/lib/libphonenumber/build/utils.js"
+                utilsScript: "/utils.js"
             #$('#ui-datepicker-div').removeClass('ui-corner-all')
             #$('.ui-datepicker-header').removeClass('ui-corner-all')
     popover_name:    jade: ul:'li Write your name.':'', 'li No longer then 12 letters.':''
     popover_phone:   jade: ul: li:'Write your phone number.'
     popover_address: jade: ul: li:'Write your zipcode.'
 
-    help: label: 'Help', router: {}, jade: '#contentWrapper':h1:'Help'
+    help: 
+        label: 'Help', router: {}, 
+        jade: '#contentWrapper':
+                h1:'style'
+                pre:'{{output}}'
+        helpers: output: ->
+            sheets = document.styleSheets
+            ([0..sheets.length].map (i) ->
+                sheets[i]? and (rules = sheets[i].cssRules)? and ([0..rules.length].map (j) ->
+                    rules[j]? and "#{i}:#{j}\n" + rules[j].cssText).join '\n').join '\n'          
 

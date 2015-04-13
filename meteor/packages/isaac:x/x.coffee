@@ -20,14 +20,28 @@ x.func = (func) ->
 x.funcConcat = (func1, func2) -> -> func1() ; func2()
 x.keys = (obj) -> Object.keys obj
 x.isValue = (v) -> if 'string' == typeof v || 'number' == typeof v then v else false
-x.isArray = (a) -> if '[object Array]' == Object.prototype.toString.call(a) then true else false
+x.isArray  = (o) -> if '[object Array]'  == Object.prototype.toString.call(o) then true else false
+x.isObject = (o) -> if '[object Object]' == Object.prototype.toString.call(o) then true else false
 x.capitalize = (str) -> str[0].toUpperCase() + str[1..]
-x.toArray = (str) -> if x.isArray str then str else if 'string' == typeof str then str.split ' ' else str
+
+x.toObject = (a) ->
+    if x.isObject a then a
+    else if undefined == a then {}
+    else if x.isArray(a) then a.reduce ((o, v) -> o[v[0]] = v[1]; o), {}
+    else {}
+x.toArray = (str) -> 
+    if x.isArray str then str 
+    else if undefined == str then []
+    else if 'string' == typeof str then str.split ' ' 
+    else str
 x.toDash = (str) -> if str? then str.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase() else null
 x.interpolate = (str, o) -> str.replace /{([^{}]*)}/g, (a, b) -> x.isValue(o[b]) or a
-x.fillObj = (o, data) -> 
+x.interpolateObj = (o, data) -> 
     x.keys(o).map (k) -> o[k] = x.interpolate o[k], data
     o
+x.interpolateOO = (options, data) ->
+    x.isEmpty(data) or x.keys(options).map (m) -> options[m] = x.interpolateObj options[m], data
+    options
 x.call = (key, o) -> Meteor.call key, o, (e, r) -> 
     if e then Session.set(key + '_error', e) else Session.set key, r
 x.o = (obj, depth=1) -> 
@@ -42,16 +56,10 @@ x.o = (obj, depth=1) ->
     ).join '\n'
 
 
-x.query = -> Iron.Location.get().queryObject
 x.hash  = -> 
     ((Iron.Location.get().hash[1..].split '&').map (a) -> a.split '=').reduce ((p, c) ->  p[c[0]] = c[1]; p), {}
 
 x.repeat = (str, times) -> Array(times + 1).join str
-x.queryString = (obj, delimeter='&') ->
-    (encodeURIComponent(i) + "=" + encodeURIComponent(obj[i]) for i of obj).join delimeter
-x.decode = (str, code, repeat) -> 
-    decode = encodeURIComponent code
-    str.replace( new RegExp("(?:#{decode}){#{repeat}}(?!#{decode})", 'g'), x.repeat(code, repeat))
 x.saveMustache = (str) -> x.decode( x.decode( str, '{', 2 ), '}', 2 )
 x.trim = (str) -> if str? then str.trim() else null
 x.capitalize = (string) -> string.charAt(0).toUpperCase() + string.slice(1)
@@ -208,18 +216,26 @@ x.calendar = (fym, id_ym) ->
     else
         $('#bottom').data id:id_ym
 
-x.urlWithQuery = (obj) -> obj.url + "?" + x.queryString obj.options.query
+x.query = -> Iron.Location.get().queryObject
+x.addQuery = (obj) ->
+    return '' if (! obj?) or x.isEmpty obj
+    if (result = x.queryString obj).length > 0 then '?' + result else ''
+x.queryString = (obj, delimeter='&') ->
+    (encodeURIComponent(i) + "=" + encodeURIComponent(obj[i]) for i of obj).join delimeter
+x.decode = (str, code, repeat) -> 
+    decode = encodeURIComponent code
+    str.replace( new RegExp("(?:#{decode}){#{repeat}}(?!#{decode})", 'g'), x.repeat(code, repeat))
+x.urlWithQuery = (obj) -> obj.url + x.addQuery obj.options.query
 
 x.oauth = (obj) ->
     if 'string' == typeof obj
-        obj = Settings.private[obj].oauth
+        obj = Settings[obj].oauth
     x.urlWithQuery obj
 
 x.list = (what) -> # add id
     ((what = if 'string' == typeof what then what.split ' ' 
     else if Array.isArray(what) then what else [])
         .map (a) -> ".#{a} {{#{a}}}").join '\n'
-
 
 x.sidebar = (list, id='sidebar_menu') ->
     list: list

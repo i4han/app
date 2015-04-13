@@ -13,7 +13,7 @@ module.exports.ui =
             4: "script(type='text/javascript' src='<%= @googlemap_input %>')"
             5: "meta(name='viewport', content='initial-scale=1.0, user-scalable=no')"
             6: "meta(charset='utf-8')"
-        eco: -> googlemap_input: -> x.urlWithQuery Settings.private.google.map_input
+        eco: -> googlemap_input: -> x.urlWithQuery Settings.google.map_input
         startup: ->
             ''
         styl: -> 

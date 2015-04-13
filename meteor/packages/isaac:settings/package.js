@@ -1,7 +1,7 @@
 
 Package.describe({ 
     summary: 'Initalizing settings.',
-    version: '0.1.5',
+    version: '0.1.8',
     documentation: null
 });
 
@@ -11,6 +11,4 @@ Package.on_use( function (api) {
     api.export( 'db',       ['client', 'server'] ); 
     api.export( 'Settings', ['client', 'server'] );
     api.export( 'Pages',    ['client', 'server'] );    
-//    api.export( 'Sat',      ['client', 'server'] );
-//    api.export( 'Config',   ['client', 'server'] ); 
 });

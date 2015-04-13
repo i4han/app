@@ -7,18 +7,24 @@ template(name='layout')
         +sidebar
         +yield
 
+template(name='layout_naked')
+    +yield
+
+template(name='lander')
+    img(src="two-girls-getber.jpg", id="bg", width="1200px")
+    .logo#logo-left get
+    .logo#logo-right ber
+    #hero
+        #hero-copy Simplify your teens rides
+        .copy#e1 For parents or gurdiens
+        +button(label="Connect with UBER")
+        .copy#e2 For teens
+
 template(name='home')
     #contentWrapper
         h2#title Sign up with UBER
-        .col-md-6#e1
-            p#name Isaac Han
-            p#address 2353 Hagen Link NW, Edmonton, AB T6R 0B2
-            br
-            with uber
-                +button
-        .col-md-6#e2
-            a(class="btn-info", href="https://login.uber.com/oauth/authorize?scope=request%20profile%20history_lite&amp;client_id=xJsIAYCmEZElqHVLKJyPxVNcXUXqwE_q&amp;redirect_uri=https%3A%2F%2Fwww.getber.com%2Fsubmit&amp;response_type=token") Connect with Uber
-        .col-md-6#e3 S {{hello}}
+        +button(label="Connect with UBER")
+        .col-md-6#e3 See you soon{{hello}}
         #items
             .col-md-11#pack
                 each items
@@ -27,6 +33,9 @@ template(name='home')
 template(name='sidebar_home')
     each items
         +menu_list
+
+template(name='world')
+    h1 {{a}} world
 
 template(name='profile')
     #contentWrapper
@@ -132,7 +141,8 @@ template(name='popover_address')
 
 template(name='help')
     #contentWrapper
-        h1 Help
+        h1 style
+        pre {{output}}
 
 template(name='login')
     ul.nav.navbar-nav#login-buttons

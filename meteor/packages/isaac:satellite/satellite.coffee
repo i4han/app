@@ -1,9 +1,8 @@
 
-collections = -> x.toArray Meteor.settings.public.collections
+collections = x.toArray Meteor.settings.public.collections
 
 db.server = ->
-    collections().map (collection) ->
-        console.log collection
+    collections.map (collection) ->
         db[collection] = new Meteor.Collection collection
         db[collection].allow
             insert: (doc) -> true
@@ -15,19 +14,15 @@ db.server = ->
         Meteor.publish collection, -> db[collection].find {}
 
 db.client = ->
-    collections().map (collection) ->
+    collections.map (collection) ->
         db[collection] = new Meteor.Collection collection
         Meteor.subscribe collection
 
-Pages.init = ->
-    delete Pages.init
-    pagesInFile = module.exports
-    (x.keys pagesInFile).map (file) ->
-        Pages[key] = val for key, val of pagesInFile[file] if file[0..1] != '__'
-        (( x.keys pagesInFile[file] ).filter (key) -> key[0..1] == '__').map (name) -> delete Pages[name]
 
 x.satelliteInit = ->
-    Pages.init()
+    (x.keys module.exports).map (file) ->
+        Pages[key] = val for key, val of module.exports[file] if file[0..1] != '__'
+        (( x.keys module.exports[file] ).filter (key) -> key[0..1] == '__').map (name) -> delete Pages[name]
     if Meteor.isServer
         db.server()
         methods = {}
@@ -41,8 +36,8 @@ x.satelliteInit = ->
         router_map = {}
         atRendered = []
         (x.keys Pages).map (name) -> (x.keys Pages[name]).map (key) ->  
-            if 'startup' == key
-                startup.push Pages[name].startup
+            if  'onStartup' == key
+                startup.push Pages[name][key]
             else if 'atRendered' == key
                 obj = x.func Pages[name].atRendered
                 (x.keys obj).map (k) -> (x.keys obj[k]).map (l) ->
@@ -61,8 +56,7 @@ x.satelliteInit = ->
                 Template[name][key] x.func Pages[name][key]
             else if key in 'onCreated onDestroyed'.split ' '
                 Template[name][key] Pages[name][key]
-        Router.map ->
-            this.route key, router_map[key] for key of router_map
+        Router.map -> this.route key, router_map[key] for key of router_map
         Meteor.startup -> startup.map (func) -> func()
 
 if Meteor.isClient
@@ -71,4 +65,3 @@ if Meteor.isClient
         $.fn[k] = x.$[k] for k of x.$
 else if Meteor.isServer
     Meteor.startup -> x.satelliteInit()
-

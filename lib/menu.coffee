@@ -3,11 +3,11 @@
 getMenu = (Pages) ->
     _ = require 'underscore'
     _.templateSettings = interpolate: /\[(.+?)\]/g
-    menu  = Pages.index.layout.navbar.menu
+    menu  = Pages.layout.navbar.menu
     ((if 'string' == typeof menu then menu.split ' ' 
     else if Array.isArray(menu) then menu else []).map (a) -> 
         ( _.template """            li: a(href="{{pathFor '[path]'}}" id='[id]') [label]""" )
-            path:a, label:Pages.index[a].label, id:'navbar-menu'
+            path:a, label:Pages[a].label, id:'navbar-menu'
     ).join '\n'
 
 module.exports.menu =

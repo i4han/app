@@ -1,7 +1,5 @@
 *.rdb
-app/client/*
-app/private/storables
-app/lib/*.coffee
-app/packages/sat/config.js
+.config.json
+.settings.cson
+.settings.json
 npm-debug.log
-site/build
