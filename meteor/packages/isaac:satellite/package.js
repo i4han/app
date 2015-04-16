@@ -1,7 +1,7 @@
 
 Package.describe({
     summary: 'Satellite: framework for Meteor in coffeescript.',
-    version: '0.2.1',
+    version: '0.2.2',
     documentation: null
 });
 
@@ -9,10 +9,10 @@ Package.on_use( function (api) {
     api.use('jquery@1.0.1');
     api.use('isaac:settings@0.1.8');
     api.use('isaac:intl-tel-input@0.1.3');
-    api.use('isaac:route@0.1.1');
+    api.use('isaac:route@0.1.2');
     api.use('isaac:masonry@0.0.1');
     api.use('isaac:moment@0.0.1');
-    api.use('isaac:x@0.3.1');
+    api.use('isaac:x@0.3.2');
     api.add_files( 'satellite.js', ['client', 'server'] );
 
     api.export( 'x',        ['client', 'server'] );    

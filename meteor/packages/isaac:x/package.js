@@ -1,7 +1,7 @@
 
 Package.describe({ 
     summary: 'x tools',
-    version: "0.3.1",
+    version: "0.3.3",
     documentation: null
 });
 
@@ -10,8 +10,8 @@ Package.on_use( function (api) {
     api.use('isaac:settings@0.1.0');
 
     api.add_files( 'x_init.js',   ['client', 'server'] );
-    api.add_files( 'x_client.js',  'client' );
     api.add_files( 'x.js',        ['client', 'server'] );
+    api.add_files( 'x_client.js',  'client' );
     api.add_files( 'methods.js', ['client', 'server'] );
     api.add_files( 'x_jquery.js', 'client' );
     api.export( 'x',        ['client', 'server'] );    

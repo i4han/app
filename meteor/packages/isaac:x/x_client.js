@@ -141,7 +141,9 @@ x.gmapInit = function (options) {
   setupClickListener('changetype-establishment', ['establishment']);
   setupClickListener('changetype-geocode', ['geocode']);
   */
-} 
+}
+
+x.removeRules(Settings.public.remove_rules);
 
 
 

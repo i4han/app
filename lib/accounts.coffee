@@ -283,6 +283,3 @@ module.exports.accounts =
         helpers:
             error_message: -> Session.get 'login.errorMessage'
             info_message:  -> Session.get 'login.infoMessage'
-
-
-#        styl$: (C,_) -> _.slice "#login-dropdown .alert|>padding 6px|margin-bottom 14px"

@@ -19,7 +19,7 @@ db.client = ->
         Meteor.subscribe collection
 
 
-x.satelliteInit = ->
+Meteor.startup ->
     (x.keys module.exports).map (file) ->
         Pages[key] = val for key, val of module.exports[file] if file[0..1] != '__'
         (( x.keys module.exports[file] ).filter (key) -> key[0..1] == '__').map (name) -> delete Pages[name]
@@ -32,12 +32,13 @@ x.satelliteInit = ->
     else if Meteor.isClient
         db.client()
         Router.configure layoutTemplate: 'layout'
-        startup = []
+        #startup = []
         router_map = {}
         atRendered = []
         (x.keys Pages).map (name) -> (x.keys Pages[name]).map (key) ->  
             if  'onStartup' == key
-                startup.push Pages[name][key]
+            #    startup.push Pages[name][key]
+                Pages[name].onStartup()
             else if 'atRendered' == key
                 obj = x.func Pages[name].atRendered
                 (x.keys obj).map (k) -> (x.keys obj[k]).map (l) ->
@@ -57,11 +58,8 @@ x.satelliteInit = ->
             else if key in 'onCreated onDestroyed'.split ' '
                 Template[name][key] Pages[name][key]
         Router.map -> this.route key, router_map[key] for key of router_map
-        Meteor.startup -> startup.map (func) -> func()
+        #Meteor.startup -> startup.map (func) -> func()
+        $ ($) -> 
+            o.$.map (f) -> f()
+            $.fn[k] = x.$[k] for k of x.$
 
-if Meteor.isClient
-    $ ($) -> 
-        x.satelliteInit()
-        $.fn[k] = x.$[k] for k of x.$
-else if Meteor.isServer
-    Meteor.startup -> x.satelliteInit()

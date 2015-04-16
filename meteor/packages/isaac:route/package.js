@@ -1,7 +1,7 @@
 Package.describe({
   name: 'isaac:route',
   summary: 'Meteor package for shorten and rest',
-  version: '0.1.1',
+  version: '0.1.2',
   documentation: null
 });
 

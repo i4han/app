@@ -1,0 +1,144 @@
+#logo, #video, #connect-with-uber, #sign-up-for-teens {
+  height: 50px;
+}
+#logo {
+  width: 110px;
+  padding: 15px;
+  font-weight: 200;
+  font-size: 15px;
+  text-align: center;
+}
+#logo, #items .item {
+  float: left;
+}
+#logo, .logo, .copy, #hero-copy {
+  color: white;
+}
+body {
+  background-color: #ddd;
+}
+#bg, #screen-bg, #bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+#bg, #bg-video {
+  z-index: -100;
+}
+#bg, #screen-bg, .bgwidth, #log-canvas, #full-screen {
+  width: 100%;
+}
+#bg, #screen-bg, .bgheight, #map-canvas, #log-canvas, #full-screen {
+  height: 100%;
+}
+#bg {
+  background-color: #333;
+}
+#screen-bg {
+  z-index: -10;
+  background-image: url(/screen-bg.png);
+}
+#bg-video {
+  width: 100.0%;
+  height: 100.0%;
+}
+.logo {
+  margin-top: 60px;
+  font-size: 40px;
+  padding: 2px;
+}
+.logo, .title, .date {
+  display: inline;
+}
+#logo-left, .copy, #hero-copy {
+  margin-left: 80px;
+}
+#logo-left, #connect-with-uber {
+  background-color: blue;
+}
+#logo-right {
+  margin-left: 0;
+}
+#logo-right, #sign-up-for-teens, #add-rider {
+  background-color: green;
+}
+#connect-with-uber, #sign-up-for-teens, #add-rider {
+  border-width: 2px;
+}
+#connect-with-uber {
+  border-color: blue;
+}
+#connect-with-uber, #sign-up-for-teens {
+  width: 210px;
+  font-size: 20px;
+}
+#sign-up-for-teens, #add-rider {
+  border-color: green;
+}
+.copy, #hero-copy {
+  text-align: left;
+}
+.copy {
+  font-size: 32px;
+  text-shadow: 1px 1px 5px #000;
+}
+#hero {
+  width: 660px;
+  padding-bottom: 20px;
+  background-color: rgba(255,255,255,0.1);
+}
+#hero-copy {
+  margin-top: 40px;
+  font-size: 48px;
+  text-shadow: 1px 1px 3px #000;
+}
+#items .item {
+  background-color: white;
+  width: 240px;
+  height: 240px;
+  margin: 6px;
+}
+#title {
+  width: 500px;
+}
+#name {
+  width: 200px;
+}
+#address {
+  width: 400px;
+}
+#add-rider {
+  height: 30px;
+  width: 150px;
+  font-size: 12px;
+}
+#map-canvas {
+  padding: 0;
+  margin: 0;
+}
+.init {
+  display: none;
+}
+.title, .day, .event {
+  font-weight: 100;
+}
+.date {
+  font-weight: 600;
+  font-size: 14pt;
+}
+.date, .day {
+  width: 24px;
+  text-align: right;
+}
+.day {
+  display: table;
+  float: right;
+  color: #444;
+  font-size: 8pt;
+}
+.event {
+  resize: none;
+}
+.row#day01 {
+  margin-bottom: 0;
+}

@@ -3,43 +3,64 @@
 fym = 'YYYYMM'
 date_box_size = 120
 calendar_size = date_box_size * 7 + 14
-
+fullscreen = (zIndex) -> position: 'fixed', top: 0, left: 0, zIndex: zIndex
+fullsize = -> width: '100%', height: '100%'
+bigButton = (color) -> backgroundColor: color, borderWidth: 2, borderColor: color, height: 50, width: 210, fontSize: 20
 module.exports.index =
 
     logo:
-        jade: '#logo': 'Getber'
-        styl: '#logo': width: 110, float: 'left', padding: 15, fontWeight: '200', fontSize: 15, color: 'white', textAlign: 'right'
+        jade: li: '#logo': 'Getber'
+        absurd: '#logo': height: 50, width: 110, float: 'left', padding: 15, fontWeight: '200', fontSize: 15, color: 'white', textAlign: 'center'
 
     layout: 
         jade: '+navbar': '', '#wrapper': '+sidebar': '', '+yield': ''
-        styl: body: backgroundColor: '#ddd'
-        navbar: sidebar: true, login: true, menu: 'home map calendar vehicle request log help'
+        absurd: body: backgroundColor: '#ddd'
+        navbar: sidebar: true, login: true, menu: 'home map calendar request log help'
 
     layout_naked:
         jade: '+yield'
-    lander:
-        label: 'lander', router: path: '/lander', layoutTemplate: 'layout_naked'
+    main:
+        label: 'main', router: path: '/', layoutTemplate: 'layout_naked'
         jade: 
-            'img(src="<%= @hero %>", id="bg", width="1200px")':''
+            '#bg': ''
+            '#screen-bg': ''
+            '#video': ''
             '.logo#logo-left': 'get'
-            '.logo#logo-right': 'ber'
+            '.logo#logo-right': 'ber '
             '#hero':
                 '#hero-copy': 'Simplify your teens rides'
-                '.copy#e1': 'For parents or gurdiens'
-                '+button(label="Connect with UBER")': ''
-                '.copy#e2': 'For teens'
-        styl: 
-            '#bg': position: 'fixed', top: 0, left: 0, zIndex: '-1'
+                '.copy#e1': 'For parents'
+                '.copy#e2':
+                    '+button(label="Connect with UBER")': ''
+                    '+br(height="2")': ''
+                '.copy#e3': 'For teens'
+                '.copy#e4':
+                    '+button(label="Sign up for Teens")': ''
+        absurd: ->
+            '#bg':        [fullscreen(-100), fullsize(), backgroundColor: '#333']
+            '#screen-bg': [fullscreen(-10),  fullsize(), @Settings.screen_bg]
+            '#bg-video':  [fullscreen(-100), width: '100.0%', height: '100.0%']
+            '#video':    height: 50
             '.bgwidth':  width:  '100%'
-            '.bgheight': height: '100%'
-            h1: '_'
-            '.logo': marginTop: 60, fontSize: 40, color: 'white', padding: 2, display: 'inline'
+            '.bgheight': height: '100%' 
+            '.logo':       marginTop:  60, fontSize: 40, color: 'white', padding: 2, display: 'inline'
             '#logo-left':  marginLeft: 80, backgroundColor: 'blue'
             '#logo-right': marginLeft: 0,  backgroundColor: 'green'
-            '.copy': marginLeft: 80, textAlign: 'left', fontSize: 32, color: 'white', textShadow: '1px 1px 3px #000'
-            '#hero': width: '100%', backgroundColor: 'rgba(255,255,255,0.2)'
-            '#hero-copy': marginTop: 320, marginLeft: 80, textAlign: 'left', fontSize: 48, color: 'white', textShadow: '1px 1px 3px #000'
+            '#connect-with-uber': bigButton('blue')
+            '#sign-up-for-teens': bigButton('green')
+            '.copy': 
+                marginLeft: 80, textAlign: 'left', 
+                fontSize:   32, color: 'white', textShadow: '1px 1px 5px #000'
+            '#hero': width: 660, paddingBottom: 20, backgroundColor: 'rgba(255,255,255,0.1)'
+            '#hero-copy': 
+                marginTop: 40, marginLeft: 80, textAlign: 'left', 
+                fontSize: 48,  color: 'white', textShadow: '1px 1px 3px #000'
+        events:
+            'click #connect-with-uber': -> Router.go '/forward/uber_oauth'
         eco: -> hero: -> @Settings.lander.hero
+        onDocumentReady: ->
+
+
         onStartup: ->
             $(window).load ->
                 theWindow = $ window
@@ -52,9 +73,19 @@ module.exports.index =
                     else
                         $bg.removeClass().addClass 'bgwidth'
                 theWindow.resize(resizeBg).trigger 'resize'
-            $(window).trigger 'resize' 
+            $(window).trigger 'resize'
+        onRendered: ->
+            $('body').css 'background-image', 'url("/screen-bg.png"))'
+            video = """
+                <video id="bg-video" preload="auto" autoplay="true" loop="loop" muted="muted" volume="0" src="/uber.mp4">
+                    <source src="/uber.mp4" type="video/mp4">
+                </video>"""
+            $(video).insertAfter '#video'
+        onDestroyed: ->
+            $('body').css 'background-image', ''
+
     home: 
-        label: 'Home', sidebar: 'sidebar_home',  router: path: '/'  
+        label: 'Home', sidebar: 'sidebar_home',  router: path: 'home'  
         jade: '#contentWrapper': 
                 'h2#title': 'Sign up with UBER'
                 '+button(label="Connect with UBER")': ''                    
@@ -69,12 +100,13 @@ module.exports.index =
             hello: -> Session.get 'hello'
         events:
             'click #connect-with-uber': -> Router.go '/forward/uber_oauth'
-        styl: 
+        absurd: 
             '#items .item':backgroundColor:'white', width:240, height:240, float:'left', margin:6
             '#title':   width:500 
             '#name':    width:200 
             '#address': width:400
         onCreated: ->
+            #call.hello db:'User'
             Meteor.call 'hello', 'world', (e, result) -> Session.set 'hello', result
             Meteor.call 'uber_oauth', (e, result) -> Session.set 'uber_oauth', result
         onRendered: -> 
@@ -85,6 +117,12 @@ module.exports.index =
     world:
         label: 'Hello'
         jade: h1: '{{a}} world'
+    history:
+        label: 'Ride History', router: path: 'history'
+        jade: ' '
+    location:
+        lable: 'Locations',    router: path: 'location'
+
     profile:
         lable: 'Profile', sidebar: 'sidebar_profile', router: path: 'profile'
         jade: '#contentWrapper':
@@ -100,13 +138,18 @@ module.exports.index =
         label: 'Submit', router: path: 'submit'
         jade: 
             h2:'Connected'
+            '+button(label="Add rider")':''
             p:'access_token is {{token}} {{output}}'
         helpers:
             token: -> x.hash().access_token
             output: -> JSON.stringify Session.get('uber_profile'), null, 4
         onCreated: -> x.call 'uber_profile', token:x.hash().access_token
+        absurd: 
+            '#add-rider': backgroundColor: 'green', borderWidth: 2, borderColor: 'green', height: 30, width: 150, fontSize: 12
+        events:
+            'click #add-rider': -> console.log 'add rider'
 
-    vehicle:
+    __vehicle:
         label: 'Vehicle', sidebar: 'sidebar_vehicle', router: path: 'vehicle'
         jade: '#contentWrapper': 
                 h1: 'You vehicle information', br: ''
@@ -124,7 +167,7 @@ module.exports.index =
     map: 
         label: 'Map', sidebar: 'sidebar_map', router: path: 'map'
         jade: '#map-canvas'
-        styl: '#map-canvas': height: '100%', padding: 0, margin: 0
+        absurd: '#map-canvas': height: '100%', padding: 0, margin: 0
         onRendered: ->
             google.maps.event.addDomListener window, 'load', Pages.map.map_init
             x.timeout 10, Pages.map.map_init
@@ -153,7 +196,7 @@ module.exports.index =
         label: 'Log', router: path: 'log'
         jade:  '#log-canvas'
         onRendered: -> $('#log-canvas').html '<object id="full-screen" data="http://localhost:8778/"/>'
-        styl:
+        absurd:
             '#log-canvas':  height: '100%', width: '100%'
             '#full-screen': height: '100%', width: '100%'
     policy:
@@ -179,7 +222,7 @@ module.exports.index =
                 x.position parentId:@id, class:'date',  top: 5, left:(date_box_size - 35)
                 x.position parentId:@id, class:'day',   top:28, left:(date_box_size - 37)
                 ''
-        styl:
+        absurd:
             '.init':  display:'none'
             '.title': display:'inline', fontWeight:'100'               
             '.date':  display:'inline', fontWeight:'600', fontSize:'14pt', width:24, textAlign:'right'

@@ -16,47 +16,59 @@ async    = require 'async'
 cson     = require 'CSON'
 prompt   = require 'prompt'
 nconf    = require 'nconf'
+api     = (require 'absurd')()
 
 {spawn, exec} = require 'child_process'
 
 indent_str = Array(4 + 1).join ' '
 cwd  = process.cwd()    
 home = process.env.HOME
-workspace     = 'workspace'
-work = path.join home, workspace
-settings_json =  path.join work, '.settings.json'
-settings_cson =  path.join work, '.settings.cson'
-nconf.file file: path.join work, '.config.json'
+add  = path.join
+workspace = 'workspace'
+work = add home, workspace
+settings_json =  add work, '.settings.json'
+settings_cson =  add work, '.settings.cson'
+nconf.file file: add work, '.config.json'
 Settings = cson.load settings_cson
 site     = Settings.site or process.exit(1)
-lib_path     = path.join work, 'lib'
-style_path   = path.join work, 'style'
-meteor_path  = path.join work, 'meteor'
-apps_path    = path.join work, 'apps' 
-site_path    = path.join apps_path, site 
-index_coffee = path.join site_path, 'index.coffee'
-site_meteor_path    = path.join site_path, 'app'    
-site_client_path    = path.join site_meteor_path, 'client'
-site_lib_path       = path.join site_meteor_path, 'lib'
-site_public_path    = path.join site_meteor_path, 'public'
-meteor_client_path  = path.join meteor_path, 'client'
-meteor_lib_path     = path.join meteor_path, 'lib'
-meteor_public_path  = path.join meteor_path, 'public'
-meteor_package_path = path.join meteor_path, 'packages'
-x_path    = path.join meteor_path, 'packages/isaac:x'
+lib_path     = add work, 'lib'
+style_path   = add work, 'style'
+meteor_path  = add work, 'meteor'
+apps_path    = add work, 'apps' 
+site_path    = add apps_path, site 
+index_coffee = add site_path, 'index.coffee'
+site_meteor_path    = add site_path, 'app'    
+site_client_path    = add site_meteor_path, 'client'
+site_lib_path       = add site_meteor_path, 'lib'
+site_public_path    = add site_meteor_path, 'public'
+meteor_client_path  = add meteor_path, 'client'
+meteor_lib_path     = add meteor_path, 'lib'
+meteor_public_path  = add meteor_path, 'public'
+meteor_package_path = add meteor_path, 'packages'
+x_path    = add meteor_path, 'packages/isaac:x'
 
-{x} = require path.join x_path, 'x'
-x.extend x, (require path.join x_path, 'x_init').x
-x.extend Settings, Settings[site]
+{x} = require add x_path, 'x'
+x.extend x, (require add x_path, 'x_init').x
 
-theme_cson = path.join style_path, Settings.theme + '.cson'
-Theme      = cson.load theme_cson
+theme_cson = add style_path, (Settings[site].theme or Settings.theme) + '.cson'
+Theme = {}
+init_settings = ->
+    Settings = cson.load settings_cson
+    Ss = Settings[site]
+    Ss.public.meteor_methods = []
+    x.keys(Ss).map (k) -> x.isObject(Ss[k]) and x.keys(Ss[k]).map (l) ->
+        if x.isObject(Ss[k][l])
+            method = Ss[k][l].meteor_method
+            'string' == typeof method and Ss.public.meteor_methods.push method
+    x.extend Settings, Ss
+    Theme = cson.load theme_cson
+init_settings()
 lib_files    = x.toArray Settings.lib_files
 other_files  = x.toArray Settings.other_files
 my_packages  = x.toArray Settings.packages
 public_files = x.toArray Settings.public_files
-package_paths = my_packages.map (p) -> path.join meteor_package_path, p
-lib_paths     = lib_files  .map (l) -> path.join lib_path, l + '.coffee'
+package_paths = my_packages.map (p) -> add meteor_package_path, p
+lib_paths     = lib_files  .map (l) -> add lib_path, l + '.coffee'
 
 updated = 'updated time'
 logio_port = 8777
@@ -132,7 +144,7 @@ install = ->
         # logs
         # logh
         """
-    fs.writeFile file = path.join(work, 'install.sh'), data, (err) -> 
+    fs.writeFile file = add(work, 'install.sh'), data, (err) -> 
         if err then log err else fs.chmod file, 0o755, (err) -> log err or data
 
 logconf = ->
@@ -165,8 +177,8 @@ logconf = ->
             }
             """
     ([k,v] for k,v of obj).forEach (a) ->
-        fs.writeFile path.join(home, a[0]), a[1], (err) -> log err or a[1]
-    logs.map (a) -> fs.exists f = path.join( home,'.log.io', a), (ex) -> ex or fs.writeFile f
+        fs.writeFile add(home, a[0]), a[1], (err) -> log err or a[1]
+    logs.map (a) -> fs.exists f = add( home,'.log.io', a), (ex) -> ex or fs.writeFile f
 
 
 log = ->
@@ -177,7 +189,7 @@ isType = (file, type) -> path.extname(file) is '.' + type  # move to x?
 
 collectExt = (dir, ext) ->
     ((fs.readdirSync dir).map (file) -> 
-        if isType(file, ext) then fs.readFileSync path.join dir, file else '').join '\n'
+        if isType(file, ext) then fs.readFileSync add dir, file else '').join '\n'
 
 cd     = (dir) -> process.chdir dir
 
@@ -185,7 +197,7 @@ deldir = (dir) ->           # consider async
     return dir if ! dir.match new RegExp "/#{workspace}/"
     if fs.existsSync dir
         (fs.readdirSync dir).forEach (file, index) -> 
-            curPath = path.join dir, file
+            curPath = add dir, file
             fs.unlinkSync curPath unless (fs.lstatSync curPath).isDirectory()
     dir
 
@@ -208,7 +220,7 @@ coffee_alone = ->
     coffees = []
     watched_coffee = lib_paths.concat(index_coffee)
     package_paths.map (p) -> (fs.readdirSync p).map (f) -> 
-        isType(f, 'coffee') and watched_coffee.push path.join p, f
+        isType(f, 'coffee') and watched_coffee.push add p, f
     ps.lookup command: 'node',   psargs: 'ux', (e, a) -> a.map (p, i) -> 
         if '-wbc' == p.arguments?[3] and (c = p.arguments[4])?
             if (i = watched_coffee.indexOf(c)) <  0 then process.kill p.pid, 'SIGKILL'
@@ -245,8 +257,8 @@ hold_watch = (sec) -> updated = process.hrtime()[0] + sec
 
 start_up = ->
     coffee_alone()
-    chokidar.watch(settings_cson).on 'change', -> settings() ; reset_settings()
-    chokidar.watch(meteor_lib_path).on 'change', (d) -> cp d, path.join site_lib_path, path.basename d
+    chokidar.watch(settings_cson).on 'change', -> settings()
+    chokidar.watch(meteor_lib_path).on 'change', (d) -> cp d, add site_lib_path, path.basename d
     lib_paths.concat([index_coffee, theme_cson]).map (f) -> chokidar.watch(f).on 'change', -> build()
     hold_watch(2)
     package_paths.map (p) ->
@@ -264,13 +276,15 @@ command = ->
         switch (line = line.replace(/\s{2,}/g,' ').trim().split ' ')[0]
             when '.'        then console.log 'hi'
             when 'build'    then build()
+            when 'time'     then console.log new Date()
             when 'publish'  then publish()
             when 'update'   then meteor_update()
+            when 'settings' then settings()
             when 'coffee'   then switch line[1] 
                 when 'alone' then coffee_alone() 
                 when 'clean' then coffee_clean() 
             when 'meteor'   then start_meteor()
-            when 'packages' then console.log nconf.get 'updated_packages'
+            when 'packages' then console.log nconf.get 'updated_packages'; nconf.save()
             when 'get'      then console.log nconf.get line[1]
             when 'set'      then nconf.set line[1], line[2]
             when 'stop'     then 'meteor' == line[1] and stop_meteor()
@@ -282,12 +296,9 @@ command = ->
         nconf.save()
         process.exit(1)
 
-reset_settings = ->
-    Settings = cson.load settings_cson
-    x.extend Settings, Settings[site]
 
 settings = ->
-    reset_settings()
+    init_settings()
     (fs.readdirSync apps_path).concat(['private']).map (d) -> delete Settings[d]
     fs.writeFile settings_json, JSON.stringify(Settings, '', 4) + '\n', (e, data) -> 
         console.log new Date(), 'Settings'
@@ -295,7 +306,7 @@ settings = ->
 mkdir = (dir) -> fs.readdir dir, (e, l) -> e and fs.mkdirSync dir
 
 cpdir = (source, target) ->
-    (fs.readdirSync source).map (f) -> f and source and target and cp path.join(source, f), path.join target, f
+    (fs.readdirSync source).map (f) -> f and source and target and cp add(source, f), add target, f
 
 cp = (source, target) ->
     fs.readFile source, (e, data) -> e or fs.readFile target, (e_t, data_t) ->
@@ -312,8 +323,8 @@ publish = ->
     version = {}
     updated_packages = nconf.get 'updated_packages'
     my_packages.map (v, i) ->
-        package_dir = path.join meteor_package_path, v
-        package_js  = path.join package_dir, 'package.js'
+        package_dir = add meteor_package_path, v
+        package_js  = add package_dir, 'package.js'
         isLast = my_packages.length - 1 == i
         (isLast or -1 < updated_packages.indexOf(package_dir)) and fs.readFile package_js, 'utf8', (e, data) ->
             data.match /version:\s*['"]([0-9.]+)['"]\s*,/m
@@ -332,7 +343,7 @@ publish = ->
                     e or x.keys(version).concat([my_packages[my_packages.length - 1]])
                     .filter((v, i, a) -> a.indexOf(v) == i).map (d) ->
                         console.log new Date, 'Publishing', d 
-                        cd path.join meteor_package_path, d
+                        cd add meteor_package_path, d
                         meteor_publish()
 
 
@@ -384,33 +395,45 @@ directives =
         file: '6.css',  indent: 0
         format: (name, block) -> stylus(block).render() + '\n'
 
+write_build = (file, data) ->
+    f = add(site_client_path, file)
+    data.length > 0 and fs.readFile f, 'utf8', (err, d) ->
+        (!d? or data != d) and fs.writeFile f, data, (e) ->
+            fs.writeFile add(meteor_client_path, file), data, (e2) ->
+                console.log new Date(), f
+
+func2obj = (v) ->
+    @Settings = Settings
+    @Theme = Theme
+    if 'function' == typeof v then v.call @ 
+    else if x.isObject(v) then v else {}
+
 build = () ->
-    log index_coffee, site_client_path
+    console.log new Date(), 'Start to build.'
+    init_settings()
     mkdir site_client_path
     Pages = [index_coffee]
-        .concat lib_files  .map (l) -> path.join lib_path, l + '.coffee'
-        .concat other_files.map (o) -> path.join site_path, o
+        .concat lib_files  .map (l) -> add lib_path, l + '.coffee'
+        .concat other_files.map (o) -> add site_path, o
         .map (f) -> delete require.cache[f] ; require f
         .reduce ((o,v) -> x.keys(v[k = x.keys(v)[0]]).map((l) -> o[l] = v[k][l]) ; o), {}
-    x.keys(directives).map ($) ->
-        it = directives[$]
-        data = (x.func(it.header) || '') + (((x.keys Pages).map (name) ->
-            if (block = func$str Pages[name][$], Pages[name].eco, Pages)
+    x.keys(Pages).map((n, i) -> Pages[n].absurd and api.add x.addpx func2obj Pages[n].absurd)
+        .concat([write_build 'absurd.css', api.compile()])
+    x.keys(directives).map (d) -> 
+        it = directives[d]
+        write_build it.file, (x.func(it.header) || '') + ((x.keys(Pages).map (name) ->
+            if (block = func$str Pages[name][d], Pages[name].eco, Pages)
                 it.format.call @, name, indent block, it.indent 
         ).filter (o) -> o?).join ''
-        file = path.join site_client_path, it.file
-        data.length > 0 and fs.readFile file, 'utf8', (err, d) ->
-            (!d? or data != d) and fs.writeFile file, data, (e) ->
-                fs.writeFile path.join(meteor_client_path, it.file), data, (e2) ->
-                    console.log new Date(), file
+        
     mkdir site_public_path
-    public_files.map (f) -> cp path.join(meteor_public_path, f), path.join site_public_path, f
+    public_files.map (f) -> cp add(meteor_public_path, f), add site_public_path, f
 
 gitpass = ->
     prompt.message = 'github'
     prompt.start()
     prompt.get {name:'password', hidden: true}, (err, result) ->
-        fs.writeFileSync path.join(home, '/.netrc'), """
+        fs.writeFileSync add(home, '/.netrc'), """
             machine github.com
                 login i4han
                 password #{result.password}

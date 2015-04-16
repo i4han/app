@@ -23,18 +23,17 @@ module.exports.menu =
             menu = getMenu(@Pages)
             """
             .navbar.navbar-default.navbar-#{@Theme.navbar.style}
-                +logo
                 .navbar-left 
                     ul.nav.navbar-nav
                         li: a#menu-toggle: i.fa.fa-bars
+                        +logo
             #{menu}
                 .navbar-right
                     +login
             """
-#        styl: -> @_.slice ".navbar|>background-color rgba(20, 23, 240, 0.7)|<.navbar-fixed-top|>border 0px"
-        styl: 
-            '.navbar':backgroundColor:'rgba(20, 23, 240, 0.7)'
-            '.navbar-fixed-top':border:0
+        styl: ->
+            '.navbar': backgroundColor:@Theme.navbar.backgroundColor
+            '.navbar-fixed-top': border: 0
         events:
             'click #menu-toggle': (event) -> $("#wrapper").toggleClass "toggled" # event.preventDefault()                
             'click #navbar-menu': (event) ->
@@ -43,47 +42,24 @@ module.exports.menu =
 
         styl$: ->
             T = @Theme.navbar 
-            """
-            #menu-toggle
-                width 50px
-            #login-buttons
-                height 50px
-                width #{T.login.width}
-            li#login-dropdown-list
-                width #{T.login.width}
-                height #{T.height}
-                display table-cell
-                text-align center
-                vertical-align middle
-            .navbar-default .navbar-nav > li > a
-                color #{T.text.color}
-            .navbar-left > ul > li > a
-                width #{T.text.width}
-                text-align center
-            .navbar-right > li:hover
-            .navbar-left > ul > li:hover
-            .navbar-nav > li > a:hover
-                text-decoration none
-                color #{T.hover.color}
-                background-color #{T.hover.background_color}
-            .dropdown-toggle > i.fa-chevron-down
-                padding-left 4px
-            #navbar-menu:focus
-                color black
-                background-color #{T.focus.background_color}
-            #login-dropdown:hover
-                cursor pointer
-            #login-dropdown-list > a
-                width  #{T.login.width}
-                height #{T.height}
-                color  #{T.text.color}
-                text-decoration none
-                cursor pointer
-                padding ( ( #{T.height} - #{T.text.height} ) / 2 )
-            #login-dropdown-list > a:hover
-                background-color #{T.hover.background_color}
-            """
-    sidebar:
+            '#menu-toggle': width: 50
+            '#login-buttons': height: 50, width: T.login.width
+            'li#login-dropdown-list': 
+                width: T.login.width, height: T.height, display: 'table-cell'
+                textAlign: 'center', verticalAlign: 'middle'
+            '.navbar-default .navbar-nav > li > a:focus': backgroundColor: T.focus.backgroundColor
+            '.navbar-default .navbar-nav > li > a': color: T.text.color
+            '.navbar-left > ul > li > a': width: T.text.width, textAlign: 'center'
+            '.navbar-right > li:hover, .navbar-left > ul > li:hover, .navbar-nav > li > a:hover':
+                textDecoration: 'none', color: T.hover.color, backgroundColor: T.hover.backgroundColor
+            '.dropdown-toggle > i.fa-chevron-down': paddingLeft: 4,
+            '#navbar-menu:focus': color: 'black', backgroundColor: T.focus.backgroundColor
+            '#login-dropdown:hover': cursor: 'pointer'
+            '#login-dropdown-list > a': 
+                width: T.login.width, height: T.height, color: T.text.color
+                textDecoration: 'none', cursor: 'pointer', padding: (T.height - T.text.height) / 2
+            '#login-dropdown-list > a:hover': backgroundColor: T.hover.backgroundColor
+    sidebar: 
         styl$: -> sidebar_width = '160px'; """
             #wrapper 
                 padding-top: 50px;
@@ -103,7 +79,7 @@ module.exports.menu =
                 padding-top: 50px
                 margin-left: 0; /* -#{sidebar_width}; */
                 overflow-y: auto;
-                background: #aaa;
+                background: rgba(0, 160, 0, 0.6)
                 -webkit-transition: all 0.5s ease;
                 -moz-transition: all 0.5s ease;
                 -o-transition: all 0.5s ease;

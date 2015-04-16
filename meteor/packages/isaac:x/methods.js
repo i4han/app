@@ -14,6 +14,14 @@ if (Meteor.isServer) {
   });
   Meteor.methods(methods);
 } else if (Meteor.isClient) {
+  Settings["public"].meteor_methods.map(function(m) {
+    return call[m] = function(options) {
+      return Meteor.call(m, options.options, function(e, result) {
+        Session.set(m, result);
+        return options.db && db[options.db].insert(result.data);
+      });
+    };
+  });
   (typeof window !== "undefined" && window !== null) && ('DIV H2 BR'.split(' ')).map(function(a) {
     return window[a] = function(obj, str) {
       if (str != null) {

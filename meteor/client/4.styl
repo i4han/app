@@ -1,72 +1,3 @@
-#logo
-    width 110px
-    float left
-    padding 15px
-    font-weight 200
-    font-size 15px
-    color white
-    text-align right
-
-body
-    background-color #ddd
-
-#bg
-    position fixed
-    top 0px
-    left 0px
-    z-index -1
-.bgwidth
-    width 100%
-.bgheight
-    height 100%
-h1 _
-.logo
-    margin-top 60px
-    font-size 40px
-    color white
-    padding 2px
-    display inline
-#logo-left
-    margin-left 80px
-    background-color blue
-#logo-right
-    margin-left 0px
-    background-color green
-.copy
-    margin-left 80px
-    text-align left
-    font-size 32px
-    color white
-    text-shadow 1px 1px 3px #000
-#hero
-    width 100%
-    background-color rgba(255,255,255,0.2)
-#hero-copy
-    margin-top 320px
-    margin-left 80px
-    text-align left
-    font-size 48px
-    color white
-    text-shadow 1px 1px 3px #000
-
-#items .item
-    background-color white
-    width 240px
-    height 240px
-    float left
-    margin 6px
-#title
-    width 500px
-#name
-    width 200px
-#address
-    width 400px
-
-#map-canvas
-    height 100%
-    padding 0px
-    margin 0px
-
 #containerCalendar
     width 854px
     max-width 854px
@@ -87,43 +18,11 @@ h2
 .spacer
     line-height 10px
 
-#log-canvas
-    height 100%
-    width 100%
-#full-screen
-    height 100%
-    width 100%
-
-.init
-    display none
-.title
-    display inline
-    font-weight 100
-.date
-    display inline
-    font-weight 600
-    font-size 14pt
-    width 24px
-    text-align right
-.day
-    display table
-    font-weight 100
-    float right
-    width 24px
-    text-align right
-    color #444
-    font-size 8pt
-.event
-    resize none
-    font-weight 100
-.row#day01
-    margin-bottom 0px
-
 #e13
     height 300px
 
 .navbar
-    background-color rgba(20, 23, 240, 0.7)
+    background-color rgba(20, 23, 240, 0.6)
 .navbar-fixed-top
     border 0px
 
@@ -133,4 +32,35 @@ body
     height 100%
     font-family 'PT Sans', sans-serif
     font-weight 200px
+
+html, body, #map-canvas
+    height 100%
+    margin 0px
+    padding 0px
+.controls
+    margin-top 16px
+    border 1px solid transparent
+    border-radius 2px 0 0 2px
+    box-sizing border-box
+    -moz-box-sizing border-box
+    height 32px
+    outline none
+    box-shadow 0 2px 6px rgba(0, 0, 0, 0.3)
+#pac-input
+    background-color #fff
+    font-size 15px
+    font-weight 300
+    margin-left 12px
+    padding 0 11px 0 13px
+    text-overflow ellipsis
+    width 400px
+#pac-input:focus
+    border-color #4d90fe
+#type-selector
+    color #fff
+    background-color #4d90fe
+    padding 5px 11px 0px 11px
+#type-selector label
+    font-size 13px
+    font-weight 300
 

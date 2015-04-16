@@ -1,35 +1,33 @@
-font_stylesheet:  "https://fonts.googleapis.com/css?family=PT+Sans:400,700"
-font_family:            "'PT Sans', sans-serif"
-font_weight:            200
-backgound_color:        '#eee'
+fontStylesheet:  "https://fonts.googleapis.com/css?family=PT+Sans:400,700"
+fontFamily:            "'PT Sans', sans-serif"
+fontWeight:            200
+backgoundColor:        '#eee'
 navbar:
     style:              'fixed-top'
-    height:             '50px'
+    height:             50
     color:              '#999'
-    border:             '0px'
-    border_color:       '#fff'
-    background_color:   '#eee'
+    backgroundColor:    'rgba(20, 23, 240, 0.6)'
     login:
-        width:          '100px'
+        width:          100
         dropdown:
-            width:      '190px'
+            width:      190
     dropdown:
-        width:          '240px'
-        padding:        '25px'
+        width:          240
+        padding:        25
         a:
             height:     '24px'
             hover:      '#eee'
     text:
         color:          '#fff'
-        font_size:      '10px'
+        fontSize:      '10px'
         height:         '20px'
         width:          '80px'
     hover:
-        color:              'black'
-        background_color:   '#eee'
+        color:             'black'
+        backgroundColor:   'rgba(255, 255, 255, 0.4)'
     focus:
         color:              'black'
-        background_color:   'white'
+        backgroundColor:   'rgba(255, 255, 255, 0.6)'
 sidebar:
     a:
-        color:          'white'
+        color:          'rgba(255, 255, 255, 1)'

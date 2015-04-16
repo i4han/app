@@ -1,5 +1,6 @@
 template(name='logo')
-    #logo Getber
+    li
+        #logo Getber
 
 template(name='layout')
     +navbar
@@ -10,15 +11,21 @@ template(name='layout')
 template(name='layout_naked')
     +yield
 
-template(name='lander')
-    img(src="two-girls-getber.jpg", id="bg", width="1200px")
+template(name='main')
+    #bg
+    #screen-bg
+    #video
     .logo#logo-left get
-    .logo#logo-right ber
+    .logo#logo-right ber 
     #hero
         #hero-copy Simplify your teens rides
-        .copy#e1 For parents or gurdiens
-        +button(label="Connect with UBER")
-        .copy#e2 For teens
+        .copy#e1 For parents
+        .copy#e2
+            +button(label="Connect with UBER")
+            +br(height="2")
+        .copy#e3 For teens
+        .copy#e4
+            +button(label="Sign up for Teens")
 
 template(name='home')
     #contentWrapper
@@ -37,6 +44,9 @@ template(name='sidebar_home')
 template(name='world')
     h1 {{a}} world
 
+template(name='history')
+     
+
 template(name='profile')
     #contentWrapper
         with user
@@ -48,9 +58,10 @@ template(name='item')
 
 template(name='submit')
     h2 Connected
+    +button(label="Add rider")
     p access_token is {{token}} {{output}}
 
-template(name='vehicle')
+template(name='__vehicle')
     #contentWrapper
         h1 You vehicle information
         br
@@ -199,14 +210,13 @@ template(name='menu_list')
 
 template(name='navbar')
     .navbar.navbar-default.navbar-fixed-top
-        +logo
         .navbar-left 
             ul.nav.navbar-nav
                 li: a#menu-toggle: i.fa.fa-bars
+                +logo
                 li: a(href="{{pathFor 'home'}}" id='navbar-menu') Home
                 li: a(href="{{pathFor 'map'}}" id='navbar-menu') Map
                 li: a(href="{{pathFor 'calendar'}}" id='navbar-menu') Calendar
-                li: a(href="{{pathFor 'vehicle'}}" id='navbar-menu') Vehicle
                 li: a(href="{{pathFor 'request'}}" id='navbar-menu') Request
                 li: a(href="{{pathFor 'log'}}" id='navbar-menu') Log
                 li: a(href="{{pathFor 'help'}}" id='navbar-menu') Help

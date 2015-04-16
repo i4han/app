@@ -4,7 +4,7 @@ global.x = {$:{}} if !x?         # for cake
 module.exports.x = x if !Meteor? # for cake
 
 x.extend = (object, properties) -> object[key] = val for key, val of properties; object
-x.isLowerCase = (char, index) -> 'a' <= char[index] <= 'z'
+# x.isLowerCase = (char, index) -> 'a' <= char[index] <= 'z' # ?
 x.isString = (str) -> str? and 'string' == typeof str and str.length > 0
 x.isVisible = (v) -> if 'function' == typeof v then v() else if false is v then false else true
 x.isPortableKey = (str) -> /^[a-z]+$/i.test str # . or #
@@ -17,7 +17,7 @@ x.timeout = (time, func) -> Meteor.setTimeout func, time
 x.func = (func) -> 
     if 'function' == typeof func then func() 
     else if 'undefined' == func then {} else func
-x.funcConcat = (func1, func2) -> -> func1() ; func2()
+# x.funcConcat = (func1, func2) -> -> func1() ; func2()
 x.keys = (obj) -> Object.keys obj
 x.isValue = (v) -> if 'string' == typeof v || 'number' == typeof v then v else false
 x.isArray  = (o) -> if '[object Array]'  == Object.prototype.toString.call(o) then true else false
@@ -42,8 +42,8 @@ x.interpolateObj = (o, data) ->
 x.interpolateOO = (options, data) ->
     x.isEmpty(data) or x.keys(options).map (m) -> options[m] = x.interpolateObj options[m], data
     options
-x.call = (key, o) -> Meteor.call key, o, (e, r) -> 
-    if e then Session.set(key + '_error', e) else Session.set key, r
+#x.call = (key, o) -> Meteor.call key, o, (e, r) -> 
+#    if e then Session.set(key + '_error', e) else Session.set key, r
 x.o = (obj, depth=1) -> 
     ((Object.keys obj).map (key) ->
         value = obj[key]
@@ -232,6 +232,7 @@ x.oauth = (obj) ->
         obj = Settings[obj].oauth
     x.urlWithQuery obj
 
+
 x.list = (what) -> # add id
     ((what = if 'string' == typeof what then what.split ' ' 
     else if Array.isArray(what) then what else [])
@@ -252,8 +253,46 @@ x.assignPopover = (o,v) ->
 
 x.popover = (list) -> list.reduce ((o, v) -> x.assignPopover o, v), {}
 
+
 x.log = ->
     (arguments != null) and ([].slice.call(arguments)).concat(['\n']).map (str) ->
         if Meteor.isServer then fs.appendFileSync Config.log_file, str + ' ' # fs? server?
         else console.log str
 
+NotPxDefaultProperties = 'zIndex fontWeight'.split ' '
+
+x.addpx = (obj) ->
+    x.keys(obj).map((k) -> [k 
+        if x.isObject(ok = obj[k]) then x.addpx ok
+        else if 0 == ok then '0'
+        else if 'number' == typeof ok then String(ok) + 
+            (if k in NotPxDefaultProperties then '' else 'px')
+        else ok
+    ]).reduce ((o, v) -> o[v[0]] = v[1]; o), {}
+
+class x.Style
+    constructor: (selector) ->
+        @selector = selector
+        @rules = @style = null 
+        [0..(sheets = document.styleSheets).length - 1].forEach (i) => 
+            sheets?[i]?.cssRules? and [0..(rules = sheets[i].cssRules).length - 1].forEach (j) =>
+                if rules[j] and rules[j].selectorText == selector
+                    @rules = rules[j]
+                    @style = rules[j].style
+    set:    (property, value) -> @style.setProperty(property, value)
+    get:    (property)        -> @style[property]
+    remove: (property)        -> @style.removeProperty(property)
+
+x.style = (name) -> new x.Style(name)
+
+x.removeRule = (selector, property) -> 
+    [0..(sheets = document.styleSheets).length - 1].forEach (i) -> 
+        sheets?[i]?.cssRules? and [0..(rules = sheets[i].cssRules).length - 1].forEach (j) ->
+            if rules[j] and rules[j].selectorText == selector
+                if x.isArray(property)
+                    property.map (p) -> rules[j].style.removeProperty p
+                else
+                    rules[j].style.removeProperty property
+x.removeRules = (obj) -> x.isObject(obj) and x.keys(obj).forEach (k) -> x.removeRule(k, obj[k])
+x.insertRule = (rule) ->
+    if o.stylesheet.insertRule then o.stylesheet.insertRule rule else o.stylesheet.addRule rule

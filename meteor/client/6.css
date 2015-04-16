@@ -75,6 +75,9 @@ li#login-dropdown-list {
   text-align: center;
   vertical-align: middle;
 }
+.navbar-default .navbar-nav > li > a:focus {
+  background-color: rgba(255,255,255,0.6);
+}
 .navbar-default .navbar-nav > li > a {
   color: #fff;
 }
@@ -87,14 +90,14 @@ li#login-dropdown-list {
 .navbar-nav > li > a:hover {
   text-decoration: none;
   color: #000;
-  background-color: #eee;
+  background-color: rgba(255,255,255,0.4);
 }
 .dropdown-toggle > i.fa-chevron-down {
   padding-left: 4px;
 }
-#navbar-menu:focus {
+.dropdown-toggle > i.fa-chevron-down #navbar-menu:focus {
   color: #000;
-  background-color: #fff;
+  background-color: rgba(255,255,255,0.6);
 }
 #login-dropdown:hover {
   cursor: pointer;
@@ -105,10 +108,10 @@ li#login-dropdown-list {
   color: #fff;
   text-decoration: none;
   cursor: pointer;
-  padding: 15px;
+  padding: NaNpx;
 }
 #login-dropdown-list > a:hover {
-  background-color: #eee;
+  background-color: rgba(255,255,255,0.4);
 }
 
 #wrapper {
@@ -131,7 +134,7 @@ li#login-dropdown-list {
   padding-top: 50px;
   margin-left: 0; /* -160px; */
   overflow-y: auto;
-  background: #aaa;
+  background: rgba(0,160,0,0.6);
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -224,27 +227,46 @@ li#login-dropdown-list {
 }
 
 .btn {
-  font-family: 'PT Sans';
+  font-family: PT Sans;
   width: 150px;
-  border: 0;
+  border: 0px;
   margin-top: 5px;
 }
 .btn-default {
   background-color: #f8f8f8;
 }
-.btn-default,
-.btn-primary,
-.btn-success,
-.btn-info,
-.btn-warning,
-.btn-danger,
-.btn-default:hover,
-.btn-primary:hover,
-.btn-success:hover,
-.btn-info:hover,
-.btn-warning:hover,
+.btn-primary {
+  border: 0px;
+}
+.btn-success {
+  border: 0px;
+}
+.btn-info {
+  border: 0px;
+}
+.btn-warning {
+  border: 0px;
+}
+.btn-danger {
+  border: 0px;
+}
+.btn-default:hover {
+  border: 0px;
+}
+.btn-primary:hover {
+  border: 0px;
+}
+.btn-success:hover {
+  border: 0px;
+}
+.btn-info:hover {
+  border: 0px;
+}
+.btn-warning:hover {
+  border: 0px;
+}
 .btn-danger:hover {
-  border: 0;
+  border: 0px;
 }
 
 .modal-backdrop {

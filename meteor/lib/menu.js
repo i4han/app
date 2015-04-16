@@ -37,15 +37,17 @@ module.exports.menu = {
     jade: function() {
       var menu;
       menu = getMenu(this.Pages);
-      return ".navbar.navbar-default.navbar-" + this.Theme.navbar.style + "\n    +logo\n    .navbar-left \n        ul.nav.navbar-nav\n            li: a#menu-toggle: i.fa.fa-bars\n" + menu + "\n    .navbar-right\n        +login";
+      return ".navbar.navbar-default.navbar-" + this.Theme.navbar.style + "\n    .navbar-left \n        ul.nav.navbar-nav\n            li: a#menu-toggle: i.fa.fa-bars\n            +logo\n" + menu + "\n    .navbar-right\n        +login";
     },
-    styl: {
-      '.navbar': {
-        backgroundColor: 'rgba(20, 23, 240, 0.7)'
-      },
-      '.navbar-fixed-top': {
-        border: 0
-      }
+    styl: function() {
+      return {
+        '.navbar': {
+          backgroundColor: this.Theme.navbar.backgroundColor
+        },
+        '.navbar-fixed-top': {
+          border: 0
+        }
+      };
     },
     events: {
       'click #menu-toggle': function(event) {
@@ -60,14 +62,65 @@ module.exports.menu = {
     styl$: function() {
       var T;
       T = this.Theme.navbar;
-      return "#menu-toggle\n    width 50px\n#login-buttons\n    height 50px\n    width " + T.login.width + "\nli#login-dropdown-list\n    width " + T.login.width + "\n    height " + T.height + "\n    display table-cell\n    text-align center\n    vertical-align middle\n.navbar-default .navbar-nav > li > a\n    color " + T.text.color + "\n.navbar-left > ul > li > a\n    width " + T.text.width + "\n    text-align center\n.navbar-right > li:hover\n.navbar-left > ul > li:hover\n.navbar-nav > li > a:hover\n    text-decoration none\n    color " + T.hover.color + "\n    background-color " + T.hover.background_color + "\n.dropdown-toggle > i.fa-chevron-down\n    padding-left 4px\n#navbar-menu:focus\n    color black\n    background-color " + T.focus.background_color + "\n#login-dropdown:hover\n    cursor pointer\n#login-dropdown-list > a\n    width  " + T.login.width + "\n    height " + T.height + "\n    color  " + T.text.color + "\n    text-decoration none\n    cursor pointer\n    padding ( ( " + T.height + " - " + T.text.height + " ) / 2 )\n#login-dropdown-list > a:hover\n    background-color " + T.hover.background_color;
+      return {
+        '#menu-toggle': {
+          width: 50
+        },
+        '#login-buttons': {
+          height: 50,
+          width: T.login.width
+        },
+        'li#login-dropdown-list': {
+          width: T.login.width,
+          height: T.height,
+          display: 'table-cell',
+          textAlign: 'center',
+          verticalAlign: 'middle'
+        },
+        '.navbar-default .navbar-nav > li > a:focus': {
+          backgroundColor: T.focus.backgroundColor
+        },
+        '.navbar-default .navbar-nav > li > a': {
+          color: T.text.color
+        },
+        '.navbar-left > ul > li > a': {
+          width: T.text.width,
+          textAlign: 'center'
+        },
+        '.navbar-right > li:hover, .navbar-left > ul > li:hover, .navbar-nav > li > a:hover': {
+          textDecoration: 'none',
+          color: T.hover.color,
+          backgroundColor: T.hover.backgroundColor
+        },
+        '.dropdown-toggle > i.fa-chevron-down': {
+          paddingLeft: 4,
+          '#navbar-menu:focus': {
+            color: 'black',
+            backgroundColor: T.focus.backgroundColor
+          }
+        },
+        '#login-dropdown:hover': {
+          cursor: 'pointer'
+        },
+        '#login-dropdown-list > a': {
+          width: T.login.width,
+          height: T.height,
+          color: T.text.color,
+          textDecoration: 'none',
+          cursor: 'pointer',
+          padding: (T.height - T.text.height) / 2
+        },
+        '#login-dropdown-list > a:hover': {
+          backgroundColor: T.hover.backgroundColor
+        }
+      };
     }
   },
   sidebar: {
     styl$: function() {
       var sidebar_width;
       sidebar_width = '160px';
-      return "#wrapper \n    padding-top: 50px;\n    padding-left: 0px;\n    -webkit-transition: all 0.5s ease;\n    -moz-transition: all 0.5s ease;\n    -o-transition: all 0.5s ease;\n    transition: all 0.5s ease; /* (-webkit-|-moz-|-o-|)transition */\n#wrapper.toggled \n    padding-left: " + sidebar_width + ";\n#sidebar-wrapper\n    z-index: 1000;\n    position: fixed;\n    left: 0; /* " + sidebar_width + "; */\n    width: 100;\n    height: 100%;\n    padding-top: 50px\n    margin-left: 0; /* -" + sidebar_width + "; */\n    overflow-y: auto;\n    background: #aaa;\n    -webkit-transition: all 0.5s ease;\n    -moz-transition: all 0.5s ease;\n    -o-transition: all 0.5s ease;\n    transition: all 0.5s ease;\n#wrapper.toggled #sidebar-wrapper\n    margin-left: -" + sidebar_width + "; /* width: " + sidebar_width + "; */\n#content-wrapper\n    width: 100%;\n    padding: 15px;\n#wrapper.toggled #content-wrapper\n    position: absolute;\n    margin-right: -" + sidebar_width + ";\n.sidebar-nav\n    position absolute\n    top 40px\n    width " + sidebar_width + "\n    margin 0\n    padding 0\n    list-style none\n.sidebar-nav li\n    text-indent 20px\n    line-height 40px\n.sidebar-nav li a \n    display block\n    text-decoration none\n    color " + this.Theme.sidebar.a.color + "\n.sidebar-nav li a:hover\n    text-decoration: none\n    color #000\n    background-color #e8e8e8\n.sidebar-nav li a:active,\n.sidebar-nav li a:focus\n    text-decoration none\n    color #000\n    background-color #ddd\n.sidebar-nav > .sidebar-brand\n    height 65px\n    font-size 18px\n    line-height 60px\n.sidebar-nav > .sidebar-brand a\n    color #999\n.sidebar-nav > .sidebar-brand a:hover\n    color #fff\n    background none\n@media(min-width:768px)\n    #wrapper\n        padding-left " + sidebar_width + "\n        height 100%\n    #wrapper.toggled \n        padding-left 0\n    #sidebar-wrapper\n        width " + sidebar_width + ";\n    #wrapper.toggled #sidebar-wrapper\n        /* width: 0; */\n    #wrapper.toggled #content-wrapper\n        position relative\n        margin-right 0";
+      return "#wrapper \n    padding-top: 50px;\n    padding-left: 0px;\n    -webkit-transition: all 0.5s ease;\n    -moz-transition: all 0.5s ease;\n    -o-transition: all 0.5s ease;\n    transition: all 0.5s ease; /* (-webkit-|-moz-|-o-|)transition */\n#wrapper.toggled \n    padding-left: " + sidebar_width + ";\n#sidebar-wrapper\n    z-index: 1000;\n    position: fixed;\n    left: 0; /* " + sidebar_width + "; */\n    width: 100;\n    height: 100%;\n    padding-top: 50px\n    margin-left: 0; /* -" + sidebar_width + "; */\n    overflow-y: auto;\n    background: rgba(0, 160, 0, 0.6)\n    -webkit-transition: all 0.5s ease;\n    -moz-transition: all 0.5s ease;\n    -o-transition: all 0.5s ease;\n    transition: all 0.5s ease;\n#wrapper.toggled #sidebar-wrapper\n    margin-left: -" + sidebar_width + "; /* width: " + sidebar_width + "; */\n#content-wrapper\n    width: 100%;\n    padding: 15px;\n#wrapper.toggled #content-wrapper\n    position: absolute;\n    margin-right: -" + sidebar_width + ";\n.sidebar-nav\n    position absolute\n    top 40px\n    width " + sidebar_width + "\n    margin 0\n    padding 0\n    list-style none\n.sidebar-nav li\n    text-indent 20px\n    line-height 40px\n.sidebar-nav li a \n    display block\n    text-decoration none\n    color " + this.Theme.sidebar.a.color + "\n.sidebar-nav li a:hover\n    text-decoration: none\n    color #000\n    background-color #e8e8e8\n.sidebar-nav li a:active,\n.sidebar-nav li a:focus\n    text-decoration none\n    color #000\n    background-color #ddd\n.sidebar-nav > .sidebar-brand\n    height 65px\n    font-size 18px\n    line-height 60px\n.sidebar-nav > .sidebar-brand a\n    color #999\n.sidebar-nav > .sidebar-brand a:hover\n    color #fff\n    background none\n@media(min-width:768px)\n    #wrapper\n        padding-left " + sidebar_width + "\n        height 100%\n    #wrapper.toggled \n        padding-left 0\n    #sidebar-wrapper\n        width " + sidebar_width + ";\n    #wrapper.toggled #sidebar-wrapper\n        /* width: 0; */\n    #wrapper.toggled #content-wrapper\n        position relative\n        margin-right 0";
     },
     jade: "form#listen-to-menu-change\n#sidebar-wrapper\n    #sidebar-top\n    ul.sidebar-nav#sidebar_menu_insert",
     rendered: function() {

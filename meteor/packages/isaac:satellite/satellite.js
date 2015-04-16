@@ -39,8 +39,8 @@ db.client = function() {
   });
 };
 
-x.satelliteInit = function() {
-  var atRendered, methods, router_map, startup;
+Meteor.startup(function() {
+  var atRendered, methods, router_map;
   (x.keys(module.exports)).map(function(file) {
     var key, val, _ref;
     if (file.slice(0, 2) !== '__') {
@@ -79,14 +79,13 @@ x.satelliteInit = function() {
     Router.configure({
       layoutTemplate: 'layout'
     });
-    startup = [];
     router_map = {};
     atRendered = [];
     (x.keys(Pages)).map(function(name) {
       return (x.keys(Pages[name])).map(function(key) {
         var obj;
         if ('onStartup' === key) {
-          return startup.push(Pages[name][key]);
+          return Pages[name].onStartup();
         } else if ('atRendered' === key) {
           obj = x.func(Pages[name].atRendered);
           return (x.keys(obj)).map(function(k) {
@@ -132,26 +131,16 @@ x.satelliteInit = function() {
       }
       return _results;
     });
-    return Meteor.startup(function() {
-      return startup.map(function(func) {
-        return func();
+    return $(function($) {
+      var k, _results;
+      o.$.map(function(f) {
+        return f();
       });
+      _results = [];
+      for (k in x.$) {
+        _results.push($.fn[k] = x.$[k]);
+      }
+      return _results;
     });
   }
-};
-
-if (Meteor.isClient) {
-  $(function($) {
-    var k, _results;
-    x.satelliteInit();
-    _results = [];
-    for (k in x.$) {
-      _results.push($.fn[k] = x.$[k]);
-    }
-    return _results;
-  });
-} else if (Meteor.isServer) {
-  Meteor.startup(function() {
-    return x.satelliteInit();
-  });
-}
+});
