@@ -25,10 +25,10 @@ body {
 #bg, #bg-video {
   z-index: -100;
 }
-#bg, #screen-bg, .bgwidth, #log-canvas, #full-screen {
+#bg, #screen-bg, #log-canvas, #full-screen {
   width: 100%;
 }
-#bg, #screen-bg, .bgheight, #map-canvas, #log-canvas, #full-screen {
+#bg, #screen-bg, #map-canvas, #log-canvas, #full-screen {
   height: 100%;
 }
 #bg {
@@ -36,11 +36,12 @@ body {
 }
 #screen-bg {
   z-index: -10;
-  background-image: url(/screen-bg.png);
+  background-image: url(/screen-bg2.png);
 }
 #bg-video {
-  width: 100.0%;
   height: 100.0%;
+  margin-left: 0;
+  display: block;
 }
 .logo {
   margin-top: 60px;
@@ -83,9 +84,9 @@ body {
   text-shadow: 1px 1px 5px #000;
 }
 #hero {
-  width: 660px;
+  width: 700px;
   padding-bottom: 20px;
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(255,255,255,0.15);
 }
 #hero-copy {
   margin-top: 40px;

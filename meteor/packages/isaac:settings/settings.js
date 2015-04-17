@@ -7,8 +7,10 @@ Settings = Meteor.settings;
 if (Meteor.isServer) {
 } else if (Meteor.isClient) {
 	window.call = {}
+	window.style = {}
 	window.o = {$:[]}; 
 
+	window.px = function (v) { return String(v) + 'px'; }
 	o.style = document.createElement('style');
 	o.style.setAttribute('id', 'satellite');
 
@@ -16,7 +18,4 @@ if (Meteor.isServer) {
 		document.body.appendChild(o.style);
 		o.stylesheet = o.style.sheet ? o.style.sheet : o.style.styleSheet;
 	});
-//    Meteor.call('Settings', function (err, result) {
-//        Session.set('Settings', result);
-//    });
 }

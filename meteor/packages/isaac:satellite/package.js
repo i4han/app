@@ -1,7 +1,7 @@
 
 Package.describe({
     summary: 'Satellite: framework for Meteor in coffeescript.',
-    version: '0.2.2',
+    version: '0.2.3',
     documentation: null
 });
 

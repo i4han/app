@@ -279,11 +279,12 @@ class x.Style
                 if rules[j] and rules[j].selectorText == selector
                     @rules = rules[j]
                     @style = rules[j].style
-    set:    (property, value) -> @style.setProperty(property, value)
-    get:    (property)        -> @style[property]
-    remove: (property)        -> @style.removeProperty(property)
+    set:    (property, value) -> @style.setProperty(property, value); @instance
+    get:    (property)        -> @style[property] ; @instance
+    remove: (property)        -> @style[property] and @style.removeProperty(property) ; @instance
+    _instance: (h)             -> @instance = h
 
-x.style = (name) -> new x.Style(name)
+x.style = (name) -> (h = new x.Style(name))._instance h
 
 x.removeRule = (selector, property) -> 
     [0..(sheets = document.styleSheets).length - 1].forEach (i) -> 

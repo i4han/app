@@ -28,7 +28,7 @@ $ ./install.sh
 	$ cake settings
 	$ cd apps/getber/app
 	$ meteor --port 3000 --settings ../../../.settings.json
-
+	 
 	$ cd meteor
 	$ meteor --port 3300 --settings ../.settings.json
 

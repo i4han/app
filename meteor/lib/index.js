@@ -7,19 +7,19 @@ date_box_size = 120;
 
 calendar_size = date_box_size * 7 + 14;
 
+fullsize = function() {
+  return {
+    width: '100%',
+    height: '100%'
+  };
+};
+
 fullscreen = function(zIndex) {
   return {
     position: 'fixed',
     top: 0,
     left: 0,
     zIndex: zIndex
-  };
-};
-
-fullsize = function() {
-  return {
-    width: '100%',
-    height: '100%'
   };
 };
 
@@ -87,18 +87,23 @@ module.exports.index = {
       '#screen-bg': '',
       '#video': '',
       '.logo#logo-left': 'get',
-      '.logo#logo-right': 'ber ',
+      '.logo#logo-right': 'ber',
       '#hero': {
-        '#hero-copy': 'Simplify your teens rides',
+        '#hero-copy': 'Safeguard your family rides',
         '.copy#e1': 'For parents',
         '.copy#e2': {
           '+button(label="Connect with UBER")': '',
           '+br(height="2")': ''
         },
-        '.copy#e3': 'For teens',
+        '.copy#e3': 'For 18 years or yonger',
         '.copy#e4': {
           '+button(label="Sign up for Teens")': ''
         }
+      }
+    },
+    events: {
+      'click #connect-with-uber': function() {
+        return Router.go('/forward/uber_oauth');
       }
     },
     absurd: function() {
@@ -111,18 +116,13 @@ module.exports.index = {
         '#screen-bg': [fullscreen(-10), fullsize(), this.Settings.screen_bg],
         '#bg-video': [
           fullscreen(-100), {
-            width: '100.0%',
-            height: '100.0%'
+            height: '100.0%',
+            marginLeft: 0,
+            display: 'block'
           }
         ],
         '#video': {
           height: 50
-        },
-        '.bgwidth': {
-          width: '100%'
-        },
-        '.bgheight': {
-          height: '100%'
         },
         '.logo': {
           marginTop: 60,
@@ -149,9 +149,9 @@ module.exports.index = {
           textShadow: '1px 1px 5px #000'
         },
         '#hero': {
-          width: 660,
+          width: 700,
           paddingBottom: 20,
-          backgroundColor: 'rgba(255,255,255,0.1)'
+          backgroundColor: 'rgba(255,255,255,0.15)'
         },
         '#hero-copy': {
           marginTop: 40,
@@ -163,11 +163,6 @@ module.exports.index = {
         }
       };
     },
-    events: {
-      'click #connect-with-uber': function() {
-        return Router.go('/forward/uber_oauth');
-      }
-    },
     eco: function() {
       return {
         hero: function() {
@@ -175,31 +170,29 @@ module.exports.index = {
         }
       };
     },
-    onDocumentReady: function() {},
-    onStartup: function() {
-      $(window).load(function() {
-        var resizeBg, theWindow;
-        theWindow = $(window);
-        resizeBg = function() {
-          var $bg, aspectRatio;
-          $bg = $('#bg');
-          aspectRatio = $bg.width() / $bg.height();
-          console.log('ar', aspectRatio);
-          if (theWindow.width() / theWindow.height() < aspectRatio) {
-            return $bg.removeClass().addClass('bgheight');
-          } else {
-            return $bg.removeClass().addClass('bgwidth');
-          }
-        };
-        return theWindow.resize(resizeBg).trigger('resize');
+    on$Ready: function() {
+      return $(this).resize(function() {
+        var window_height, window_width;
+        if (movie && (window_width = $(this).width()) / (window_height = $(this).height()) > 1.78) {
+          movie.remove('height').set('width', '100%');
+          return $video.css('margin-left', '').css('margin-top', px((window_height - $video.height()) / 2));
+        } else if (movie) {
+          movie.remove('width').set('height', '100%');
+          return $video.css('margin-top', '').css('margin-left', px((window_width - $video.width()) / 2));
+        }
       });
-      return $(window).trigger('resize');
+    },
+    onStartup: function() {
+      return this.movie = x.style('#bg-video');
     },
     onRendered: function() {
       var video;
       $('body').css('background-image', 'url("/screen-bg.png"))');
       video = "<video id=\"bg-video\" preload=\"auto\" autoplay=\"true\" loop=\"loop\" muted=\"muted\" volume=\"0\" src=\"/uber.mp4\">\n    <source src=\"/uber.mp4\" type=\"video/mp4\">\n</video>";
-      return $(video).insertAfter('#video');
+      this.$video = $(video).insertAfter('#video');
+      return x.timeout(100, function() {
+        return $(this).resize();
+      });
     },
     onDestroyed: function() {
       return $('body').css('background-image', '');
@@ -733,14 +726,6 @@ module.exports.index = {
       }
     },
     events: x.popover('name phone address'.split(' ')),
-    atRendered: {
-      '.ui-datepicker-header': {
-        removeClass: 'ui-corner-all ui-widget-header'
-      },
-      '#ui-datepicker-div': {
-        removeClass: 'ui-corner-all ui-widget'
-      }
-    },
     onRendered: function() {
       var datepicker;
       $('#datepicker').css("opacity", '50%').datepicker();
@@ -752,12 +737,13 @@ module.exports.index = {
           return $('.ui-datepicker-header').removeClass('ui-corner-all ui-widget-header');
         });
       });
-      return x.timeout(100, function() {
+      x.timeout(100, function() {
         return $('#mobile-number').intlTelInput({
           preferredCountries: ["ca", "us"],
           utilsScript: "/utils.js"
         });
       });
+      return $('#ui-datepicker-div').removeClass('ui-corner-all');
     }
   },
   popover_name: {

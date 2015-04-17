@@ -1,7 +1,7 @@
 
 collections = x.toArray Meteor.settings.public.collections
 
-db.server = ->
+db_server = ->
     collections.map (collection) ->
         db[collection] = new Meteor.Collection collection
         db[collection].allow
@@ -13,52 +13,31 @@ db.server = ->
             remove: (userId, doc) -> false
         Meteor.publish collection, -> db[collection].find {}
 
-db.client = ->
+db_client = ->
     collections.map (collection) ->
         db[collection] = new Meteor.Collection collection
         Meteor.subscribe collection
 
 
 Meteor.startup ->
-    (x.keys module.exports).map (file) ->
-        Pages[key] = val for key, val of module.exports[file] if file[0..1] != '__'
-        (( x.keys module.exports[file] ).filter (key) -> key[0..1] == '__').map (name) -> delete Pages[name]
+    x.keys(module.exports).map (file) ->
+        Pages[key] = val for key, val of module.exports[file]
+        x.keys(module.exports[file]).filter((key) -> key[0..1] == '__').map (name) -> delete Pages[name]
     if Meteor.isServer
-        db.server()
-        methods = {}
-        (x.keys Pages).map (name) -> (x.keys Pages[name]).map (key) ->  
-            methods[k] = v for k, v of Pages[name][key] if 'methods' == key
-        Meteor.methods methods
+        db_server()
+        x.keys(Pages).map (name) -> (methods = Pages[name].methods) and Meteor.methods methods
     else if Meteor.isClient
-        db.client()
+        db_client()
         Router.configure layoutTemplate: 'layout'
-        #startup = []
-        router_map = {}
-        atRendered = []
-        (x.keys Pages).map (name) -> (x.keys Pages[name]).map (key) ->  
-            if  'onStartup' == key
-            #    startup.push Pages[name][key]
-                Pages[name].onStartup()
-            else if 'atRendered' == key
-                obj = x.func Pages[name].atRendered
-                (x.keys obj).map (k) -> (x.keys obj[k]).map (l) ->
-                    if   'removeClass' == l then atRendered.push -> $(k).removeClass obj[k][l]
-                    else if 'addClass' == l then atRendered.push -> $(k).addClass obj[k][l]
-                    else atRendered.push -> $(k).css l, x.value obj[k][l]
-            else if 'onRendered' == key
-                Template[name][key] -> 
-                    Pages[name][key]() 
-                    atRendered.map (f) -> f()
-            else if 'router' == key 
-                router_map[name] = Pages[name].router
-            else if key in 'eco navbar'.split ' ' # Config.templates.concat 
-                ''
-            else if key in 'events helpers'.split ' '
-                Template[name][key] x.func Pages[name][key]
-            else if key in 'onCreated onDestroyed'.split ' '
-                Template[name][key] Pages[name][key]
-        Router.map -> this.route key, router_map[key] for key of router_map
-        #Meteor.startup -> startup.map (func) -> func()
+        x.keys(Pages).map (name) -> 
+            _ = Pages[name]  
+            _.onStartup and Pages[name].onStartup.call(window)
+            _.router    and Router.map -> @route name, Pages[name].router
+            _.events    and Template[name].events  x.func Pages[name].events
+            _.helpers   and Template[name].helpers x.func Pages[name].helpers
+            _.on$Ready  and $ ($) -> Pages[name].on$Ready.call(window)
+            ('onCreated onRendered onDestroyed'.split ' ').forEach (d) -> 
+                _[d] and Template[name][d] -> Pages[name][d].call(window)
         $ ($) -> 
             o.$.map (f) -> f()
             $.fn[k] = x.$[k] for k of x.$

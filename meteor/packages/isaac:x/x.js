@@ -651,15 +651,22 @@ x.Style = (function() {
   }
 
   Style.prototype.set = function(property, value) {
-    return this.style.setProperty(property, value);
+    this.style.setProperty(property, value);
+    return this.instance;
   };
 
   Style.prototype.get = function(property) {
-    return this.style[property];
+    this.style[property];
+    return this.instance;
   };
 
   Style.prototype.remove = function(property) {
-    return this.style.removeProperty(property);
+    this.style[property] && this.style.removeProperty(property);
+    return this.instance;
+  };
+
+  Style.prototype._instance = function(h) {
+    return this.instance = h;
   };
 
   return Style;
@@ -667,7 +674,8 @@ x.Style = (function() {
 })();
 
 x.style = function(name) {
-  return new x.Style(name);
+  var h;
+  return (h = new x.Style(name))._instance(h);
 };
 
 x.removeRule = function(selector, property) {
