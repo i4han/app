@@ -1,6 +1,6 @@
 template(name='logo')
     li
-        #logo Getber
+        #navbar-logo-i0 Getber
 
 template(name='layout')
     +navbar
@@ -11,21 +11,27 @@ template(name='layout')
 template(name='layout_naked')
     +yield
 
-template(name='main')
-    #bg
-    #screen-bg
-    #video
-    .logo#logo-left get
-    .logo#logo-right ber
-    #hero
-        #hero-copy Safeguard your family rides
-        .copy#e1 For parents
-        .copy#e2
-            +button(label="Connect with UBER")
+template(name='logo_main')
+    .logo#main-logo_main-left0 get
+    .logo#main-logo_main-right0 ber
+
+template(name='copy_main')
+    #main-copy_main-hero0
+        #main-copy_main-copy0 Safeguard your family rides
+        .copy#main-copy_main-1 For parents
+        .copy#main-copy_main-2
+            +button(label="Connect with UBER" id="main-copy_main-connect0")
             +br(height="2")
-        .copy#e3 For 18 years or yonger
-        .copy#e4
-            +button(label="Sign up for Teens")
+        .copy#main-copy_main-3 For 18 years or younger
+        .copy#main-copy_main-4
+            +button(label="Sign up for Teens" id="main-copy_main-signup0")
+
+template(name='main')
+    #window-main-bg0
+    #window-main-screen0
+    #window-main-video0
+    +logo_main
+    +copy_main
 
 template(name='home')
     #contentWrapper
@@ -43,9 +49,6 @@ template(name='sidebar_home')
 
 template(name='world')
     h1 {{a}} world
-
-template(name='history')
-     
 
 template(name='profile')
     #contentWrapper

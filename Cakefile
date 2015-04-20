@@ -20,7 +20,6 @@ api     = (require 'absurd')()
 
 {spawn, exec} = require 'child_process'
 
-indent_str = Array(4 + 1).join ' '
 cwd  = process.cwd()    
 home = process.env.HOME
 add  = path.join
@@ -51,7 +50,7 @@ x_path    = add meteor_path, 'packages/isaac:x'
 x.extend x, (require add x_path, 'x_init').x
 
 theme_cson = add style_path, (Settings[site].theme or Settings.theme) + '.cson'
-Theme = {}
+@Theme = @Module = {}
 init_settings = ->
     Settings = cson.load settings_cson
     Ss = Settings[site]
@@ -61,7 +60,8 @@ init_settings = ->
             method = Ss[k][l].meteor_method
             'string' == typeof method and Ss.public.meteor_methods.push method
     x.extend Settings, Ss
-    Theme = cson.load theme_cson
+    @Theme = cson.load theme_cson
+    @Settings = Settings
 init_settings()
 lib_files    = x.toArray Settings.lib_files
 other_files  = x.toArray Settings.other_files
@@ -69,6 +69,9 @@ my_packages  = x.toArray Settings.packages
 public_files = x.toArray Settings.public_files
 package_paths = my_packages.map (p) -> add meteor_package_path, p
 lib_paths     = lib_files  .map (l) -> add lib_path, l + '.coffee'
+module_paths  = [index_coffee] 
+    .concat lib_files  .map (l) -> add lib_path, l + '.coffee'
+    .concat other_files.map (o) -> add site_path, o
 
 updated = 'updated time'
 logio_port = 8777
@@ -308,8 +311,11 @@ mkdir = (dir) -> fs.readdir dir, (e, l) -> e and fs.mkdirSync dir
 cpdir = (source, target) ->
     (fs.readdirSync source).map (f) -> f and source and target and cp add(source, f), add target, f
 
+compare_file = (source, target) ->
+    true
+
 cp = (source, target) ->
-    fs.readFile source, (e, data) -> e or fs.readFile target, (e_t, data_t) ->
+    ! compare_file(source, target) and fs.readFile source, (e, data) -> e or fs.readFile target, (e_t, data_t) ->
         (e_t or data.length > 0 and data.toString() != data_t.toString()) and fs.writeFile target, data, ->
             console.log new Date(), target   
     #(fs.createReadStream source).pipe fs.createWriteStream target
@@ -349,51 +355,33 @@ publish = ->
 
 coffee = (data) -> cs.compile '#!/usr/bin/env node\n' + data, bare:true
 
-vfunc$str = (obj, pages) ->
-    for key, value of obj
-        obj[key] = func$str value, undefined, pages
-    obj
-
-func$str = (what, obj, pages) ->
-    @Settings = Settings
-    @Pages = pages
-    @Theme = Theme
-    obj = if 'function' == typeof obj then vfunc$str obj(), pages else vfunc$str obj, pages
-    if !what? then undefined
-    else if 'string'   == typeof what then (if x.isEmpty obj then what else eco.render what, obj)
-    else if 'object'   == typeof what then (if x.isEmpty obj then x.o what else eco.render (x.o what), obj)
-    else if 'function' == typeof what then func$str (what.call @, @C), obj, pages
-
-indent = (block, indent) -> 
-    if indent then block.replace /^/gm, Array(++indent).join indent_str else block
-
 directives =
     jade:
-        file: '1.jade', indent: 1
-        format: (name, block) -> "template(name='#{name}')\n#{block}\n\n"
+        file: '1.jade'
+        f: (n, b) -> b = x.indent(b, 1); "template(name='#{n}')\n#{b}\n\n"
     jade$:
-        file: '2.html', indent: 1
-        format: (name, block) -> jade.compile( "template(name='#{name}')\n#{block}\n\n", null )()  
+        file: '2.html'
+        f: (n, b) -> b = x.indent(b, 1); jade.compile( "template(name='#{n}')\n#{b}\n\n", null )()  
     HTML:
-        file: '3.html', indent: 1
-        format: (name, block) -> "<template name=\"#{name}\">\n#{block}\n</template>\n"
+        file: '3.html'
+        f: (n, b) -> b = x.indent(b, 1); "<template name=\"#{n}\">\n#{b}\n</template>\n"
     head:
-        file: '0.jade', indent: 1
+        file: '0.jade'
         header: -> 'head\n'    #  'doctype html\n' has not yet suppored
-        format: (name, block) -> block + '\n'
+        f: (n, b) -> x.indent(b, 1) + '\n'
     less:
-        file: '7.less', indent: 0
-        format: (name, block) -> block + '\n'
+        file: '7.less'
+        f: (n, b) -> b + '\n'
     css:
-        file: '5.css',  indent: 0
-        header: -> (collectExt style_path, 'css') + '\n'
-        format: (name, block) -> block + '\n'
+        file: '5.css'
+        header: -> collectExt(style_path, 'css') + '\n'
+        f: (n, b) -> b + '\n'
     styl:
-        file: '4.styl', indent: 0
-        format: (name, block) -> block + '\n\n'
+        file: '4.styl'
+        f: (n, b) -> b + '\n\n'
     styl$:
-        file: '6.css',  indent: 0
-        format: (name, block) -> stylus(block).render() + '\n'
+        file: '6.css'
+        f: (n, b) -> stylus(b).render() + '\n'
 
 write_build = (file, data) ->
     f = add(site_client_path, file)
@@ -402,32 +390,49 @@ write_build = (file, data) ->
             fs.writeFile add(meteor_client_path, file), data, (e2) ->
                 console.log new Date(), f
 
-func2obj = (v) ->
-    @Settings = Settings
-    @Theme = Theme
-    if 'function' == typeof v then v.call @ 
-    else if x.isObject(v) then v else {}
+toObject = (v) ->
+    if !v? then {}
+    else if x.isFunction v then (if x.isScalar(r = v.call @) then r else toObject r)
+    else if x.isArray  v then v.reduce ((o, w) -> x.extend o, toObject w), {}
+    else if x.isObject v then x.keys(v).reduce ((o, k) -> 
+        o[k] = if x.isScalar(r = v[k]) then r else toObject r
+        o), {}
+    else if x.isString v then ((o = {})[v] = '') or o
+
+no_seperator = 'jade jade$'.split ' '
+
+toTidy = (v, n) -> 
+    if x.isString v[n] then v[n] 
+    else x.tideValue x.tideKey (toObject v[n]), v.block + '-' + v.name, (if n in no_seperator then '' else ' ')
+
+toString = (v, n) -> 
+    if x.isString v[n]
+        str = v[n]
+    else
+        v[n] = toObject v[n]
+        str = x.indentStyle toTidy v, n
+    if x.isEmpty data = toObject v.eco then str
+    else eco.render str, toObject data
 
 build = () ->
-    console.log new Date(), 'Start to build.'
+    console.log new Date()
     init_settings()
     mkdir site_client_path
-    Pages = [index_coffee]
-        .concat lib_files  .map (l) -> add lib_path, l + '.coffee'
-        .concat other_files.map (o) -> add site_path, o
-        .map (f) -> delete require.cache[f] ; require f
-        .reduce ((o,v) -> x.keys(v[k = x.keys(v)[0]]).map((l) -> o[l] = v[k][l]) ; o), {}
-    x.keys(Pages).map((n, i) -> Pages[n].absurd and api.add x.addpx func2obj Pages[n].absurd)
-        .concat([write_build 'absurd.css', api.compile()])
+    @Module = module_paths.reduce ((o, f) -> x.extend o, (v = delete require.cache[f] and require f)[k = x.keys(v)[0]]), {}
+    x.keys(@Module).map (name) -> 
+        @Module[name].name = name
+        @Module[name].block = @Module[name].block or 'x'
     x.keys(directives).map (d) -> 
-        it = directives[d]
-        write_build it.file, (x.func(it.header) || '') + ((x.keys(Pages).map (name) ->
-            if (block = func$str Pages[name][d], Pages[name].eco, Pages)
-                it.format.call @, name, indent block, it.indent 
-        ).filter (o) -> o?).join ''
+        write_build (it = directives[d]).file, (x.func(it.header) || '') + 
+            x.keys(@Module).map((n) -> (b = toString(@Module[n], d)) and it.f.call @, n, b).filter((o) -> o?).join ''
+    x.keys(@Module).map((n, i) -> @Module[n].absurd and api.add toTidy @Module[n], 'absurd')
+        .concat([write_build 'absurd.css', api.compile()])
         
     mkdir site_public_path
-    public_files.map (f) -> cp add(meteor_public_path, f), add site_public_path, f
+    fs.readdirSync(meteor_lib_path).map (f) -> 
+        cp add(meteor_lib_path,    f), add site_lib_path,    f
+    public_files.map (f) -> 
+        cp add(meteor_public_path, f), add site_public_path, f
 
 gitpass = ->
     prompt.message = 'github'
@@ -443,7 +448,6 @@ gitpass = ->
 task 'watch',     'Start the server',           -> daemon() ; start_up()
 task 'clean',     'Remove generated files',     -> coffee_clean()
 task 'setup',     'Config and prepare profile', -> profile()  ; logconf()
-task 'reset',     'Reset files',                -> clean_up() ; sync() ; touch() ; build()    
 task 'logconf',   'Create log config file',     -> logconf()
 task 'mongoconf', 'Create mongo config file',   -> mongoconf()
 task 'publish',   'Publish Meteor packages',    -> publish()

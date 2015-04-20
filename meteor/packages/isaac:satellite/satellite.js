@@ -40,44 +40,45 @@ db_client = function() {
 
 Meteor.startup(function() {
   x.keys(module.exports).map(function(file) {
-    var key, val, _ref;
+    var key, val, _ref, _results;
     _ref = module.exports[file];
+    _results = [];
     for (key in _ref) {
       val = _ref[key];
-      Pages[key] = val;
+      _results.push(Module[key] = val);
     }
-    return x.keys(module.exports[file]).filter(function(key) {
-      return key.slice(0, 2) === '__';
-    }).map(function(name) {
-      return delete Pages[name];
-    });
+    return _results;
+  });
+  x.keys(Module).filter(function(name) {
+    return name.slice(0, 2) === '__' && delete Module[name];
   });
   if (Meteor.isServer) {
     db_server();
-    return x.keys(Pages).map(function(name) {
+    return x.keys(Module).map(function(name) {
       var methods;
-      return (methods = Pages[name].methods) && Meteor.methods(methods);
+      return (methods = Module[name].methods) && Meteor.methods(methods);
     });
   } else if (Meteor.isClient) {
     db_client();
     Router.configure({
       layoutTemplate: 'layout'
     });
-    x.keys(Pages).map(function(name) {
+    x.keys(Module).map(function(name) {
       var _;
-      _ = Pages[name];
-      _.onStartup && Pages[name].onStartup.call(window);
+      console.log(name);
+      _ = Module[name];
+      _.onStartup && Module[name].onStartup.call(window);
       _.router && Router.map(function() {
-        return this.route(name, Pages[name].router);
+        return this.route(name, Module[name].router);
       });
-      _.events && Template[name].events(x.func(Pages[name].events));
-      _.helpers && Template[name].helpers(x.func(Pages[name].helpers));
+      _.events && Template[name].events(x.tideEventKey(x.func(Module[name].events), Module[name].block + '-' + name));
+      _.helpers && Template[name].helpers(x.func(Module[name].helpers));
       _.on$Ready && $(function($) {
-        return Pages[name].on$Ready.call(window);
+        return Module[name].on$Ready.call(window);
       });
       return ('onCreated onRendered onDestroyed'.split(' ')).forEach(function(d) {
         return _[d] && Template[name][d](function() {
-          return Pages[name][d].call(window);
+          return Module[name][d].call(window, name);
         });
       });
     });

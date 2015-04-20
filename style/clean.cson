@@ -2,6 +2,21 @@ fontStylesheet:  "https://fonts.googleapis.com/css?family=PT+Sans:400,700"
 fontFamily:            "'PT Sans', sans-serif"
 fontWeight:            200
 backgoundColor:        '#eee'
+layout:
+    MarginSides:
+    MarginTop:
+    sidebar:
+        width:
+        marginLeft:
+        marginRight:
+        marginTop
+        marginBottom
+    navbar:
+        height:     50
+        menuStart:
+        loginWidth:
+    dropdown:
+        width:
 navbar:
     style:              'fixed-top'
     height:             50
@@ -26,7 +41,7 @@ navbar:
         color:             'black'
         backgroundColor:   'rgba(255, 255, 255, 0.4)'
     focus:
-        color:              'black'
+        color:             'black'
         backgroundColor:   'rgba(255, 255, 255, 0.6)'
 sidebar:
     a:

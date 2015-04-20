@@ -4,11 +4,11 @@ module.exports.ui =
         jade: ' '
         head: ->
             title: @Settings.title
-            1: "link(rel='stylesheet' href='#{@Theme.fontStylesheet}')"
-            #2: "script(type='text/javascript' src='<%= @googlemap %>')"
-            3: "script(type='text/javascript' src='<%= @googlemap_input %>')"
-            4: "meta(name='viewport', content='initial-scale=1.0, user-scalable=no')"
-            5: "meta(charset='utf-8')"
+            '%a': "link(rel='stylesheet' href='#{@Theme.fontStylesheet}')"
+            #'%b': "script(type='text/javascript' src='<%= @googlemap %>')"
+            '%c': "script(type='text/javascript' src='<%= @googlemap_input %>')"
+            '%d': "meta(name='viewport', content='initial-scale=1.0, user-scalable=no')"
+            '%e': "meta(charset='utf-8')"
         eco: -> googlemap_input: -> x.urlWithQuery Settings.google.map_input
         styl: -> 
             html: height: '100%'

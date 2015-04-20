@@ -81,7 +81,7 @@ module.exports.accounts =
     login: 
         styl$: 
             '#login-buttons':float:'right',border:0
-            '#login-buttons + li .dropdown-menu':float:'right',right:0,left:'auto'
+            '#login-buttons + li .dropdown-menu':float:'right', right:0, left:'auto'
         jade: 'ul.nav.navbar-nav#login-buttons':'+Template.dynamic(template=template)':''
         events:
             'click input, click label, click button, click .dropdown-menu, click .alert': (event) -> event.stopPropagation()

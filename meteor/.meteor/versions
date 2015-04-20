@@ -32,9 +32,9 @@ isaac:intl-tel-input@0.1.3
 isaac:masonry@0.0.1
 isaac:moment@0.0.1
 isaac:route@0.1.2
-isaac:satellite@0.2.3
-isaac:settings@0.1.8
-isaac:x@0.3.3
+isaac:satellite@0.2.5
+isaac:settings@0.1.9
+isaac:x@0.3.4
 jquery@1.11.3_2
 json@1.0.3
 launch-screen@1.0.2

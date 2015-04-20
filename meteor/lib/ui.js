@@ -5,10 +5,10 @@ module.exports.ui = {
     head: function() {
       return {
         title: this.Settings.title,
-        1: "link(rel='stylesheet' href='" + this.Theme.fontStylesheet + "')",
-        3: "script(type='text/javascript' src='<%= @googlemap_input %>')",
-        4: "meta(name='viewport', content='initial-scale=1.0, user-scalable=no')",
-        5: "meta(charset='utf-8')"
+        '%a': "link(rel='stylesheet' href='" + this.Theme.fontStylesheet + "')",
+        '%c': "script(type='text/javascript' src='<%= @googlemap_input %>')",
+        '%d': "meta(name='viewport', content='initial-scale=1.0, user-scalable=no')",
+        '%e': "meta(charset='utf-8')"
       };
     },
     eco: function() {

@@ -4,37 +4,36 @@ global.x = {$:{}} if !x?         # for cake
 module.exports.x = x if !Meteor? # for cake
 
 x.extend = (object, properties) -> object[key] = val for key, val of properties; object
-# x.isLowerCase = (char, index) -> 'a' <= char[index] <= 'z' # ?
-x.isString = (str) -> str? and 'string' == typeof str and str.length > 0
+x.isFunction = (v) -> 'function' == typeof v
+x.isString = (v) -> 'string' == typeof v   # and v.length > 0
+x.isNumber = (v) -> 'number' == typeof v
+x.isDigit = (v) -> /^[0-9]+$/.test v
+x.isScalar = (v) -> x.isNumber(v) or x.isString(v)
 x.isVisible = (v) -> if 'function' == typeof v then v() else if false is v then false else true
-x.isPortableKey = (str) -> /^[a-z]+$/i.test str # . or #
-x.isDigit = (str) -> /^[0-9]+$/.test str
-x.value = (value) ->
-    if      'number'   == typeof value then value.toString() + 'px'
-    else if 'string'   == typeof value then value # (value = value.replace v,k for k,v of repcode()).pop()
-    else if 'function' == typeof value then value() else value
+x.isPortableKey = (v) -> /^[a-z]+$/i.test v  # . or '#'
 x.timeout = (time, func) -> Meteor.setTimeout func, time
 x.func = (func) -> 
     if 'function' == typeof func then func() 
     else if 'undefined' == func then {} else func
-# x.funcConcat = (func1, func2) -> -> func1() ; func2()
 x.keys = (obj) -> Object.keys obj
-x.isValue = (v) -> if 'string' == typeof v || 'number' == typeof v then v else false
+x.isValue  = (v) -> if 'string' == typeof v || 'number' == typeof v then v else false
 x.isArray  = (o) -> if '[object Array]'  == Object.prototype.toString.call(o) then true else false
 x.isObject = (o) -> if '[object Object]' == Object.prototype.toString.call(o) then true else false
 x.capitalize = (str) -> str[0].toUpperCase() + str[1..]
-
+x.toDash = (str) -> 
+    str = str.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase()
+    str.replace /\$([0-9])/g, ($1) -> '-' + $1
 x.toObject = (a) ->
-    if x.isObject a then a
-    else if undefined == a then {}
-    else if x.isArray(a) then a.reduce ((o, v) -> o[v[0]] = v[1]; o), {}
+    if    undefined == a then {}
+    else if x.isObject a then a
+    else if x.isString a then ((v = {})[a] = '') or v 
+    else if x.isArray  a then a.reduce ((o, v) -> o[v[0]] = v[1]; o), {}
     else {}
 x.toArray = (str) -> 
     if x.isArray str then str 
     else if undefined == str then []
     else if 'string' == typeof str then str.split ' ' 
     else str
-x.toDash = (str) -> if str? then str.replace /([A-Z])/g, ($1) -> '-' + $1.toLowerCase() else null
 x.interpolate = (str, o) -> str.replace /{([^{}]*)}/g, (a, b) -> x.isValue(o[b]) or a
 x.interpolateObj = (o, data) -> 
     x.keys(o).map (k) -> o[k] = x.interpolate o[k], data
@@ -42,27 +41,43 @@ x.interpolateObj = (o, data) ->
 x.interpolateOO = (options, data) ->
     x.isEmpty(data) or x.keys(options).map (m) -> options[m] = x.interpolateObj options[m], data
     options
-#x.call = (key, o) -> Meteor.call key, o, (e, r) -> 
-#    if e then Session.set(key + '_error', e) else Session.set key, r
-x.o = (obj, depth=1) -> 
-    ((Object.keys obj).map (key) ->
+
+x.addProperty = (obj, key, value) -> console.log obj, key. value; obj[key] = value; obj
+
+x.value = (value) ->
+    if      'number'   == typeof value then value.toString() + 'px'
+    else if 'string'   == typeof value then value # (value = value.replace v,k for k,v of repcode()).pop()
+    else if 'function' == typeof value then value() else value
+
+keyFix = (key) ->
+    key = x.toDash(key) if x.isPortableKey(key)       
+    switch 
+        when (i = key.indexOf '%') > 0 then key[..i - 1] 
+        when 0 == i then ''
+        else key
+
+x.indentStyle = (obj, depth=1) ->
+    return obj unless x.isObject obj 
+    x.keys(obj).map((key) ->
         value = obj[key]
-        key = x.toDash(key) if x.isPortableKey(key)
-        (Array(depth).join '    ') + 
-        if  'object' == typeof value then [key, x.o(value, depth + 1)].join '\n'
-        else if '' is value          then key
-        else if '' is key or x.isDigit(key) then x.value value
-        else key + ' ' + x.value value
+        key = keyFix key
+        (Array(depth).join '    ') + switch 
+            when x.isObject value then [key, x.indentStyle(value, depth + 1)].join '\n'
+            when '' is value      then key
+            when '' is key        then x.value value
+            else key + ' ' + x.value value
     ).join '\n'
 
 
 x.hash  = -> 
     ((Iron.Location.get().hash[1..].split '&').map (a) -> a.split '=').reduce ((p, c) ->  p[c[0]] = c[1]; p), {}
 
+indent_string = Array(4 + 1).join ' ' 
+x.indent = (b, i) -> if i then b.replace /^/gm, Array(i + 1).join indent_string else b
 x.repeat = (str, times) -> Array(times + 1).join str
 x.saveMustache = (str) -> x.decode( x.decode( str, '{', 2 ), '}', 2 )
 x.trim = (str) -> if str? then str.trim() else null
-x.capitalize = (string) -> string.charAt(0).toUpperCase() + string.slice(1)
+x.capitalize = (str) -> str.charAt(0).toUpperCase() + str.slice(1)
 x.dasherize = (str) -> str.trim().replace(/([A-Z])/g, "-$1").replace(/[-_\s]+/g, "-").toLowerCase()
 x.prettyJSON = (obj) -> JSON.stringify obj, null, 4
 x.getValue = (id) ->
@@ -169,11 +184,10 @@ x.contentEditable = (id, func) ->
                 $cloned.html $(@).html()
             console.log $cloned.css opacity: 1
             console.log $(@).css overflow:'visible', opacity: 0
-            Meteor.setTimeout =>
+            Meteor.setTimeout (=>
                 $(@).css overflow:'hidden', opacity: 1
                 $cloned.css opacity: 0
-            ,
-                200
+            ), 200
 
 x.scrollSpy = (obj) ->
     $$ = $ '.scrollspy'
@@ -240,9 +254,8 @@ x.list = (what) -> # add id
 
 x.sidebar = (list, id='sidebar_menu') ->
     list: list
-    jade: -> x.o 'each items': '+menu_list': ''
-    helpers: 
-        items: -> list.map (a) -> { page:a, id:id } # ̵̵̵correct - id must unique.
+    jade: 'each items': '+menu_list': ''
+    helpers: items: -> list.map (a) -> { name:a, id:id } # ̵̵̵correct - id must unique.
 
 x.assignPopover = (o,v) -> 
     o['focus input#'+v] = -> 
@@ -261,14 +274,55 @@ x.log = ->
 
 NotPxDefaultProperties = 'zIndex fontWeight'.split ' '
 
-x.addpx = (obj) ->
-    x.keys(obj).map((k) -> [k 
-        if x.isObject(ok = obj[k]) then x.addpx ok
-        else if 0 == ok then '0'
-        else if 'number' == typeof ok then String(ok) + 
-            (if k in NotPxDefaultProperties then '' else 'px')
-        else ok
-    ]).reduce ((o, v) -> o[v[0]] = v[1]; o), {}
+tideKey = (key, prefix, seperator) ->
+    (r = key.match /%\{\s*([a-z0-9]+)\s*\}/) and key = key.replace /%\{\s*[a-z0-9]+\s*\}/, prefix + '-' + r[1]
+    return key if (/[ #+.-]+/.test key) or
+                  (/^h[1-6]$/.test key) or 
+                  (key.indexOf('_') == -1) and (not /[0-9]+/.test key)
+    key.split('_').map((a) -> switch 
+        when '' == a then undefined 
+        when /[0-9]+/.test a then '#' + prefix + '-' + a
+        else '.' + a
+    ).filter((f) -> f).join seperator
+
+x.tideKey = (obj, prefix, seperator) ->
+    return obj unless x.isObject obj
+    x.keys(obj).reduce ((o, k) -> 
+        o[tideKey k, prefix, seperator] = switch
+            when x.isObject(ok = obj[k]) then x.tideKey ok, prefix, seperator
+            else ok
+        o), {}
+
+
+tideEventKey = (k, prefix) ->
+    while r = k.match /\s+%([a-z0-9]+)(,|\s+|$)/
+        k = k.replace(/%[a-z0-9]+(,|\s+|$)/, '#'+ prefix + '-' + r[1] + r[2])
+    k
+
+x.tideEventKey = (obj, prefix) ->
+    x.keys(obj).reduce ((o, k) -> x.addProperty o, tideEventKey(k, prefix), obj[k]), {}
+
+x.tideValue = (obj) ->
+    return obj unless x.isObject obj
+    x.keys(obj).reduce ((o, k) ->
+        o[k] = switch
+            when x.isObject(ok = obj[k]) then x.tideValue ok
+            when 0 == ok then '0'
+            when 'number' == typeof ok then String(ok) + 
+                (if k in NotPxDefaultProperties then '' else 'px')
+            else ok
+        o), {}
+
+class x.Module
+    constructor: (name) ->
+        @name = name
+    id: (str) ->
+        if str.indexOf(' ') > -1 then str.split(' ').map (s) => 
+            '#' + window.Module[@name].block + '-' + @name + '-' + s
+        else '#' + window.Module[@name].block + '-' + @name + '-' + str    
+    _instance: (i) -> @instance = i
+
+x.module = (name) -> (i = new x.Module(name))._instance i
 
 class x.Style
     constructor: (selector) ->
@@ -280,11 +334,11 @@ class x.Style
                     @rules = rules[j]
                     @style = rules[j].style
     set:    (property, value) -> @style.setProperty(property, value); @instance
-    get:    (property)        -> @style[property] ; @instance
+    get:    (property)        -> @style[property]
     remove: (property)        -> @style[property] and @style.removeProperty(property) ; @instance
-    _instance: (h)             -> @instance = h
+    _instance: (i)             -> @instance = i
 
-x.style = (name) -> (h = new x.Style(name))._instance h
+x.style = (name) -> (i = new x.Style(name))._instance i
 
 x.removeRule = (selector, property) -> 
     [0..(sheets = document.styleSheets).length - 1].forEach (i) -> 
